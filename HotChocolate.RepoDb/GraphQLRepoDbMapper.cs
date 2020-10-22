@@ -105,9 +105,8 @@ namespace HotChocolate.RepoDb
         public IRepoDbCursorPagingParams GetPagingParameters()
         {
             var graphQLPagingArgs = this.GraphQLParamsContext?.PagingArgs;
-            
-            if(graphQLPagingArgs == null || !graphQLPagingArgs.HasValue 
-               || (graphQLPagingArgs.Value.Before == null && graphQLPagingArgs.Value.After == null))
+
+            if (graphQLPagingArgs == null)
             {
                 //If no Paging args are availble and/or both Before & After cursor params are null
                 //  then we don't have a valid paging parameter so we return null.

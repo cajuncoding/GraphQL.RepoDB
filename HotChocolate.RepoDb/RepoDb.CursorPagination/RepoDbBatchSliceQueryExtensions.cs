@@ -16,8 +16,8 @@ namespace RepoDb.CursorPagination
     {
         public static async Task<CursorPageSlice<TEntity>> BatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
-            int afterCursor = 0, int firstTake = 0,
-            int beforeCursor = 0, int lastTake = 0,
+            int? afterCursor = null, int? firstTake = null,
+            int? beforeCursor = null, int? lastTake = null,
             IEnumerable<OrderField> orderBy = null,
             IEnumerable<QueryField> where = null,
             string hints = null,
@@ -29,9 +29,6 @@ namespace RepoDb.CursorPagination
         where TEntity : class
         where TDbConnection : DbConnection
         {
-            //Validate arguments...
-            AsserteCursorPagingArgsAreValid(firstTake, lastTake, orderBy);
-
             var tableName = ClassMappedNameCache.Get<TEntity>();
 
             //Ensure we have default fields; default is to include All Fields...
@@ -40,8 +37,8 @@ namespace RepoDb.CursorPagination
                 : FieldCache.Get<TEntity>();
 
             //Convert enumerable Where fields to QueryGroup...
-            var whereGroup = where != null 
-                ? new QueryGroup(where) 
+            var whereGroup = where != null
+                ? new QueryGroup(where)
                 : null;
 
             //TODO: Where Filters NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
@@ -61,9 +58,9 @@ namespace RepoDb.CursorPagination
                 //  being 'internal' scoped; that we will need to access....
                 //whereGroup: whereGroup,
                 hints: hints,
-                afterCursor: afterCursor,
-                firstTake: firstTake, 
-                beforeCursor: beforeCursor,
+                afterCursorIndex: afterCursor,
+                firstTake: firstTake,
+                beforeCursorIndex: beforeCursor,
                 lastTake: lastTake,
                 //Currently we MUST include the Total Count because it's required to tell if there is a previous/next page
                 includeTotalCountQuery: true
@@ -102,7 +99,7 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction">The instance of <see cref="IDbTransaction"/> object.</param>
         private static void DisposeConnectionForPerCallExtension<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
-            IDbConnection connection, 
+            IDbConnection connection,
             IDbTransaction transaction = null
         )
         where TEntity : class
@@ -148,7 +145,7 @@ namespace RepoDb.CursorPagination
             IDbTransaction transaction = null,
             string tableName = null,
             CancellationToken cancellationToken = default
-        ) where TEntity: class
+        ) where TEntity : class
         {
 
             //Get the Fields from Cache first (as this can't be done after Reader is opened...
@@ -156,7 +153,7 @@ namespace RepoDb.CursorPagination
             var dbSetting = dbConn.GetDbSetting();
             var dbFieldsForCache = await DbFieldCache.GetAsync(dbConn, tableNameForCache, transaction, false, cancellationToken);
 
-             //Ensure that the DB Connection is open (RepoDb provided extension)...
+            //Ensure that the DB Connection is open (RepoDb provided extension)...
             await dbConn.EnsureOpenAsync();
 
             //Re-use the RepoDb Execute Reader method to get benefits of Command & Param caches, etc.
@@ -201,7 +198,7 @@ namespace RepoDb.CursorPagination
 
                     //Now attempt to step to the Total Count query result...
                     //Note: We know to attempt getting the TotalCount if there is a second result set avaialble.
-                    if(await reader.NextResultAsync() && await reader.ReadAsync())
+                    if (await reader.NextResultAsync() && await reader.ReadAsync())
                     {
                         //This is a Scalar query so the first ordinal value is the Total Count!
                         totalCount = Convert.ToInt32(reader.GetValue(0));
@@ -214,30 +211,6 @@ namespace RepoDb.CursorPagination
                 return cursorPage;
             }
         }
-
-
-        public static void AsserteCursorPagingArgsAreValid(
-            int firstTake = 0,
-            int lastTake = 0,
-            IEnumerable<OrderField> orderBy = null
-        )
-        {
-            if (firstTake <= 0 && lastTake <= 0)
-                throw new ArgumentException(
-                    "At least one take size is required; either 'firstTake' or 'lastTake' size must be specified.",
-                    nameof(firstTake)
-                );
-
-            if (orderBy?.Count() <= 0)
-                throw new ArgumentException(
-                    "A valid Order By field must be specified to ensure consistent ordering of data.",
-                    nameof(orderBy)
-                );
-        }
-
- 
-
-
     }
 
 }

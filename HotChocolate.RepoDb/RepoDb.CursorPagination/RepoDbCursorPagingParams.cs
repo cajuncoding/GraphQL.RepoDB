@@ -22,7 +22,7 @@ namespace RepoDb.CursorPagination
             this.BeforeIndex = DeserializeCursor(before);
         }
 
-        public static string SerializeCursor(int? index)
+        public static string? SerializeCursor(int? index)
         {
             return index != null
                 ? IndexEdge<string>.Create(String.Empty, (int)index)?.Cursor
@@ -33,7 +33,7 @@ namespace RepoDb.CursorPagination
         {
             return cursor != null
                 ? IndexEdge<string>.DeserializeCursor(cursor)
-                : default;
+                : (int?)null;
         }
 
         public int? First { get; }

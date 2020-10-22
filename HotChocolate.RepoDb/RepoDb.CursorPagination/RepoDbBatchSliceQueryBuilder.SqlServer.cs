@@ -1,5 +1,7 @@
-﻿using RepoDb;
+﻿using HotChocolate.PreProcessedExtensions.Pagination;
+using RepoDb;
 using RepoDb.CustomExtensions;
+using RepoDb.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,39 +31,19 @@ namespace RepoDb.CursorPagination
             IEnumerable<OrderField> orderBy,
             QueryGroup whereGroup = null,
             string hints = null,
-            int afterCursor = 0,
-            int firstTake = 0,
-            int beforeCursor = 0,
-            int lastTake = 0,
+            int? afterCursorIndex = null,
+            int? firstTake = null,
+            int? beforeCursorIndex = null,
+            int? lastTake = null,
             bool includeTotalCountQuery = true
         )
             where TEntity : class
         {
-            int page = 1, rowsPerBatch = 0;
-
-            //TODO Improve this Algorithm to support BOTH, but for now we support only First+After, or Last+Before!
-            if (firstTake > 0)
-            {
-                //Rows per batch is the same as the Take specified!
-                rowsPerBatch = firstTake;
-                //Derive a Page from the Cursors existing Position using zero based Page value and zero based starting
-                //  cursor value (the first item is #1 after the cursor starting postion of 0) - no shift is needed.
-                page = (afterCursor / firstTake);
-            }
-            else //LastTake must be > 0 asl already validated above...
-            {
-                //Rows per batch is the same as the Take specified!
-                rowsPerBatch = lastTake;
-                //Derive a Page from the Cursors existing Position using zero based Page value (the first item #1
-                // is the one before the specified cursor) so we need to truncate the division result and then subtract 1.
-                page = ((int)beforeCursor / lastTake) - 1;
-            }
+            var dbSetting = RepoDbSettings.SqlServerSettings;
+            string cursorIndexName = nameof(IHaveCursor.CursorIndex);
 
             // Initialize the builder
             var builder = new QueryBuilder();
-
-            var dbSetting = RepoDbSettings.SqlServerSettings;
-            string cursorIndexName = nameof(IHaveCursor.CursorIndex);
 
             //Ensure that we Remove any risk of Name conflicts with the CursorIndex field on the CTE
             //  because we are dynamically adding ROW_NUMBER() as [CursorInex]!
@@ -82,15 +64,15 @@ namespace RepoDb.CursorPagination
                         .FieldsFrom(cteFields, dbSetting)
                     .From().TableNameFrom(tableName, dbSetting)
                     .HintsFrom(hints)
-                    //TODO: NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
-                    //  being 'internal' scoped; that we will need to access....
-                    //.WhereFrom(whereGroup, dbSetting)
+                //TODO: NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
+                //  being 'internal' scoped; that we will need to access....
+                //.WhereFrom(whereGroup, dbSetting)
                 .CloseParen()
                 .Select()
                     .FieldsFrom(selectFields, dbSetting)
                 .From().WriteText("CTE")
-                //TODO:  Update to Support First+After & Last+Before at the same time...
-                .WriteText(string.Concat($"WHERE ([{cursorIndexName}] BETWEEN ", (page * rowsPerBatch) + 1, " AND ", (page + 1) * rowsPerBatch, ")"))
+                //Implement Relay Spec Cursor Slicing Algorithm!
+                .WriteText(BuildRelaySpecWhereCondition(cursorIndexName, afterCursorIndex, beforeCursorIndex, firstTake, lastTake))
                 .OrderByFrom(orderBy, dbSetting)
                 .End();
 
@@ -117,5 +99,137 @@ namespace RepoDb.CursorPagination
             return builder.GetString();
         }
 
+        public static void AsserteCursorPagingArgsAreValid(
+            int? after, int? before, int? first, int? last,
+            IEnumerable<OrderField> orderBy = null
+        )
+        {
+            //If both cursors are specified we can provide some validation rather than resulting in an 
+            //  unexpected set of results (e.g. none).
+            if (after.HasValue && before.HasValue && after > before)
+            {
+                throw new ArgumentException($"The cursor values are invalid; the '{CursorPagingArgNames.AfterDescription}' cursor " +
+                    $"must occur before the '{CursorPagingArgNames.BeforeDescription}' cursor argument.");
+            }
+
+            //Implement Exception as defined by Relay Spec.
+            if (first.HasValue && first < 0)
+            {
+                throw new ArgumentException(
+                    $"The value for '{CursorPagingArgNames.FirstDescription}' must be greater than zero.",
+                    CursorPagingArgNames.FirstDescription
+                );
+            }
+
+            //Implement Exception as defined by Relay Spec.
+            if (last.HasValue && last < 0)
+            {
+                throw new ArgumentException(
+                    $"The value for '{CursorPagingArgNames.LastDescription}' must be greater than zero.",
+                    CursorPagingArgNames.LastDescription
+                );
+            }
+
+            if (orderBy?.Count() <= 0)
+                throw new ArgumentException(
+                    "A valid Order By field must be specified to ensure consistent ordering of data.",
+                    nameof(orderBy)
+                );
+        }
+
+        private static string BuildRelaySpecWhereCondition(string cursorFieldName, int? afterCursorIndex, int? beforeCursorIndex, int? firstTake, int? lastTake)
+        {
+            //Implement Cursor pagination algorithm in alightment with industry accepted Relay Spec. for GraphQL
+            //For more info. see: https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+            AsserteCursorPagingArgsAreValid(
+                after: afterCursorIndex,
+                before: beforeCursorIndex,
+                first: firstTake,
+                last: lastTake
+            );
+
+            string where = string.Empty;
+            int? startIndex = null;
+            int? endIndex = null;
+            int count = 0;
+
+            //FIRST we process after/before args...
+            if (afterCursorIndex.HasValue && beforeCursorIndex.HasValue)// Both 'after' & 'before' args
+            {
+                //Both Before & After are specified; This scenario is discouraged by the Spec but not prohibited!
+                startIndex = ((int)afterCursorIndex + 1);
+                endIndex = ((int)beforeCursorIndex - 1);
+                count = ((int)endIndex - (int)startIndex) + 1;
+            }
+            else if (afterCursorIndex.HasValue) //Only 'after' arg
+            {
+                startIndex = ((int)afterCursorIndex + 1);
+                count = int.MaxValue;
+            }
+            else if (beforeCursorIndex.HasValue) //Only 'before' arg
+            {
+                // When taking from the End we know that the start is 1 (vice versa is not true)
+                startIndex = 1;
+                endIndex = ((int)beforeCursorIndex - 1);
+                count = (int)endIndex;
+            }
+            else //NEITHER After or Before where Specified...
+            {
+                //Even now start from 1; with undefined End...
+                startIndex = 1;
+                count = int.MaxValue;
+            }
+
+            //SECOND we process first/last args which may apply combinatorially...
+            //  For example this may be the first time endIndex is intialized, based on FIRST process above.
+            if (firstTake.HasValue && count > firstTake && startIndex.HasValue)
+            {
+                endIndex = (startIndex + (int)firstTake) - 1;
+                count = (int)firstTake;
+            }
+
+            //Last can be combined in addition to First above (not exclusive)
+            if (lastTake.HasValue && count > lastTake)
+            {
+                if (endIndex.HasValue)
+                {
+                    startIndex = ((int)endIndex - (int)lastTake) + 1;
+                    //count = (int)lastTake;
+                }
+                else
+                {
+                    //This is the Case where We are requested to select from the End of all results
+                    //  dynamically because no Before Cursor (ending cursor) was provided...
+                    //Therefore this requires a special Query condition to Dynamically compute 
+                    //  the currently uknown StartIndex...
+                    startIndex = null;
+                    endIndex = null;
+                }
+            }
+
+            //Finally we can conver the Mapped Start & End indexes to valid Where Clause...
+            if (startIndex.HasValue && endIndex.HasValue)
+            {
+                where = $"WHERE ([{cursorFieldName}] BETWEEN {startIndex} AND {endIndex})";
+            }
+            else if (startIndex.HasValue)
+            {
+                where = $"WHERE ([{cursorFieldName}] >= {startIndex})";
+            }
+            else if (endIndex.HasValue)
+            {
+                where = $"WHERE ([{cursorFieldName}] <= {endIndex})";
+            }
+            //Handle Unique Case of ONLY 'Last' was provided without any 'Before' cursor!
+            else if (lastTake.HasValue)
+            {
+                //Computing from the End is the most complex so some performance hit is likely acceptable 
+                //  since it's a less used use-case.
+                //NOTE: This must use the Dynamic Count() to determine the End of the existing result set...
+                where = $"WHERE ([{cursorFieldName}] > (SELECT (COUNT([{cursorFieldName}]) - {(int)lastTake}) FROM CTE))";
+            }
+
+            return where;
+        }
     }
 }
