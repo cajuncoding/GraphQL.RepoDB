@@ -18,7 +18,8 @@ namespace HotChocolate.PreProcessedExtensions.Sorting
     {
         public PreProcessedSortedResults(IEnumerable<TEntity> results)
         {
-            this.AddRange(results);
+            if(results != null)
+                this.AddRange(results);
         }
 
     }

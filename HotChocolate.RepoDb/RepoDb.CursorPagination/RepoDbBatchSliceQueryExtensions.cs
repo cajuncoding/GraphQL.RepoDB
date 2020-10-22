@@ -1,6 +1,7 @@
 ﻿using HotChocolate.PreProcessedExtensions.Pagination;
 using RepoDb;
 using RepoDb.CustomExtensions;
+using RepoDb.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -68,16 +69,52 @@ namespace RepoDb.CursorPagination
                 includeTotalCountQuery: true
             );
 
-            //var results = await baseRepo.BatchQueryAsync(page, rowsPerBatch, orderBy, fields, hints, transaction, cancellationToken);
-            using (var sqlConn = (DbConnection)transaction?.Connection ?? baseRepo.CreateConnection())
+            //Below Logic mirrors that of RepoDb Source for managing the Connection (PerInstance or PerCall)!
+            var connection = (DbConnection)(transaction?.Connection ?? baseRepo.CreateConnection());
+
+            try
             {
-                var cursorPageResult = await sqlConn.ExecuteBatchSliceQueryAsync<TEntity>(
+                //var results = await baseRepo.BatchQueryAsync(page, rowsPerBatch, orderBy, fields, hints, transaction, cancellationToken);
+                var cursorPageResult = await connection.ExecuteBatchSliceQueryAsync<TEntity>(
                     commandText: query,
                     cancellationToken: cancellationToken
                 );
                 return cursorPageResult;
             }
+            catch
+            {
+                // Throw back the error
+                throw;
+            }
+            finally
+            {
+                // Dispose the connection
+                baseRepo.DisposeConnectionForPerCallExtension(connection, transaction);
+            }
+        }
 
+        /// <summary>
+        /// CLONED from RepoDb source code that is marked as 'internal' but needed to handle in a consistent way!
+        /// Disposes an <see cref="IDbConnection"/> object if there is no <see cref="IDbTransaction"/> object connected
+        /// and if the current <see cref="ConnectionPersistency"/> value is <see cref="ConnectionPersistency.PerCall"/>.
+        /// </summary>
+        /// <param name="connection">The instance of <see cref="IDbConnection"/> object.</param>
+        /// <param name="transaction">The instance of <see cref="IDbTransaction"/> object.</param>
+        private static void DisposeConnectionForPerCallExtension<TEntity, TDbConnection>(
+            this BaseRepository<TEntity, TDbConnection> baseRepo,
+            IDbConnection connection, 
+            IDbTransaction transaction = null
+        )
+        where TEntity : class
+        where TDbConnection : DbConnection
+        {
+            if (baseRepo.ConnectionPersistency == ConnectionPersistency.PerCall)
+            {
+                if (transaction == null)
+                {
+                    connection.Dispose();
+                }
+            }
         }
 
         /// <summary>
@@ -122,30 +159,42 @@ namespace RepoDb.CursorPagination
              //Ensure that the DB Connection is open (RepoDb provided extension)...
             await dbConn.EnsureOpenAsync();
 
-            using (var dbCommand = (DbCommand)dbConn.CreateCommand(commandText, CommandType.Text, commandTimeout, transaction))
-            using (var reader = await dbCommand.ExecuteReaderAsync())
+            //Re-use the RepoDb Execute Reader method to get benefits of Command & Param caches, etc.
+            using (var reader = (DbDataReader)await dbConn.ExecuteReaderAsync(
+                commandText: commandText,
+                param: queryParams,
+                commandType: CommandType.Text,
+                transaction: transaction,
+                commandTimeout: commandTimeout,
+                cancellationToken: cancellationToken
+                ))
             {
                 //BBernard
-                //NOTE: This Code Taken from RepoDb Source (DataReader.ToEnumerableAsync<TEntity>(...) core code
-                //  so that we clone minimal amount of logic outside of RepoDb due to 'internal' scope.
+                //We NEED to manually process the Reader externally here!
+                //Therefore, this had to be Code borrowed from RepoDb Source (DataReader.ToEnumerableAsync<TEntity>(...) 
+                // core code so that we clone minimal amount of logic outside of RepoDb due to 'internal' scope.
                 var results = new List<CursorResult<TEntity>>();
                 int totalCount = 0;
                 if (reader != null && !reader.IsClosed && reader.HasRows)
                 {
-                    var functionCacheProxy = new RepoDbFunctionCacheProxy<TEntity>();
-                    var entityMappingFunc = functionCacheProxy.GetDataReaderToDataEntityFunctionCompatible(reader, dbConn, transaction, true, dbFieldsForCache, dbSetting);
                     string cursorIndexName = nameof(IHaveCursor.CursorIndex);
 
-                    while (await reader.ReadAsync())
+                    //Initialie the RepoDb compiled entity mapping function (via Brute Force Proxy class; it's marked 'internal'.
+                    var functionCacheProxy = new RepoDbFunctionCacheProxy<TEntity>();
+                    var repoDbMappingFunc = functionCacheProxy.GetDataReaderToDataEntityFunctionCompatible(
+                        reader, dbConn, transaction, true, dbFieldsForCache, dbSetting
+                    ) ?? throw new Exception($"Unable to retrieve the RepoDb entity mapping function for [{typeof(TEntity).Name}].");
+
+                    while (await reader.ReadAsync(cancellationToken))
                     {
                         //Dynamically read the Entity from the Results...
-                        TEntity entity = entityMappingFunc(reader);
+                        TEntity entity = repoDbMappingFunc(reader);
 
                         //Manually Process the Cursor for each record...
-                        //NOTE: we want to extract the values of the CursorIndex field and return in a Decorator class so so that 
-                        //  there is NO REQUIREMENT that the original business Model (TEntity) have any special fields/interfaces added.
                         var cursorIndex = Convert.ToInt32(reader.GetValue(cursorIndexName));
 
+                        //This allows us to extract the CursorIndex field and return in a Decorator class 
+                        //  so there's NO REQUIREMENT that the Model (TEntity) have any special fields/interfaces added.
                         var cursorResult = new CursorResult<TEntity>(entity, cursorIndex);
                         results.Add(cursorResult);
                     }

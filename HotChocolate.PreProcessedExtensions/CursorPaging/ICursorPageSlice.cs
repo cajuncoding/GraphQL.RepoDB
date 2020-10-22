@@ -9,7 +9,7 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
     /// This class represents a set of results/nodes of an edge/slice/page.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public interface ICursorPageSlice<TEntity> : IHavePagingInfo where TEntity : class
+    public interface ICursorPageSlice<TEntity> : IHavePreProcessedPagingInfo where TEntity : class
     {
         /// <summary>
         /// The set of all CursorResults decorator classes for TEntity model with Cursor Index values.

@@ -42,15 +42,23 @@ namespace StarWars.Characters
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
+            //********************************************************************************
+            //Get the data and convert to List() to ensure it's an Enumerable
+            //  and no longer using IQueryable to successfully simulate 
+            //  pre-processed results.
             var characters = repository.GetCharacters().ToList();
             
-            //Perform some pre-processed Sorting!
+            //Perform some pre-processed Sorting & Then Paging!
+            //This could be done in a lower repository or pushed to the Database!
             var sortedCharacters = characters.SortDynamically(graphQLParams.SortArgs);
-            var slicedCharacters = sortedCharacters.PaginateAsCursorSlice(graphQLParams.PagingArgs);
+            var slicedCharacters = sortedCharacters.SliceAsCursorPage(graphQLParams.PagingArgs);
 
             //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
             //  it will not have additional post-processing in the HotChocolate pipeline!
+            //NOTE: Filtering will be applied but ONLY to the results we are now returning;
+            //       Because this would normally be pushed down to the Sql Database layer.
             return new PreProcessedCursorSliceResults<ICharacter>(slicedCharacters);
+            //********************************************************************************
         }
 
         /// <summary>
@@ -69,83 +77,5 @@ namespace StarWars.Characters
             [Service] ICharacterRepository repository) =>
             repository.Search(text);
 
-    }
-
-    public static class CustomExtensionsFor
-    {
-        public static IOrderedEnumerable<T> SortDynamically<T>(this IEnumerable<T> items, IReadOnlyList<ISortOrderField> sortArgs)
-        {
-            //Map the Sort by property string names to actual Property Descriptors
-            //for dynamic processign...
-            var propCollection = TypeDescriptor.GetProperties(typeof(T));
-            var sortGetters = sortArgs?.Select(s => new {
-                SortArg = s,
-                Getter = propCollection.Find(s.FieldName, true)
-            });
-
-            IOrderedEnumerable<T> orderedItems = null;
-            foreach (var sort in sortGetters)
-            {
-                if (orderedItems == null)
-                {
-                    orderedItems = sort.SortArg.IsAscending()
-                        ? items.OrderBy(c => sort.Getter.GetValue(c))
-                        : items.OrderByDescending(c => sort.Getter.GetValue(c));
-                }
-                else
-                {
-                    orderedItems = sort.SortArg.IsAscending()
-                        ? orderedItems.ThenBy(c => sort.Getter.GetValue(c))
-                        : orderedItems.ThenByDescending(c => sort.Getter.GetValue(c));
-                }
-            }
-
-            return orderedItems;
-        }
-
-        public static ICursorPageSlice<T> PaginateAsCursorSlice<T>(this IEnumerable<T> items, CursorPagingArguments pagingArgs)
-            where T: class
-        {
-            
-            var after = pagingArgs.After != null
-                ? IndexEdge<string>.DeserializeCursor(pagingArgs.After)
-                : 0;
-
-            var before = pagingArgs.Before != null
-                ? IndexEdge<string>.DeserializeCursor(pagingArgs.Before)
-                : 0;
-
-            //FIRST log the index of all items in the list BEFORE slicing, 
-            // as these indexes are the Cursor Indexes for paging up/down the entire list...
-            //ICursorResult is the Decorator around the Entity Models.
-            int index = 0;
-            IEnumerable<ICursorResult<T>> slice = items.Select(c => new CursorResult<T>(c, ++index)).ToList();
-            int totalCount = slice.Count();
-
-            //Now we can extract the Slice requested.
-            if (after > 0 && slice.Count() > after)
-            {
-                slice = slice.Skip(after);
-            }
-
-            if(pagingArgs.First > 0 && slice.Count() > pagingArgs.First)
-            {
-                slice = slice.Take(pagingArgs.First.Value);
-            }
-
-            if (before > 0 && slice.Count() > before)
-            {
-                slice = slice.SkipLast(before);
-            }
-
-            if (pagingArgs.Last > 0 && slice.Count() > pagingArgs.Last)
-            {
-                slice = slice.TakeLast(pagingArgs.Last.Value);
-            }
-
-            //Wrap all results into a PagedCursor Slice result wit Total Count...
-            var cursorPageSlice = new CursorPageSlice<T>(slice, totalCount);
-            return cursorPageSlice;
-        }
     }
 }

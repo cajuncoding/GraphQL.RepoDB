@@ -43,7 +43,7 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
                 throw new ArgumentNullException(nameof(source));
             }
 
-            bool isPreProcessedResult = typeof(IAmPreProcessedResult).IsAssignableFrom(source.Type);
+            bool isPreProcessedResult = source.Type.IsDerivedFromGenericParent(typeof(IPreProcessedCursorSliceResults<>));
             return source.IsArrayOrList && isPreProcessedResult;
         }
 

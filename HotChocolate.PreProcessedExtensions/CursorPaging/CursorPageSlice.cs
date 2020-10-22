@@ -8,11 +8,11 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
     {
         public CursorPageSlice(IEnumerable<ICursorResult<TEntity>> results, int totalCount)
         {
-            this.CursorResults = results ?? throw new ArgumentNullException(nameof(results));
+            this.CursorResults = results;
             this.TotalCount = totalCount;
 
-            var firstCursor = results.FirstOrDefault();
-            var lastCursor = results.LastOrDefault();
+            var firstCursor = results?.FirstOrDefault();
+            var lastCursor = results?.LastOrDefault();
 
             //Now we can deduce if there are results before or after this slice based on the total count
             //  and the ordinal index of the first and last cursors.
@@ -22,7 +22,7 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
 
         public IEnumerable<ICursorResult<TEntity>> CursorResults { get; protected set; }
 
-        public IEnumerable<TEntity> Results => CursorResults.Select(cr => cr?.Entity);
+        public IEnumerable<TEntity> Results => CursorResults?.Select(cr => cr?.Entity);
 
         public int? TotalCount { get; protected set; }
 

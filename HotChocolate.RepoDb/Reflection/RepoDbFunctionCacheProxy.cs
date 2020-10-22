@@ -96,7 +96,8 @@ namespace RepoDb.CustomExtensions
         }
 
         /// <summary>
-        /// This method is for the Latest version (master branch) of RepoDb
+        /// Retireve the compiled entity mapping function from RepoDb internal FunctionCache, in a compatible
+        /// way for version 1.12.4 or the master branch as of 10/21/2020 - yet to be released version.
         /// </summary>
         /// <param name="reader"></param>
         /// <param name="connection"></param>

@@ -38,17 +38,19 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
             {
                 int? totalCount = pagedResults.TotalCount;
 
-                IReadOnlyList<IndexEdge<TEntity>> selectedEdges = pagedResults.ToEdgeResults().ToList();
+                //Ensure we are null safe and return a valid empty list by default.
+                IReadOnlyList<IndexEdge<TEntity>> selectedEdges = 
+                    pagedResults?.ToEdgeResults().ToList() ?? new List<IndexEdge<TEntity>>(); ;
 
                 IndexEdge<TEntity>? firstEdge = selectedEdges.FirstOrDefault();
                 IndexEdge<TEntity>? lastEdge = selectedEdges.LastOrDefault();
 
                 var connectionPageInfo = new ConnectionPageInfo(
-                    hasNextPage: pagedResults.HasNextPage,
-                    hasPreviousPage: pagedResults.HasPreviousPage,
+                    hasNextPage: pagedResults?.HasNextPage ?? false,
+                    hasPreviousPage: pagedResults?.HasPreviousPage ?? false,
                     startCursor: firstEdge?.Cursor,
                     endCursor: lastEdge?.Cursor,
-                    totalCount: totalCount
+                    totalCount: totalCount ?? 0
                 );
 
                 var graphQLConnection = new Connection<TEntity>(
