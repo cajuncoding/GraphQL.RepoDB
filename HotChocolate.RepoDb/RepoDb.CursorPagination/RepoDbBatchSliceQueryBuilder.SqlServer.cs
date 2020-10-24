@@ -4,6 +4,7 @@ using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace RepoDb.CursorPagination
@@ -137,6 +138,7 @@ namespace RepoDb.CursorPagination
                 );
         }
 
+        [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         private static string BuildRelaySpecWhereCondition(string cursorFieldName, int? afterCursorIndex, int? beforeCursorIndex, int? firstTake, int? lastTake)
         {
             //Implement Cursor pagination algorithm in alightment with industry accepted Relay Spec. for GraphQL

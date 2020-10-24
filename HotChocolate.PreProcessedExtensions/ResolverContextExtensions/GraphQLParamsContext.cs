@@ -13,7 +13,7 @@ namespace HotChocolate.PreProcessedExtensions
         protected IResolverContext _resolverContext;
         protected CursorPagingArguments? _pagingArgs;
         protected IReadOnlyList<ISortOrderField> _sortArgs;
-        protected IReadOnlyList<IFieldSelection> _selectionFields;
+        protected IReadOnlyList<IPreProcessingSelection> _selectionFields;
         protected IReadOnlyList<string> _selectionNames;
 
         public GraphQLParamsContext(IResolverContext resolverContext)
@@ -22,8 +22,8 @@ namespace HotChocolate.PreProcessedExtensions
         }
 
         public virtual IResolverContext ResolverContext => _resolverContext;
-        public virtual IReadOnlyList<IFieldSelection> SelectionFields => _selectionFields ??= _resolverContext.GetSelectionsSafely();
-        public virtual IReadOnlyList<string> SelectionNames => _selectionNames ??= _resolverContext.GetSelectionNamesSafely();
+        public virtual IReadOnlyList<IPreProcessingSelection> SelectionFields => _selectionFields ??= _resolverContext.GetPreProcessingSelections();
+        public virtual IReadOnlyList<string> SelectionNames => _selectionNames ??= _resolverContext.GetPreProcessingSelectionNames();
         public virtual IReadOnlyList<ISortOrderField> SortArgs => _sortArgs ??= _resolverContext.GetSortingArgsSafely();
         //TODO: TEST lazy loading for Struct Type CursorPagingArguments...
         public virtual CursorPagingArguments PagingArgs => _pagingArgs ??= _resolverContext.GetCursorPagingArgsSafely();

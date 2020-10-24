@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -153,6 +154,7 @@ namespace RepoDb.CursorPagination
             }
         }
 
+
         /// <summary>
         /// Internal query execution method for Slice Queries based on TEntity model. We attempt to use as much as possible
         ///     from RepoDb, with the caveat that some resources/utitlies are internal and requrie brute force via relfection
@@ -176,6 +178,7 @@ namespace RepoDb.CursorPagination
         /// <param name="tableName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
         private static async Task<CursorPageSlice<TEntity>> ExecuteBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConn,
             string commandText,

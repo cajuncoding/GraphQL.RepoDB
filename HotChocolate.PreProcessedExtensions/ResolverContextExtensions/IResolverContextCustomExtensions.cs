@@ -1,12 +1,8 @@
-﻿# nullable enable
+﻿#nullable enable
 
-using HotChocolate.Data.Sorting;
-using HotChocolate.Data.Sorting.Expressions;
 using HotChocolate.Execution.Processing;
-using HotChocolate.Language;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,30 +50,25 @@ namespace HotChocolate.PreProcessedExtensions
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static IReadOnlyList<IFieldSelection> GetSelectionsSafely(this IResolverContext context)
+        public static IReadOnlyList<PreProcessingSelection> GetPreProcessingSelections(this IResolverContext context)
         {
-            if (context == null) 
+            if (context == null)
                 return null!;
 
-            List<IFieldSelection> selectionResults = new List<IFieldSelection>();
+            var selectionResults = new List<PreProcessingSelection>();
 
-            var hotChocolateNamedType = context?.Field.Type.NamedType();
+            //var hotChocolateNamedType = context?.Field.Type.NamedType();
             //ObjectType? currentObjectType = null;
 
-            //TryGetObjecType()...
-            //if (hotChocolateNamedType is InterfaceType interfaceType)
-            //    currentObjectType = interfaceType.ResolveConcreteType(context, "allCharacters");
-            //else if (hotChocolateNamedType is ObjectType objectType)
-            //    currentObjectType = objectType;
-
-            if (hotChocolateNamedType is ObjectType currentObjectType)
+            //if (hotChocolateNamedType is ObjectType currentObjectType)
+            //{
+            var selections = GatherChildSelections(context!);
+            if (selections.Any())
             {
-                var selections = context!.GetSelections(currentObjectType);
-
                 //BBernard
                 //Determine if the Selection is for a Connection, and dive deeper to get the real
                 //  selections from the node {} field.
-                var lookup = selections.ToLookup(s => s.Field.Name.ToString());
+                var lookup = selections.ToLookup(s => s.SelectionName.ToString().ToLower());
 
                 //Handle paging cases; current Node is a Connection so we have to look for selections inside
                 //  ->edges->nodes, or inside the ->nodes (shortcut per Relay spec); both of which may exist(?)
@@ -87,14 +78,14 @@ namespace HotChocolate.PreProcessedExtensions
                     //          we gather from all if they are defined...
                     if (lookup.Contains(SelectionNodeName.Nodes))
                     {
-                        var nodesSelectionField = lookup[SelectionNodeName.Nodes].FirstOrDefault() as Selection;
+                        var nodesSelectionField = lookup[SelectionNodeName.Nodes].FirstOrDefault();
                         var childSelections = GatherChildSelections(context, nodesSelectionField);
                         selectionResults.AddRange(childSelections);
                     }
 
                     if (lookup.Contains(SelectionNodeName.Edges))
                     {
-                        var edgesSelectionField = lookup[SelectionNodeName.Edges].FirstOrDefault() as Selection;
+                        var edgesSelectionField = lookup[SelectionNodeName.Edges].FirstOrDefault();
                         var nodeSelectionField = FindChildSelectionByName(context, SelectionNodeName.EdgeNode, edgesSelectionField);
                         var childSelections = GatherChildSelections(context, nodeSelectionField);
                         selectionResults.AddRange(childSelections);
@@ -107,7 +98,7 @@ namespace HotChocolate.PreProcessedExtensions
                 }
             }
 
-            return selectionResults as IReadOnlyList<IFieldSelection>;
+            return selectionResults;
         }
 
         /// <summary>
@@ -116,9 +107,12 @@ namespace HotChocolate.PreProcessedExtensions
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static List<string> GetSelectionNamesSafely(this IResolverContext context)
+        public static List<string> GetPreProcessingSelectionNames(this IResolverContext context)
         {
-            return context.GetSelectionsSafely()?.Select(f => f.Field.Name.ToString()).ToList();
+            return context?
+                .GetPreProcessingSelections()?
+                .Select(s => s.Name.ToString())
+                .ToList()!;
         }
 
         /// <summary>
@@ -127,21 +121,21 @@ namespace HotChocolate.PreProcessedExtensions
         /// https://github.com/ChilliCream/hotchocolate/blob/a1f2438b74b19e965b560ca464a9a4a896dab79a/src/Core/Core.Tests/Execution/ResolverContextTests.cs#L83-L89
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="selection"></param>
+        /// <param name="baseSelection"></param>
         /// <param name="selectionFieldName"></param>
         /// <returns></returns>
-        private static ISelection FindChildSelectionByName(IResolverContext context, string selectionFieldName, ISelection? selection)
+        private static PreProcessingSelection FindChildSelectionByName(IResolverContext context, string selectionFieldName, PreProcessingSelection? baseSelection)
         {
-            var field = selection?.Field ?? context.Field;
-            if (field.Type.NamedType() is ObjectType objectType)
-            {
-                var childSelections = context.GetSelections(objectType, selection?.SelectionSet);
-                return childSelections.FirstOrDefault(
-                    s => s.Field.Name.ToString().Equals(selectionFieldName, StringComparison.OrdinalIgnoreCase)
-                ) as ISelection;
-            }
+            if (context == null)
+                return null!;
 
-            return null;
+            var childSelections = GatherChildSelections(context!, baseSelection);
+
+            var resultSelection = childSelections?.FirstOrDefault(
+                s => s.SelectionName.ToString().Equals(selectionFieldName, StringComparison.OrdinalIgnoreCase)
+            )!;
+
+            return resultSelection!;
         }
 
         /// <summary>
@@ -150,51 +144,81 @@ namespace HotChocolate.PreProcessedExtensions
         /// https://github.com/ChilliCream/hotchocolate/blob/a1f2438b74b19e965b560ca464a9a4a896dab79a/src/Core/Core.Tests/Execution/ResolverContextTests.cs#L83-L89
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="selection"></param>
+        /// <param name="baseSelection"></param>
         /// <returns></returns>
-        private static List<ISelection> GatherChildSelections(IResolverContext context, ISelection? selection = null)
+        private static List<PreProcessingSelection> GatherChildSelections(IResolverContext context, PreProcessingSelection? baseSelection = null)
         {
-            List<ISelection> gathered = new List<ISelection>();
-            var field = selection?.Field ?? context.Field;
-            if (field.Type.NamedType() is ObjectType objectType)
+            if (context == null)
+                return null!;
+
+            var gathered = new List<PreProcessingSelection>();
+
+            //Initialize the optional base field selection if specified...
+            var baseFieldSelection = baseSelection?.FieldSelection;
+
+            //Dynamically support re-basing to the specified baseSelection or fallback to current Context.Field
+            var field = baseFieldSelection?.Field ?? context.Field;
+            
+            var namedType = field.Type.NamedType();
+            switch (namedType)
             {
-                var childSelections = context.GetSelections(objectType, selection?.SelectionSet);
-                gathered.AddRange(childSelections.OfType<ISelection>());
+                case InterfaceType interfaceType:
+                    if (interfaceType?.Fields.Any() ?? false)
+                    {
+                        var preprocessSelections = interfaceType.Fields.Select(f => new PreProcessingSelection(f));
+                        gathered.AddRange(preprocessSelections);
+                    }
+                    break;
+
+                case ObjectType objectType:
+                    if (baseFieldSelection == null || baseFieldSelection is ISelection)
+                    {
+                        //Initialize the optional ISelection (e.g. SelectionSet) if specified (null safe)...
+                        var selectionSet = (baseFieldSelection as ISelection)?.SelectionSet;
+
+                        //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
+                        //  in default behavior for current field.
+                        var childSelections = context.GetSelections(objectType, selectionSet);
+                        var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(s));
+                        gathered.AddRange(preprocessSelections);
+                    }
+                    break;
             }
+
 
             return gathered;
         }
 
-        /// <summary>
-        /// Gather/Collect ALL selectins from the current node down, recursively.
-        /// For more info. on Node parsing logic see here:
-        /// https://github.com/ChilliCream/hotchocolate/blob/a1f2438b74b19e965b560ca464a9a4a896dab79a/src/Core/Core.Tests/Execution/ResolverContextTests.cs#L83-L89
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="selection"></param>
-        /// <param name="gatherRecursively"></param>
-        /// <returns></returns>
-        private static List<ISelection> GatherRecursiveSelections(IResolverContext context, ISelection? selection = null)
-        {
-            List<ISelection> gathered = new List<ISelection>();
-            var field = selection?.Field ?? context.Field;
+        ///// <summary>
+        ///// Gather/Collect ALL selectins from the current node down, recursively.
+        ///// For more info. on Node parsing logic see here:
+        ///// https://github.com/ChilliCream/hotchocolate/blob/a1f2438b74b19e965b560ca464a9a4a896dab79a/src/Core/Core.Tests/Execution/ResolverContextTests.cs#L83-L89
+        ///// </summary>
+        ///// <param name="context"></param>
+        ///// <param name="fieldSelection"></param>
+        ///// <param name="gatherRecursively"></param>
+        ///// <returns></returns>
+        //private static List<PreProcessingSelection> GatherRecursiveSelections(IResolverContext context, IFieldSelection? fieldSelection = null)
+        //{
+        //    var gathered = new List<PreProcessingSelection>();
+        //    var field = fieldSelection?.Field ?? context.Field;
 
-            if (selection != null && field.Type.IsLeafType())
-            {
-                gathered.Add(selection);
-            }
+        //    if (fieldSelection != null && field.Type.IsLeafType())
+        //    {
+        //        gathered.Add(new PreProcessingSelection(fieldSelection));
+        //    }
 
-            if (field.Type.NamedType() is ObjectType objectType)
-            {
-                var childSelections = context.GetSelections(objectType, selection?.SelectionSet);
-                foreach (ISelection child in childSelections)
-                {
-                    gathered.AddRange(GatherRecursiveSelections(context, child));
-                }
 
-            }
+        //    var childSelections = GatherChildSelections(context, fieldSelection);
+        //    foreach (ISelection child in childSelections)
+        //    {
+        //        gathered.AddRange(GatherRecursiveSelections(context, child));
+        //    }
 
-            return gathered;
-        }
+        //    return gathered;
+        //}
+
     }
+
+
 }
