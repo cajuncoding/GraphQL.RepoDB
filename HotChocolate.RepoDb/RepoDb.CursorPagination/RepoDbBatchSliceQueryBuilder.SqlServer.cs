@@ -41,7 +41,7 @@ namespace RepoDb.CursorPagination
         {
             var dbSetting = RepoDbSettings.SqlServerSettings;
             string cursorIndexName = nameof(IHaveCursor.CursorIndex);
-
+            
             // Initialize the builder
             var builder = new QueryBuilder();
 

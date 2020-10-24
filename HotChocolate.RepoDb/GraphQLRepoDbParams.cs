@@ -27,13 +27,13 @@ namespace HotChocolate.RepoDb
 
 
         public IReadOnlyList<Field> SelectFields => _selectFields 
-            ??= RepoDbMapper.GetSelectFields().ToList();
+            ??= RepoDbMapper.GetSelectFields()?.ToList();
 
         public IReadOnlyList<OrderField> SortOrderFields => _sortOrderFields
-            ??= RepoDbMapper.GetSortOrderFields().ToList();
+            ??= RepoDbMapper.GetSortOrderFields()?.ToList();
 
-        public IRepoDbCursorPagingParams PagingParameters =>
-            _pagingParameters ??= RepoDbMapper.GetPagingParameters();
+        public IRepoDbCursorPagingParams PagingParameters => _pagingParameters 
+            ??= RepoDbMapper?.GetPagingParameters();
 
     }
 }

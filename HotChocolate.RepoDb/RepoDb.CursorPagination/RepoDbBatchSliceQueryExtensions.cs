@@ -2,6 +2,7 @@
 using RepoDb;
 using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;
+using RepoDb.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,6 +30,53 @@ namespace RepoDb.CursorPagination
         where TEntity : class
         where TDbConnection : DbConnection
         {
+            //Below Logic mirrors that of RepoDb Source for managing the Connection (PerInstance or PerCall)!
+            var connection = (DbConnection)(transaction?.Connection ?? baseRepo.CreateConnection());
+
+            try
+            {
+                var cursorPageResult = await connection.BatchSliceQueryAsync<TEntity>(
+                    afterCursor: afterCursor,
+                    firstTake: firstTake,
+                    beforeCursor: beforeCursor,
+                    lastTake: lastTake,
+                    orderBy: orderBy,
+                    where: where,
+                    hints: hints,
+                    fields: fields,
+                    transaction: transaction,
+                    cancellationToken: cancellationToken
+                );
+
+                return cursorPageResult;
+            }
+            catch
+            {
+                // Throw back the error
+                throw;
+            }
+            finally
+            {
+                // Dispose the connection
+                baseRepo.DisposeConnectionForPerCallExtension(connection, transaction);
+            }
+        }
+
+
+        public static async Task<CursorPageSlice<TEntity>> BatchSliceQueryAsync<TEntity>(
+            this DbConnection dbConnection,
+            int? afterCursor = null, int? firstTake = null,
+            int? beforeCursor = null, int? lastTake = null,
+            IEnumerable<OrderField> orderBy = null,
+            IEnumerable<QueryField> where = null,
+            string hints = null,
+            IEnumerable<Field> fields = null,
+            IDbTransaction transaction = null,
+            CancellationToken cancellationToken = default
+        )
+        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+        where TEntity : class
+        {
             var tableName = ClassMappedNameCache.Get<TEntity>();
 
             //Ensure we have default fields; default is to include All Fields...
@@ -41,6 +89,13 @@ namespace RepoDb.CursorPagination
                 ? new QueryGroup(where)
                 : null;
 
+            //FILTER for only VALID fields from the seleciton by safely comparing to the valid fields from the DB Schema!
+            //NOTE: Per RepoDb source we need to compare unquoated names to get pure matches...
+            var dbSetting = dbConnection.GetDbSetting();
+            var dbFields = await DbFieldCache.GetAsync(dbConnection, tableName, transaction, false, cancellationToken);
+            var dbFieldLookup = dbFields.ToLookup(f => f.Name.AsUnquoted(dbSetting).ToLower());
+            var validSelectFields = selectFields.Where(s => dbFieldLookup[s.Name.AsUnquoted(dbSetting).ToLower()].Any());
+
             //TODO: Where Filters NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
             //  being 'internal' scoped; that we will need to access....
             //// Converts to propery mapped object
@@ -52,7 +107,7 @@ namespace RepoDb.CursorPagination
             //Build the Cursor Paging query...
             var query = RepoDbCursorPagingQueryBuilder.BuildSqlServerBatchSliceQuery<TEntity>(
                 tableName: tableName,
-                fields: selectFields,
+                fields: validSelectFields,
                 orderBy: orderBy,
                 //TODO: Where is NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
                 //  being 'internal' scoped; that we will need to access....
@@ -66,28 +121,12 @@ namespace RepoDb.CursorPagination
                 includeTotalCountQuery: true
             );
 
-            //Below Logic mirrors that of RepoDb Source for managing the Connection (PerInstance or PerCall)!
-            var connection = (DbConnection)(transaction?.Connection ?? baseRepo.CreateConnection());
+            var cursorPageResult = await dbConnection.ExecuteBatchSliceQueryAsync<TEntity>(
+                commandText: query,
+                cancellationToken: cancellationToken
+            );
 
-            try
-            {
-                //var results = await baseRepo.BatchQueryAsync(page, rowsPerBatch, orderBy, fields, hints, transaction, cancellationToken);
-                var cursorPageResult = await connection.ExecuteBatchSliceQueryAsync<TEntity>(
-                    commandText: query,
-                    cancellationToken: cancellationToken
-                );
-                return cursorPageResult;
-            }
-            catch
-            {
-                // Throw back the error
-                throw;
-            }
-            finally
-            {
-                // Dispose the connection
-                baseRepo.DisposeConnectionForPerCallExtension(connection, transaction);
-            }
+            return cursorPageResult;
         }
 
         /// <summary>

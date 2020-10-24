@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "PureCodeFirst-AzureFunctions-v11\StarWars-AzureFunctions.csproj", "{91E18C69-CD87-4305-B241-1DD04DB118F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.RepoDb.SqlServer", "HotChocolate.RepoDb\HotChocolate.RepoDb.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotChocolate.RepoDb.SqlServer", "HotChocolate.RepoDb\HotChocolate.RepoDb.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.PreProcessedExtensions", "HotChocolate.PreProcessedExtensions\HotChocolate.PreProcessedExtensions.csproj", "{747B95FC-FFA7-4966-A0F9-7FA315D7F823}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotChocolate.PreProcessedExtensions", "HotChocolate.PreProcessedExtensions\HotChocolate.PreProcessedExtensions.csproj", "{747B95FC-FFA7-4966-A0F9-7FA315D7F823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "Sample.StartWars-AzureFunctions\StarWars-AzureFunctions.csproj", "{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepDb", "Sample.StartWars-AzureFunctions-SqlServer\StarWars-AzureFunctions-RepDb.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{91E18C69-CD87-4305-B241-1DD04DB118F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91E18C69-CD87-4305-B241-1DD04DB118F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{91E18C69-CD87-4305-B241-1DD04DB118F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{91E18C69-CD87-4305-B241-1DD04DB118F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B7A623E-4CA8-4897-8EE7-87E692115FAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B7A623E-4CA8-4897-8EE7-87E692115FAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B7A623E-4CA8-4897-8EE7-87E692115FAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +25,14 @@ Global
 		{747B95FC-FFA7-4966-A0F9-7FA315D7F823}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{747B95FC-FFA7-4966-A0F9-7FA315D7F823}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{747B95FC-FFA7-4966-A0F9-7FA315D7F823}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7F71A73-473A-4C26-95F1-3AC699491A8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7F71A73-473A-4C26-95F1-3AC699491A8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7F71A73-473A-4C26-95F1-3AC699491A8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7F71A73-473A-4C26-95F1-3AC699491A8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

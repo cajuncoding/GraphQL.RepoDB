@@ -53,5 +53,21 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
 
             return results;
         }
+
+        //public IEnumerable<IndexEdge<TTargetType>> ToEdgeResultsOfType<TTargetType>() where TTargetType : class
+        //{
+        //    //The Linq Selection provides IEnumerable for us...
+        //    //Note: thats why we do NOT call ToList() here so that consuming classes may provide additional filtering...
+        //    var results = this.CursorPage?.CursorResults
+        //        .Select(cr => {
+        //            if (cr?.Entity is TTargetType)
+        //                return IndexEdge<TTargetType>.Create(cr.Entity as TTargetType, cr.CursorIndex);
+        //            else
+        //                return null;
+        //        })
+        //        .Where(cr => cr != null);
+
+        //    return results;
+        //}
     }
 }

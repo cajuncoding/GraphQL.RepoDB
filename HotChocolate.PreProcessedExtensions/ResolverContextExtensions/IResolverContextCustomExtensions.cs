@@ -38,11 +38,11 @@ namespace HotChocolate.PreProcessedExtensions
             {
                 return context != null
                     ? context.ArgumentValue<TArg>(argName)
-                    : default;
+                    : default!;
             }
             catch
             {
-                return default;
+                return default!;
             }
         }
 
@@ -56,11 +56,23 @@ namespace HotChocolate.PreProcessedExtensions
         /// <returns></returns>
         public static IReadOnlyList<IFieldSelection> GetSelectionsSafely(this IResolverContext context)
         {
+            if (context == null) 
+                return null!;
+
             List<IFieldSelection> selectionResults = new List<IFieldSelection>();
 
-            if (context?.Field.Type.NamedType() is ObjectType objectType)
+            var hotChocolateNamedType = context?.Field.Type.NamedType();
+            //ObjectType? currentObjectType = null;
+
+            //TryGetObjecType()...
+            //if (hotChocolateNamedType is InterfaceType interfaceType)
+            //    currentObjectType = interfaceType.ResolveConcreteType(context, "allCharacters");
+            //else if (hotChocolateNamedType is ObjectType objectType)
+            //    currentObjectType = objectType;
+
+            if (hotChocolateNamedType is ObjectType currentObjectType)
             {
-                var selections = context.GetSelections(objectType);
+                var selections = context!.GetSelections(currentObjectType);
 
                 //BBernard
                 //Determine if the Selection is for a Connection, and dive deeper to get the real

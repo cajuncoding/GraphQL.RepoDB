@@ -19,5 +19,12 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
         /// An enumerable list of the base non-decorated TEntity values.
         /// </summary>
         IEnumerable<TEntity> Results { get; }
+
+        /// <summary>
+        /// Support safe (deferred) casting to the specified Entity Type.
+        /// </summary>
+        /// <typeparam name="TTargetType"></typeparam>
+        /// <returns></returns>
+        CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class;
     }
 }

@@ -24,6 +24,19 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
 
         public IEnumerable<TEntity> Results => CursorResults?.Select(cr => cr?.Entity);
 
+        public CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class
+        {
+            var results = this.CursorResults?.Select(cr => {
+                if (cr?.Entity is TTargetType)
+                    return new CursorResult<TTargetType>(cr.Entity as TTargetType, cr.CursorIndex);
+                else
+                    return null;
+            })
+            .Where(cr => cr != null);
+            
+            return new CursorPageSlice<TTargetType>(results, (int)this.TotalCount);
+        }
+
         public int? TotalCount { get; protected set; }
 
         public bool HasNextPage { get; protected set; }
