@@ -1,4 +1,8 @@
-# (Unofficial) HotChocolate v11 Extensions for working with Micro-ORM instead of IQueryable
+# (Unofficial) HotChocolate v11 Extensions for working with Micro-ORM(s) instead of IQueryable
+
+# Work in Progress... main branch has not yet reached stable state...
+1. Still workign on Selections (support for Interfaces)
+2. Pending work on Filter Arguments...
 
 ## Overview
 TODO...

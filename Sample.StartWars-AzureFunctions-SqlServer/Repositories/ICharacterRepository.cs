@@ -10,21 +10,23 @@ namespace StarWars.Repositories
 {
     public interface ICharacterRepository
     {
-        Task<IEnumerable<ICharacter>> GetCharactersAsync(
+        Task<IEnumerable<ICharacter>> GetAllSortedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields
         );
 
-        Task<ICursorPageSlice<ICharacter>> GetCharactersAsync(
+        Task<ICursorPageSlice<ICharacter>> GetPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
             IRepoDbCursorPagingParams pagingParams
         );
 
         Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(ICharacter character);
-        Task<IEnumerable<ICharacter>> GetCharactersAsync(params int[] ids);
+        
+        Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(params int[] ids);
+        
         Task<ICharacter> GetHeroAsync(Episode episode);
-
+        
         Task<IEnumerable<ISearchResult>> SearchAsync(string text);
     }
 }

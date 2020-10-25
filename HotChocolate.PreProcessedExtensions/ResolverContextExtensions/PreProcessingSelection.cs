@@ -16,14 +16,20 @@ namespace HotChocolate.PreProcessedExtensions
     public class PreProcessingSelection : IHasName, IPreProcessingSelection
     {
         public PreProcessingSelection(IFieldSelection selectionField)
-            : this(selectionField.Field.Name)
+            : this(selectionField.Field.Name.Value)
         {
             FieldSelection = selectionField;
         }
 
-        public PreProcessingSelection(InterfaceField field)
-            : this(field.Name)
+        public PreProcessingSelection(Language.NamedSyntaxNode selectionNode)
+            : this(selectionNode.Name.Value)
         {
+        }
+
+        public PreProcessingSelection(Language.InlineFragmentNode fragmentNode, Language.NamedSyntaxNode selectionNode)
+            : this(selectionNode.Name.Value)
+        {
+            ParentFragmentNode = fragmentNode;
         }
 
         protected PreProcessingSelection(NameString name)
@@ -31,13 +37,18 @@ namespace HotChocolate.PreProcessedExtensions
             SelectionName = name;
         }
 
-        public NameString SelectionName { get; }
+        public string SelectionName { get; }
 
-        public NameString Name => SelectionName;
+        public NameString Name => new NameString(SelectionName);
 
         public IFieldSelection? FieldSelection { get; }
 
-        public bool HasFieldSelection => FieldSelection != null;
+        public bool IsFieldSelection => FieldSelection != null;
+
+        public Language.InlineFragmentNode? ParentFragmentNode { get; }
+        
+        public bool IsFragmentSelection => ParentFragmentNode != null;
+
 
         public override string ToString()
         {

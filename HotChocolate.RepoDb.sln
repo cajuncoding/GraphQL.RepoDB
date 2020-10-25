@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.PreProcessedEx
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "Sample.StartWars-AzureFunctions\StarWars-AzureFunctions.csproj", "{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepDb", "Sample.StartWars-AzureFunctions-SqlServer\StarWars-AzureFunctions-RepDb.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepoDb", "Sample.StartWars-AzureFunctions-SqlServer\StarWars-AzureFunctions-RepoDb.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

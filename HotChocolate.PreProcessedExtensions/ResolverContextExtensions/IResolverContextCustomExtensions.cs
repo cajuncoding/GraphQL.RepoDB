@@ -1,10 +1,12 @@
 ﻿#nullable enable
 
 using HotChocolate.Execution.Processing;
+using HotChocolate.Language;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -160,33 +162,92 @@ namespace HotChocolate.PreProcessedExtensions
             var field = baseFieldSelection?.Field ?? context.Field;
             
             var namedType = field.Type.NamedType();
+
             switch (namedType)
             {
+                //TODO: Refactor this to be modular...
                 case InterfaceType interfaceType:
-                    if (interfaceType?.Fields.Any() ?? false)
+                    //Get the SelectionSetNode from the Base specified or fallback to Context as default...
+                    SelectionSetNode selectionSetNode = 
+                        (baseFieldSelection as ISelection)?.SelectionSet 
+                            ?? context?.FieldSelection?.SelectionSet!;
+
+                    //Now safely process any Selections of the SelectionSet (Node)...
+                    var selections = selectionSetNode?.Selections;
+                    
+                    if (selections == null || !selections.Any())
+                        break;
+
+                    foreach(var node in selections)
                     {
-                        var preprocessSelections = interfaceType.Fields.Select(f => new PreProcessingSelection(f));
-                        gathered.AddRange(preprocessSelections);
+                        switch(node)
+                        {
+                            case FieldNode fieldNode:
+                                gathered.Add(new PreProcessingSelection(fieldNode));
+                                break;
+
+                            case InlineFragmentNode fragmentNode:
+                                //Attempt to flatten selections from Child Inline Fragments...
+                                //TODO: Determine if there is any value in Recursing past the first child level...
+                                var fragmentSelections = fragmentNode?.SelectionSet?.Selections?.OfType<FieldNode>().Select(s =>
+                                    new PreProcessingSelection(fragmentNode, s)
+                                );
+
+                                if(fragmentSelections != null && fragmentSelections.Any())
+                                    gathered.AddRange(fragmentSelections);
+                                
+                                break;
+                        }
                     }
+
                     break;
 
-                case ObjectType objectType:
-                    if (baseFieldSelection == null || baseFieldSelection is ISelection)
-                    {
-                        //Initialize the optional ISelection (e.g. SelectionSet) if specified (null safe)...
-                        var selectionSet = (baseFieldSelection as ISelection)?.SelectionSet;
+                //case ObjectType fieldType:
+                default:
 
-                        //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
-                        //  in default behavior for current field.
-                        var childSelections = context.GetSelections(objectType, selectionSet);
-                        var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(s));
-                        gathered.AddRange(preprocessSelections);
+                    if (TryGetObjectType(field.Type, out ObjectType? objectType))
+                    {
+                        if (baseFieldSelection == null || baseFieldSelection is ISelection)
+                        {
+                            //Initialize the optional ISelection (e.g. SelectionSet) if specified (null safe)...
+                            var selectionSet = (baseFieldSelection as ISelection)?.SelectionSet;
+
+                            //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
+                            //  in default behavior for current field.
+                            var childSelections = context.GetSelections(objectType, selectionSet);
+                            var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(s));
+                            gathered.AddRange(preprocessSelections);
+                        }
                     }
                     break;
             }
 
 
             return gathered;
+        }
+
+        /// <summary>
+        /// ObjectType resolver function to get the current object type; borrowed from HotChocolate source:
+        /// HotChocolate.Data -> SelectionVisitor`1.cs
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="objectType"></param>
+        /// <returns></returns>
+        private static bool TryGetObjectType(IType type, [NotNullWhen(true)] out ObjectType? objectType)
+        {
+            switch (type)
+            {
+                case NonNullType nonNullType:
+                    return TryGetObjectType(nonNullType.NamedType(), out objectType);
+                case ObjectType objType:
+                    objectType = objType;
+                    return true;
+                case ListType listType:
+                    return TryGetObjectType(listType.InnerType(), out objectType);
+                default:
+                    objectType = null;
+                    return false;
+            }
         }
 
         ///// <summary>

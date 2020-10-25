@@ -9,21 +9,21 @@ namespace StarWars.Characters
     /// </summary>
     public class Droid : ICharacter
     {
-        //public Droid(
-        //    int id,
-        //    string name,
-        //    IReadOnlyList<int> friends,
-        //    IReadOnlyList<Episode> appearsIn,
-        //    string primaryFunction,
-        //    double height = 1.72d)
-        //{
-        //    Id = id;
-        //    Name = name;
-        //    Friends = friends;
-        //    AppearsIn = appearsIn;
-        //    PrimaryFunction = primaryFunction;
-        //    Height = height;
-        //}
+        public Droid(
+            int id,
+            string name,
+            IReadOnlyList<int> friends,
+            IReadOnlyList<Episode> appearsIn,
+            string primaryFunction,
+            double height = 1.72d)
+        {
+            Id = id;
+            Name = name;
+            Friends = friends;
+            AppearsIn = appearsIn;
+            PrimaryFunction = primaryFunction;
+            Height = height;
+        }
 
         /// <inheritdoc />
         public int Id { get; }
@@ -35,7 +35,7 @@ namespace StarWars.Characters
         //NOTE: Updated to use v11 method...
         [UsePaging(type: typeof(InterfaceType<ICharacter>))]
         [GetFriendsResolver]
-        public IReadOnlyList<ICharacter> Friends { get; }
+        public IReadOnlyList<int> Friends { get; }
 
         /// <inheritdoc />
         public IReadOnlyList<Episode> AppearsIn { get; }

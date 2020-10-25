@@ -1,7 +1,6 @@
-    using System.Collections.Generic;
+using System.Collections.Generic;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
-using RepoDb.Attributes;
 
 namespace StarWars.Characters
 {

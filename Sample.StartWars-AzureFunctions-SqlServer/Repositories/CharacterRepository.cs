@@ -16,32 +16,64 @@ namespace StarWars.Repositories
 {
     public class CharacterRepository : BaseRepository<ICharacter, SqlConnection>, ICharacterRepository
     {
+        public static class TableNames
+        {
+            public const string StarWarsCharacters = "StarWarsCharacters";
+        }
+
         public CharacterRepository(string connectionString)
             : base(connectionString)
         {
-            _starships = CreateStarships().ToDictionary(t => t.Id);
         }
 
-        private Dictionary<int, Starship> _starships;
-
-
-        public async Task<IEnumerable<ICharacter>> GetCharactersAsync(
+        public async Task<IEnumerable<ICharacter>> GetAllSortedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields
         )
         {
             var sqlConn = CreateConnection();
 
-            var characters = await sqlConn.QueryAllAsync<Character>(
+            var results = await sqlConn.QueryAsync<CharacterDbModel>(
+                where: c => c.Id >= 1000 && c.Id <=2999,
                 fields: selectFields,
                 orderBy: sortFields
             );
 
-            return characters;
+            var convertedResults = results.Select(r =>
+            {
+                return r.IsHuman
+                    ? (ICharacter)new Human(r.Id, r.Name, r.HomePlanet)
+                    : (ICharacter)new Droid(r.Id, r.Name, r.PrimaryFunction);
+            });
+
+            return convertedResults;
+
+            //var safeSelectClause = await sqlConn.GetValidatedSelectClause(TableNames.StarWarsCharacters, selectFields);
+            //var safeOrderByClause = await sqlConn.GetValidatedOrderByClause(TableNames.StarWarsCharacters, sortFields);
+
+            //var query = await sqlConn.ExecuteQueryMultipleAsync(
+            //    commandText: @$"
+            //        --Query Humans (by ID Convention)
+            //        SELECT {safeSelectClause} FROM [{TableNames.StarWarsCharacters}] c 
+            //            WHERE c.Id BETWEEN 1000 and 1999 
+            //            {safeOrderByClause};
+
+            //        --Query Droids (by ID Convention)
+            //        SELECT {safeSelectClause} FROM [{TableNames.StarWarsCharacters}] c 
+            //            WHERE c.Id BETWEEN 2000 and 2999;
+            //            {safeOrderByClause};
+            //    "
+            //);
+
+            //var results = new List<ICharacter>();
+            //results.AddRange(query.Extract<Human>());
+            //results.AddRange(query.Extract<Droid>());
+
+            //return results;
         }
 
 
-        public async Task<ICursorPageSlice<ICharacter>> GetCharactersAsync(
+        public async Task<ICursorPageSlice<ICharacter>> GetPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
             IRepoDbCursorPagingParams pagingParams
@@ -49,7 +81,7 @@ namespace StarWars.Repositories
         {
             var sqlConn = CreateConnection();
 
-            var pageSlice = await sqlConn.BatchSliceQueryAsync<Character>(
+            var pageSlice = await sqlConn.BatchSliceQueryAsync<CharacterDbModel>(
                 afterCursor: pagingParams.AfterIndex!,
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
@@ -58,13 +90,27 @@ namespace StarWars.Repositories
                 fields: selectFields
             );
 
-            return pageSlice.OfType<ICharacter>();
+            var convertedSlice = pageSlice.AsMappedType<ICharacter>(r =>
+            {
+                return r.IsHuman
+                    ? (ICharacter)new Human(r.Id, r.Name, r.HomePlanet)
+                    : (ICharacter)new Droid(r.Id, r.Name, r.PrimaryFunction);
+            });
+
+            return convertedSlice;
         }
 
-        public async Task<IEnumerable<ICharacter>> GetCharactersAsync(int[] ids)
+        public async Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(int[] ids)
         {
             var sqlConn = CreateConnection();
-            return await sqlConn.QueryAsync<Character>(c => ids.Contains(c.Id));
+            var results = await sqlConn.QueryAsync<CharacterDbModel>(c => ids.Contains(c.Id));
+
+            return results.Select(r =>
+            {
+                return r.IsHuman
+                    ? (ICharacter)new Human(r.Id, r.Name, r.HomePlanet)
+                    : (ICharacter)new Droid(r.Id, r.Name, r.PrimaryFunction);
+            });
         }
 
         public async Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(ICharacter character)
@@ -107,17 +153,5 @@ namespace StarWars.Repositories
             //    yield return starship;
             //}
         }
-
-
-        private static IEnumerable<Starship> CreateStarships()
-        {
-            yield return new Starship
-            (
-                3000,
-                "TIE Advanced x1",
-                 9.2
-            );
-        }
-
     }
 }

@@ -46,7 +46,7 @@ namespace StarWars.Characters
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
-            var repoDbParams = new GraphQLRepoDbParams<Character>(graphQLParams);
+            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
 
             //********************************************************************************
             //Get the data and convert to List() to ensure it's an Enumerable
@@ -54,7 +54,7 @@ namespace StarWars.Characters
             //  pre-processed results.
             //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
             //       down to the Repository (and underlying Database) layer.
-            var charactersSlice = await repository.GetCharactersAsync(
+            var charactersSlice = await repository.GetPagedCharactersAsync(
                 repoDbParams.SelectFields,
                 repoDbParams.SortOrderFields ?? new List<OrderField> { new OrderField("name", Order.Ascending) },
                 repoDbParams.PagingParameters
@@ -75,14 +75,14 @@ namespace StarWars.Characters
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
-            var repoDbParams = new GraphQLRepoDbParams<Character>(graphQLParams);
+            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
 
-            var sortedCharacters = await repository.GetCharactersAsync(
+            var sortedCharacters = await repository.GetAllSortedCharactersAsync(
                 selectFields: repoDbParams.SelectFields, 
                 sortFields: repoDbParams.SortOrderFields
             );
 
-            return new PreProcessedSortedResults<Character>(sortedCharacters.OfType<Character>());
+            return new PreProcessedSortedResults<ICharacter>(sortedCharacters);
         }
 
         /// <summary>
@@ -91,13 +91,13 @@ namespace StarWars.Characters
         /// <param name="ids">The ids of the human to retrieve.</param>
         /// <param name="repository"></param>
         /// <returns>The character.</returns>
-        public async Task<IEnumerable<Character>> GetCharacterAsync(
+        public async Task<IEnumerable<ICharacter>> GetCharacterAsync(
             [Service] ICharacterRepository repository,
             int[] ids
         )
         {
-            var characters = await repository.GetCharactersAsync(ids);
-            return characters.OfType<Character>();
+            var characters = await repository.GetCharactersByIdAsync(ids);
+            return characters;
         }
 
         public async Task<IEnumerable<ISearchResult>> SearchAsync(
