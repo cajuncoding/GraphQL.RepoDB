@@ -15,44 +15,23 @@ namespace HotChocolate.PreProcessedExtensions
     /// </summary>
     public class PreProcessingSelection : IHasName, IPreProcessingSelection
     {
-        public PreProcessingSelection(IFieldSelection selectionField)
-            : this(selectionField.Field.Name.Value)
+        public PreProcessingSelection(ObjectType objectType, IFieldSelection selectionField)
         {
-            FieldSelection = selectionField;
+            GraphQLObjectType = objectType;
+            GraphQLFieldSelection = selectionField;
         }
 
-        public PreProcessingSelection(Language.NamedSyntaxNode selectionNode)
-            : this(selectionNode.Name.Value)
-        {
-        }
+        public ObjectType GraphQLObjectType { get; }
 
-        public PreProcessingSelection(Language.InlineFragmentNode fragmentNode, Language.NamedSyntaxNode selectionNode)
-            : this(selectionNode.Name.Value)
-        {
-            ParentFragmentNode = fragmentNode;
-        }
+        public IFieldSelection GraphQLFieldSelection { get; }
 
-        protected PreProcessingSelection(NameString name)
-        {
-            SelectionName = name;
-        }
+        public string SelectionName => GraphQLFieldSelection.ResponseName.ToString();
 
-        public string SelectionName { get; }
-
-        public NameString Name => new NameString(SelectionName);
-
-        public IFieldSelection? FieldSelection { get; }
-
-        public bool IsFieldSelection => FieldSelection != null;
-
-        public Language.InlineFragmentNode? ParentFragmentNode { get; }
-        
-        public bool IsFragmentSelection => ParentFragmentNode != null;
-
+        public NameString Name => GraphQLFieldSelection.ResponseName;
 
         public override string ToString()
         {
-            return SelectionName.ToString();
+            return $"{GraphQLObjectType.Name}:{SelectionName}";
         }
     }
 }

@@ -8,8 +8,14 @@ namespace HotChocolate.PreProcessedExtensions
     public interface IParamsContext
     {
         IResolverContext ResolverContext { get; }
-        IReadOnlyList<IPreProcessingSelection> SelectionFields { get; }
+
+        IReadOnlyList<IPreProcessingSelection> AllSelectionFields { get; }
+        IReadOnlyList<IPreProcessingSelection> SelectionFieldsFor<TObjectType>();
+
         IReadOnlyList<string> SelectionNames { get; }
+        IReadOnlyList<string> SelectionNamesFor<TObjectType>();
+
+
         IReadOnlyList<ISortOrderField> SortArgs { get; }
         CursorPagingArguments PagingArgs { get; }
     }

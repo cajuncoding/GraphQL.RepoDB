@@ -59,11 +59,6 @@ namespace HotChocolate.PreProcessedExtensions
 
             var selectionResults = new List<PreProcessingSelection>();
 
-            //var hotChocolateNamedType = context?.Field.Type.NamedType();
-            //ObjectType? currentObjectType = null;
-
-            //if (hotChocolateNamedType is ObjectType currentObjectType)
-            //{
             var selections = GatherChildSelections(context!);
             if (selections.Any())
             {
@@ -104,20 +99,6 @@ namespace HotChocolate.PreProcessedExtensions
         }
 
         /// <summary>
-        /// Retrieve the current Primary node selection names as strings (e.g. SELECT fields from data) 
-        /// from the current GraphQL query.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        public static List<string> GetPreProcessingSelectionNames(this IResolverContext context)
-        {
-            return context?
-                .GetPreProcessingSelections()?
-                .Select(s => s.Name.ToString())
-                .ToList()!;
-        }
-
-        /// <summary>
         /// Find the selection that matches the speified name.
         /// For more info. on Node parsing logic see here:
         /// https://github.com/ChilliCream/hotchocolate/blob/a1f2438b74b19e965b560ca464a9a4a896dab79a/src/Core/Core.Tests/Execution/ResolverContextTests.cs#L83-L89
@@ -132,7 +113,6 @@ namespace HotChocolate.PreProcessedExtensions
                 return null!;
 
             var childSelections = GatherChildSelections(context!, baseSelection);
-
             var resultSelection = childSelections?.FirstOrDefault(
                 s => s.SelectionName.ToString().Equals(selectionFieldName, StringComparison.OrdinalIgnoreCase)
             )!;
@@ -156,130 +136,69 @@ namespace HotChocolate.PreProcessedExtensions
             var gathered = new List<PreProcessingSelection>();
 
             //Initialize the optional base field selection if specified...
-            var baseFieldSelection = baseSelection?.FieldSelection;
-
+            var baseFieldSelection = baseSelection?.GraphQLFieldSelection;
+            
             //Dynamically support re-basing to the specified baseSelection or fallback to current Context.Field
             var field = baseFieldSelection?.Field ?? context.Field;
-            
-            var namedType = field.Type.NamedType();
 
-            switch (namedType)
+            //Initialize the optional SelectionSet to rebase processing as the root for GetSelections()
+            //  if specified (but is optional & null safe)...
+            SelectionSetNode? baseSelectionSetNode = baseFieldSelection is ISelection baseISelection
+                ? baseISelection.SelectionSet
+                : null!;
+
+            //Get all possible ObjectType(s); InterfaceTypes & UnitionTypes will have more than one...
+            var objectTypes = GetObjectTypesSafely(field.Type, context.Schema);
+
+            //Map all object types into PreProcessingSelection (adapter classes)...
+            foreach (var objectType in objectTypes)
             {
-                //TODO: Refactor this to be modular...
-                case InterfaceType interfaceType:
-                    //Get the SelectionSetNode from the Base specified or fallback to Context as default...
-                    SelectionSetNode selectionSetNode = 
-                        (baseFieldSelection as ISelection)?.SelectionSet 
-                            ?? context?.FieldSelection?.SelectionSet!;
-
-                    //Now safely process any Selections of the SelectionSet (Node)...
-                    var selections = selectionSetNode?.Selections;
-                    
-                    if (selections == null || !selections.Any())
-                        break;
-
-                    foreach(var node in selections)
-                    {
-                        switch(node)
-                        {
-                            case FieldNode fieldNode:
-                                gathered.Add(new PreProcessingSelection(fieldNode));
-                                break;
-
-                            case InlineFragmentNode fragmentNode:
-                                //Attempt to flatten selections from Child Inline Fragments...
-                                //TODO: Determine if there is any value in Recursing past the first child level...
-                                var fragmentSelections = fragmentNode?.SelectionSet?.Selections?.OfType<FieldNode>().Select(s =>
-                                    new PreProcessingSelection(fragmentNode, s)
-                                );
-
-                                if(fragmentSelections != null && fragmentSelections.Any())
-                                    gathered.AddRange(fragmentSelections);
-                                
-                                break;
-                        }
-                    }
-
-                    break;
-
-                //case ObjectType fieldType:
-                default:
-
-                    if (TryGetObjectType(field.Type, out ObjectType? objectType))
-                    {
-                        if (baseFieldSelection == null || baseFieldSelection is ISelection)
-                        {
-                            //Initialize the optional ISelection (e.g. SelectionSet) if specified (null safe)...
-                            var selectionSet = (baseFieldSelection as ISelection)?.SelectionSet;
-
-                            //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
-                            //  in default behavior for current field.
-                            var childSelections = context.GetSelections(objectType, selectionSet);
-                            var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(s));
-                            gathered.AddRange(preprocessSelections);
-                        }
-                    }
-                    break;
+                //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
+                //  in default behavior for current field.
+                var childSelections = context.GetSelections(objectType, baseSelectionSetNode);
+                var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(objectType, s));
+                gathered.AddRange(preprocessSelections);
             }
-
 
             return gathered;
         }
 
         /// <summary>
-        /// ObjectType resolver function to get the current object type; borrowed from HotChocolate source:
+        /// ObjectType resolver function to get the current object type enhanced with support
+        /// for InterfaceTypes & UnionTypes; initially modeled after from HotChocolate source:
         /// HotChocolate.Data -> SelectionVisitor`1.cs
         /// </summary>
         /// <param name="type"></param>
         /// <param name="objectType"></param>
         /// <returns></returns>
-        private static bool TryGetObjectType(IType type, [NotNullWhen(true)] out ObjectType? objectType)
+        private static List<ObjectType> GetObjectTypesSafely(IType type, ISchema schema)
         {
+            var results = new List<ObjectType>();
             switch (type)
             {
                 case NonNullType nonNullType:
-                    return TryGetObjectType(nonNullType.NamedType(), out objectType);
+                    results.AddRange(GetObjectTypesSafely(nonNullType.NamedType(), schema));
+                    break;
                 case ObjectType objType:
-                    objectType = objType;
-                    return true;
+                    results.Add(objType);
+                    break;
                 case ListType listType:
-                    return TryGetObjectType(listType.InnerType(), out objectType);
-                default:
-                    objectType = null;
-                    return false;
+                    results.AddRange(GetObjectTypesSafely(listType.InnerType(), schema));
+                    break;
+                case InterfaceType interfaceType:
+                    var possibleInterfaceTypes = schema.GetPossibleTypes(interfaceType);
+                    var objectTypesForInterface = possibleInterfaceTypes.SelectMany(t => GetObjectTypesSafely(t, schema));
+                    results.AddRange(objectTypesForInterface);
+                    break;
+                //TODO: TEST UnionTypes!
+                case UnionType unionType:
+                    var possibleUnitonTypes = schema.GetPossibleTypes(unionType);
+                    var objectTypesForUnion = possibleUnitonTypes.SelectMany(t => GetObjectTypesSafely(t, schema));
+                    results.AddRange(objectTypesForUnion);
+                    break;
             }
+
+            return results;
         }
-
-        ///// <summary>
-        ///// Gather/Collect ALL selectins from the current node down, recursively.
-        ///// For more info. on Node parsing logic see here:
-        ///// https://github.com/ChilliCream/hotchocolate/blob/a1f2438b74b19e965b560ca464a9a4a896dab79a/src/Core/Core.Tests/Execution/ResolverContextTests.cs#L83-L89
-        ///// </summary>
-        ///// <param name="context"></param>
-        ///// <param name="fieldSelection"></param>
-        ///// <param name="gatherRecursively"></param>
-        ///// <returns></returns>
-        //private static List<PreProcessingSelection> GatherRecursiveSelections(IResolverContext context, IFieldSelection? fieldSelection = null)
-        //{
-        //    var gathered = new List<PreProcessingSelection>();
-        //    var field = fieldSelection?.Field ?? context.Field;
-
-        //    if (fieldSelection != null && field.Type.IsLeafType())
-        //    {
-        //        gathered.Add(new PreProcessingSelection(fieldSelection));
-        //    }
-
-
-        //    var childSelections = GatherChildSelections(context, fieldSelection);
-        //    foreach (ISelection child in childSelections)
-        //    {
-        //        gathered.AddRange(GatherRecursiveSelections(context, child));
-        //    }
-
-        //    return gathered;
-        //}
-
     }
-
-
 }

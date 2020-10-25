@@ -45,9 +45,8 @@ namespace HotChocolate.RepoDb
             }
             else
             {
-                //NOTE: the RepDb PropertyCache provides mapping lookups, but only by mapped name (e.g. Database name)
-                //  for GraphQL (Pure Code First) we need to lookup the field by the Model's Property Name
-                //  and then convert to the mapped name. So we create a Lookup by Model Property Name!
+                //NOTE: For GraphQL we need to lookup the actual Db field by the Model's Property Name
+                //  and then convert to the actual DB field name; which might also be mapped name via RepoDb attribute. 
                 //  For more info see: https://repodb.net/cacher/propertymappednamecache
                 //TODO: Add Caching Layer here if needed to Cached a Reverse Dictionary of mappings by Model Name!
                 var mappingLookup = PropertyCache.Get<TModel>().ToLookup(p => p.PropertyInfo.Name.ToLower());

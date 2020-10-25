@@ -92,7 +92,8 @@ namespace RepoDb.CursorPagination
                 : null;
 
             //Retrieve only the select fields that are valid for the Database query!
-            var validSelectFields = await dbConnection.GetValidatedDbFields(tableName, fields);
+            //NOTE: We guard against duplicate values as a convenience.
+            var validSelectFields = await dbConnection.GetValidatedDbFields(tableName, fields.Distinct());
 
             //TODO: Where Filters NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
             //  being 'internal' scoped; that we will need to access....
