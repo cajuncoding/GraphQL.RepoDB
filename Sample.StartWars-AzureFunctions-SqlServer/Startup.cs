@@ -49,11 +49,9 @@ namespace StarWars
                 //Disabled Subscriptions for v11 and Azure Functions Example due to 
                 //  supportability in Serverless architecture...
                 //.AddType<ReviewSubscriptions>()
-                .AddType<Character>()
-                //TODO: Fix issues with Union Types and Interface Types...
-                //.AddType<Human>()
-                //.AddType<Droid>()
-                //.AddType<Starship>()
+                .AddType<Human>()
+                .AddType<Droid>()
+                .AddType<Starship>()
                 //*******************************************************************************************
                 //*******************************************************************************************
                 //Enable extensions for Pre-Processed Results!
