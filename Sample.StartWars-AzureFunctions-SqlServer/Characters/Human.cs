@@ -36,7 +36,7 @@ namespace StarWars.Characters
 
         /// <inheritdoc />
         [UsePaging(type: typeof(InterfaceType<ICharacter>))]
-        [GetFriendsResolver]
+        //[GetFriendsResolver]
         public IReadOnlyList<int> Friends { get; }
 
         /// <inheritdoc />

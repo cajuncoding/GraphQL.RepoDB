@@ -67,13 +67,23 @@ namespace StarWars.Repositories
             return await sqlConn.QueryAsync<Character>(c => ids.Contains(c.Id));
         }
 
-        public async Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(ICharacter character)
+        public async Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(
+            IEnumerable<Field> selectFields,
+            IEnumerable<OrderField> sortFields,
+            ICharacter character
+        )
         {
+            var sqlConn = CreateConnection();
+            var validDbFields = await sqlConn.GetValidatedDbFields<ICharacter>(selectFields);
 
-            throw new NotImplementedException();
+            var friends = await sqlConn.QueryAsync<Character>(
+                tableName: "ViewStarWarsFriends",
+                fields: validDbFields,
+                orderBy: sortFields,
+                where: new QueryField("FriendOfId", character.Id)
+            );
 
-            //var sqlConn = CreateConnection();
-            //return await sqlConn.QueryAsync<Character>(c => ids.Contains(c.Id));
+            return friends.OfType<ICharacter>();
         }
 
         public async Task<ICharacter> GetHeroAsync(Episode episode)

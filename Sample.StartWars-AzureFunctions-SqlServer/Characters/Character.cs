@@ -13,7 +13,7 @@ namespace StarWars.Characters
 
         public string Name { get; set; }
 
-        public IReadOnlyList<int> Friends { get; set; }
+        public IReadOnlyList<ICharacter> Friends { get; set; }
 
         public IReadOnlyList<Episode> AppearsIn { get; set; }
 

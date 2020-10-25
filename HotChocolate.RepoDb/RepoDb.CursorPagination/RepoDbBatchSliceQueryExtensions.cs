@@ -1,4 +1,5 @@
 ﻿using HotChocolate.PreProcessedExtensions.Pagination;
+using HotChocolate.RepoDb;
 using RepoDb;
 using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;
@@ -90,12 +91,8 @@ namespace RepoDb.CursorPagination
                 ? new QueryGroup(where)
                 : null;
 
-            //FILTER for only VALID fields from the seleciton by safely comparing to the valid fields from the DB Schema!
-            //NOTE: Per RepoDb source we need to compare unquoated names to get pure matches...
-            var dbSetting = dbConnection.GetDbSetting();
-            var dbFields = await DbFieldCache.GetAsync(dbConnection, tableName, transaction, false, cancellationToken);
-            var dbFieldLookup = dbFields.ToLookup(f => f.Name.AsUnquoted(dbSetting).ToLower());
-            var validSelectFields = selectFields.Where(s => dbFieldLookup[s.Name.AsUnquoted(dbSetting).ToLower()].Any());
+            //Retrieve only the select fields that are valid for the Database query!
+            var validSelectFields = await dbConnection.GetValidatedDbFields(tableName, fields);
 
             //TODO: Where Filters NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
             //  being 'internal' scoped; that we will need to access....

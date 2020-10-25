@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using RepoDb.Attributes;
@@ -9,7 +10,8 @@ namespace StarWars.Characters
     /// A character in the Star Wars universe.
     /// </summary>
     //TODO: Fix this Interface type when SubTypes are re-registered in Starup...
-    //[InterfaceType(Name = "Character")]
+    //[InterfaceType(nameof(Character))]
+    //[GraphQLName(nameof(Character))]
     public interface ICharacter : ISearchResult
     {
         /// <summary>
@@ -22,12 +24,13 @@ namespace StarWars.Characters
         /// </summary>
         string Name { get; }
 
-        ///// <summary>
-        ///// The ids of the character's friends.
-        ///// </summary>
-        ////NOTE: Updated to use v11 method...
+        /// <summary>
+        /// The ids of the character's friends.
+        /// </summary>
+        //NOTE: Updated to use v11 method...
         //[UsePaging(type: typeof(InterfaceType<ICharacter>))]
-        //IReadOnlyList<int> Friends { get; }
+        //[GetFriendsResolver]
+        //IReadOnlyList<ICharacter> Friends { get; }
 
         ///// <summary>
         ///// The episodes the character appears in.

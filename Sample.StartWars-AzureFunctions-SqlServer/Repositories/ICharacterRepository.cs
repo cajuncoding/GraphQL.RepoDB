@@ -21,7 +21,12 @@ namespace StarWars.Repositories
             IRepoDbCursorPagingParams pagingParams
         );
 
-        Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(ICharacter character);
+        Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(
+            IEnumerable<Field> selectFields,
+            IEnumerable<OrderField> sortFields,
+            ICharacter character
+        );
+
         Task<IEnumerable<ICharacter>> GetCharactersAsync(params int[] ids);
         Task<ICharacter> GetHeroAsync(Episode episode);
 

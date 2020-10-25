@@ -82,7 +82,7 @@ namespace StarWars.Characters
                 sortFields: repoDbParams.SortOrderFields
             );
 
-            return new PreProcessedSortedResults<Character>(sortedCharacters.OfType<Character>());
+            return new PreProcessedSortedResults<ICharacter>(sortedCharacters);
         }
 
         /// <summary>
@@ -91,13 +91,13 @@ namespace StarWars.Characters
         /// <param name="ids">The ids of the human to retrieve.</param>
         /// <param name="repository"></param>
         /// <returns>The character.</returns>
-        public async Task<IEnumerable<Character>> GetCharacterAsync(
+        public async Task<IEnumerable<ICharacter>> GetCharacterAsync(
             [Service] ICharacterRepository repository,
             int[] ids
         )
         {
             var characters = await repository.GetCharactersAsync(ids);
-            return characters.OfType<Character>();
+            return characters;
         }
 
         public async Task<IEnumerable<ISearchResult>> SearchAsync(
