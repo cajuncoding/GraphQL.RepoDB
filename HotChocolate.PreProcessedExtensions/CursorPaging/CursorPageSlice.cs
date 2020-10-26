@@ -24,6 +24,18 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
 
         public IEnumerable<TEntity> Results => CursorResults?.Select(cr => cr?.Entity);
 
+        public int? TotalCount { get; protected set; }
+
+        public bool HasNextPage { get; protected set; }
+
+        public bool HasPreviousPage { get; protected set; }
+        /// <summary>
+        /// Convenience method to easily cast all types in the current page to a garget compatible type
+        /// without affecting the cursor indexes, etc. Provide deffered execution via Linq Select(). Typemismatches
+        /// will be ignored and not returned for behaviour matching Linq OfType().
+        /// </summary>
+        /// <typeparam name="TTargetType"></typeparam>
+        /// <returns></returns>
         public CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class
         {
             var results = this.CursorResults?.Select(r => {
@@ -37,6 +49,13 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
             return new CursorPageSlice<TTargetType>(results, (int)this.TotalCount);
         }
 
+        /// <summary>
+        /// Convenience method to easily map/convert/project all types in the current page to a different object type
+        /// altogether, without affecting the cursor indexes, etc. Provide deffered execution via Linq Select().
+        /// </summary>
+        /// <typeparam name="TTargetType"></typeparam>
+        /// <param name="mappingFunc">Specify the Func that takes the current type in and returns the target type.</param>
+        /// <returns></returns>
         public CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class
         {
             var results = this.CursorResults?.Select(r =>
@@ -48,10 +67,14 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
             return new CursorPageSlice<TTargetType>(results, (int)this.TotalCount);
         }
 
-        public int? TotalCount { get; protected set; }
-
-        public bool HasNextPage { get; protected set; }
-
-        public bool HasPreviousPage { get; protected set; }
+        /// <summary>
+        /// Conveniene method to Wrap the current Page Slice as PreProcessedCursorSliceResults; to eliminate
+        /// cermenonial code for new'ing up the results.
+        /// </summary>
+        /// <returns></returns>
+        public IPreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice()
+        {
+            return new PreProcessedCursorSlice<TEntity>(this);
+        }
     }
 }

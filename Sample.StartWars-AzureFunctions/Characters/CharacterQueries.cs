@@ -36,7 +36,7 @@ namespace StarWars.Characters
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public PreProcessedCursorSliceResults<ICharacter> GetCharacters(
+        public PreProcessedCursorSlice<ICharacter> GetCharacters(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
@@ -57,7 +57,7 @@ namespace StarWars.Characters
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering will be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return new PreProcessedCursorSliceResults<ICharacter>(slicedCharacters);
+            return new PreProcessedCursorSlice<ICharacter>(slicedCharacters);
             //********************************************************************************
         }
 

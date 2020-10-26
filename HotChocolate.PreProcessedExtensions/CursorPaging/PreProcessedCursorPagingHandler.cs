@@ -34,7 +34,7 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
         {
             //If Appropriate we hande the values here to ensure that no post-processing is done other than
             //  correctly mapping the results into a GraphQL Connection as Edges with Cursors...
-            if (source is IPreProcessedCursorSliceResults<TEntity> pagedResults)
+            if (source is IPreProcessedCursorSlice<TEntity> pagedResults)
             {
                 int? totalCount = pagedResults.TotalCount;
 

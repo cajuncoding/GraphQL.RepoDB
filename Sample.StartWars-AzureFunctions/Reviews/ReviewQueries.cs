@@ -39,7 +39,7 @@ namespace StarWars.Reviews
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering will be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return new PreProcessedCursorSliceResults<Review>(slicedreviews);
+            return new PreProcessedCursorSlice<Review>(slicedreviews);
             //********************************************************************************
 
         }

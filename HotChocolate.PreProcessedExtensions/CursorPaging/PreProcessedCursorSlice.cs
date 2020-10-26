@@ -15,10 +15,10 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
     /// As a real List<> the PureCode Schema inference works as expected!
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class PreProcessedCursorSliceResults<TEntity> : List<TEntity>, IEnumerable<TEntity>, IPreProcessedCursorSliceResults<TEntity>
+    public class PreProcessedCursorSlice<TEntity> : List<TEntity>, IEnumerable<TEntity>, IPreProcessedCursorSlice<TEntity>
         where TEntity : class
     {
-        public PreProcessedCursorSliceResults(ICursorPageSlice<TEntity> pageSlice)
+        public PreProcessedCursorSlice(ICursorPageSlice<TEntity> pageSlice)
         {
             this.CursorPage = pageSlice;
             this.TotalCount = pageSlice?.TotalCount ?? 0;
@@ -53,21 +53,5 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
 
             return results;
         }
-
-        //public IEnumerable<IndexEdge<TTargetType>> ToEdgeResultsOfType<TTargetType>() where TTargetType : class
-        //{
-        //    //The Linq Selection provides IEnumerable for us...
-        //    //Note: thats why we do NOT call ToList() here so that consuming classes may provide additional filtering...
-        //    var results = this.CursorPage?.CursorResults
-        //        .Select(cr => {
-        //            if (cr?.Entity is TTargetType)
-        //                return IndexEdge<TTargetType>.Create(cr.Entity as TTargetType, cr.CursorIndex);
-        //            else
-        //                return null;
-        //        })
-        //        .Where(cr => cr != null);
-
-        //    return results;
-        //}
     }
 }

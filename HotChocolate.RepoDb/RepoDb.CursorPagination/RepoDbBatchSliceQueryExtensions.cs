@@ -17,7 +17,34 @@ namespace RepoDb.CursorPagination
 {
     public static class BaseRepositoryCustomExtensions
     {
-        public static async Task<CursorPageSlice<TEntity>> BatchSliceQueryAsync<TEntity, TDbConnection>(
+        /// <summary>
+        /// Base Repository extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to core feature.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDbConnection"></typeparam>
+        /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
+        /// <param name="afterCursor"></param>
+        /// <param name="firstTake"></param>
+        /// <param name="beforeCursor"></param>
+        /// <param name="lastTake"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="where"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="transaction"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             int? afterCursor = null, int? firstTake = null,
             int? beforeCursor = null, int? lastTake = null,
@@ -37,7 +64,7 @@ namespace RepoDb.CursorPagination
 
             try
             {
-                var cursorPageResult = await connection.BatchSliceQueryAsync<TEntity>(
+                var cursorPageResult = await connection.GraphQLBatchSliceQueryAsync<TEntity>(
                     afterCursor: afterCursor,
                     firstTake: firstTake,
                     beforeCursor: beforeCursor,
@@ -65,7 +92,33 @@ namespace RepoDb.CursorPagination
         }
 
 
-        public static async Task<CursorPageSlice<TEntity>> BatchSliceQueryAsync<TEntity>(
+        /// <summary>
+        /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to core feature.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbConnection">Extends DbConnection directly</param>
+        /// <param name="afterCursor"></param>
+        /// <param name="firstTake"></param>
+        /// <param name="beforeCursor"></param>
+        /// <param name="lastTake"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="where"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="transaction"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             int? afterCursor = null, int? firstTake = null,
             int? beforeCursor = null, int? lastTake = null,
@@ -122,7 +175,8 @@ namespace RepoDb.CursorPagination
 
             var cursorPageResult = await dbConnection.ExecuteBatchSliceQueryAsync<TEntity>(
                 commandText: query,
-                cancellationToken: cancellationToken
+                cancellationToken: cancellationToken,
+                transaction: transaction
             );
 
             return cursorPageResult;
@@ -181,9 +235,9 @@ namespace RepoDb.CursorPagination
             this DbConnection dbConn,
             string commandText,
             object queryParams = null,
+            string tableName = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
-            string tableName = null,
             CancellationToken cancellationToken = default
         ) where TEntity : class
         {

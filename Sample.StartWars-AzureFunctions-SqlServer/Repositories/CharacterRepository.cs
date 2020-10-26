@@ -81,7 +81,7 @@ namespace StarWars.Repositories
         {
             var sqlConn = CreateConnection();
 
-            var pageSlice = await sqlConn.BatchSliceQueryAsync<CharacterDbModel>(
+            var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
                 afterCursor: pagingParams.AfterIndex!,
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,

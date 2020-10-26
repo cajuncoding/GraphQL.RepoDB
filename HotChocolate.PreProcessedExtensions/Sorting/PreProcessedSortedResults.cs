@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace HotChocolate.PreProcessedExtensions.Sorting
 {
@@ -22,5 +23,24 @@ namespace HotChocolate.PreProcessedExtensions.Sorting
                 this.AddRange(results);
         }
 
+    }
+
+    public static class PreprocessedSortedResultsExtnsions
+    {
+        /// <summary>
+        /// Conveniene method to Wrap the current Enumeable Result Items as a PreProcessedSortResults; to eliminate
+        /// cermenonial code for new'ing up the results.
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="enumerableItems"></param>
+        /// <returns></returns>
+        public static PreProcessedSortedResults<TEntity> AsPreProcessedSortResults<TEntity>(this IEnumerable<TEntity> enumerableItems)
+            where TEntity : class
+        {
+            if (enumerableItems == null) 
+                return null;
+
+            return new PreProcessedSortedResults<TEntity>(enumerableItems);
+        }
     }
 }

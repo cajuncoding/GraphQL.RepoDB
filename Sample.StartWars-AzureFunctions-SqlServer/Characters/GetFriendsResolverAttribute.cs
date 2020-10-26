@@ -29,7 +29,7 @@ namespace StarWars.Characters
                 var friends = await repository.GetCharacterFriendsAsync(character);
 
                 var pagedFriends = friends.SliceAsCursorPage(graphQLParams.PagingArgs);
-                return new PreProcessedCursorSliceResults<ICharacter>(pagedFriends);
+                return new PreProcessedCursorSlice<ICharacter>(pagedFriends);
                 //********************************************************************************
             });
         }

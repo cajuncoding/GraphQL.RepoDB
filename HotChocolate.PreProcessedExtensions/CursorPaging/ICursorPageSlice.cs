@@ -26,5 +26,21 @@ namespace HotChocolate.PreProcessedExtensions.Pagination
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
         CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class;
+
+        /// <summary>
+        /// Convenience method to easily map/convert/project all types in the current page to a different object type
+        /// altogether, without affecting the cursor indexes, etc. Provide deffered execution via Linq Select().
+        /// </summary>
+        /// <typeparam name="TTargetType"></typeparam>
+        /// <param name="mappingFunc"></param>
+        /// <returns></returns>
+        CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class;
+
+        /// <summary>
+        /// Conveniene method to Wrap the current Page Slice as PreProcessedCursorSliceResults; to eliminate
+        /// cermenonial code for new'ing up the results.
+        /// </summary>
+        /// <returns></returns>
+        IPreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice();
     }
 }

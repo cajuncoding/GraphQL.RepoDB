@@ -40,7 +40,7 @@ namespace StarWars.Characters
         //[UseFiltering]
         [UseSorting]
         [GraphQLName("characters")]
-        public async Task<PreProcessedCursorSliceResults<ICharacter>> GetCharactersPaginatedAsync(
+        public async Task<IPreProcessedCursorSlice<ICharacter>> GetCharactersPaginatedAsync(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
@@ -64,7 +64,7 @@ namespace StarWars.Characters
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering can be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return new PreProcessedCursorSliceResults<ICharacter>(charactersSlice.OfType<ICharacter>());
+            return charactersSlice.AsPreProcessedCursorSlice();
             //********************************************************************************
         }
 
@@ -82,11 +82,11 @@ namespace StarWars.Characters
                 sortFields: repoDbParams.SortOrderFields
             );
 
-            return new PreProcessedSortedResults<ICharacter>(sortedCharacters);
+            return sortedCharacters.AsPreProcessedSortResults();
         }
 
         /// <summary>
-        /// Gets a character by it`s id.
+        /// Gets all Characters for the specified Id values.
         /// </summary>
         /// <param name="ids">The ids of the human to retrieve.</param>
         /// <param name="repository"></param>
@@ -100,10 +100,21 @@ namespace StarWars.Characters
             return characters;
         }
 
+        /// <summary>
+        /// Search across all Character types via Union of results in GraphQL.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="repository"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ISearchResult>> SearchAsync(
             string text,
-            [Service] ICharacterRepository repository) =>
-                await repository.SearchAsync(text);
+            [Service] ICharacterRepository repository
+        )
+        {
+            var searchResults = await repository.SearchAsync(text);
+            return searchResults;
+        }
+
 
     }
 }
