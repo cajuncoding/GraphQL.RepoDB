@@ -1,5 +1,8 @@
-﻿using HotChocolate.Resolvers;
+﻿# nullable enable
+
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using System.Reflection;
 
 namespace HotChocolate.PreProcessedExtensions
 {
@@ -7,7 +10,14 @@ namespace HotChocolate.PreProcessedExtensions
     {
         IFieldSelection GraphQLFieldSelection { get; }
         ObjectType GraphQLObjectType { get; }
+        MemberInfo? ClassMemberInfo { get; }
         NameString Name { get; }
         string SelectionName { get; }
+        string SelectionMemberName { get; }
+        /// <summary>
+        /// Select the MemberName if possible otherwise retrieve the SelectionName
+        /// because technically the underlying IFieldSelection.Member is a nullable field.
+        /// </summary>
+        string SelectionMemberNameOrDefault { get; }
     }
 }

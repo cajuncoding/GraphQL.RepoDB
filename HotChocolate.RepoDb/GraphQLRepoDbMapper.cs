@@ -26,19 +26,63 @@ namespace HotChocolate.RepoDb
         }
 
         /// <summary>
-        /// Map the Selection name values from HotChocolate GraphQL Query (names of the Schema) to RepoDb specific
-        /// values that have the underlying DB field name (as potentially mapped on the Model).
+        /// Map the Selection name values for a specific GrqphQL type from the HotChocolate GraphQL Schema (names of the Schema) 
+        /// to RepoDb specific values that have the underlying DB field name (as potentially mapped on the Model).
         /// All Fields are returned as a default if the value is undefined and/or invalid and cannot be mapped.
         /// NOTE: Property names and db fields names are not guaranteed to be the same.
         /// </summary>
         /// <param name="fieldNamesFilter"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+        /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
+        /// GraphQL ParamsContext.
+        /// </returns>
+        public IEnumerable<Field> GetSelectFieldsFor<TGraphQLEntity>()
+        {
+            //Get the Selection Member names -- the actual class property/member names mapped by GraphQL;
+            //  this may be different than the GraphQL Schema names due to GraphQL name mapping.
+            IEnumerable<string> selectionNamesFilter = this.GraphQLParamsContext?.SelectionMemberNamesFor<TGraphQLEntity>();
+
+            return GetSelectFields(selectionNamesFilter);
+        }
+
+        /// <summary>
+        /// Map the Selection name values from all available HotChocolate GraphQL Query selections (names of the Schema) to 
+        /// RepoDb specific values that have the underlying DB field name (as potentially mapped on the Model).
+        /// All Fields are returned as a default if the value is undefined and/or invalid and cannot be mapped.
+        /// NOTE: Property names and db fields names are not guaranteed to be the same.
+        /// </summary>
+        /// <param name="fieldNamesFilter"></param>
+        /// <returns>
+        /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+        /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
+        /// GraphQL ParamsContext.
+        /// </returns>
         public IEnumerable<Field> GetSelectFields()
         {
-            IEnumerable<string> fieldNamesFilter = this.GraphQLParamsContext?.SelectionNames;
+            //Get the Selection Member names -- the actual class property/member names mapped by GraphQL;
+            //  this may be different than the GraphQL Schema names due to GraphQL name mapping.
+            IEnumerable<string> selectionNamesFilter = this.GraphQLParamsContext?.SelectionMemberNames;
 
+            return GetSelectFields(selectionNamesFilter);
+        }
+
+        /// <summary>
+        /// Map the Selection name values from the specified Selection Names provided to the   
+        /// RepoDb specific values that have the underlying DB field name (as potentially mapped on the Model).
+        /// All Fields are returned as a default if the value is undefined and/or invalid and cannot be mapped.
+        /// NOTE: Property names and db fields names are not guaranteed to be the same.
+        /// </summary>
+        /// <param name="fieldNamesFilter"></param>
+        /// <returns>
+        /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+        /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
+        /// GraphQL ParamsContext.
+        /// </returns>
+        public IEnumerable<Field> GetSelectFields(IEnumerable<string> selectionNamesFilter)
+        {
             // Ensure we are null safe and Get all the fields in that case...
-            if (fieldNamesFilter == null)
+            if (selectionNamesFilter == null)
             {
                 //NOTE: Since there's no need to filter we can just get ALL fields from the FieldCache!
                 return FieldCache.Get<TModel>();
@@ -51,7 +95,7 @@ namespace HotChocolate.RepoDb
                 //TODO: Add Caching Layer here if needed to Cached a Reverse Dictionary of mappings by Model Name!
                 var mappingLookup = PropertyCache.Get<TModel>().ToLookup(p => p.PropertyInfo.Name.ToLower());
 
-                var selectFields = fieldNamesFilter
+                var selectFields = selectionNamesFilter
                     .Select(name => mappingLookup[name.ToLower()]?.FirstOrDefault()?.AsField())
                     .Where(prop => prop != null);
 

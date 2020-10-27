@@ -33,6 +33,10 @@ namespace HotChocolate.PreProcessedExtensions
             //When retrieving only Names, we should take all Distinct values...
             => SelectionFieldsFor<TObjectType>()?.Select(s=> s.SelectionName).Distinct().ToList();
 
+        public IReadOnlyList<string> SelectionMemberNamesFor<TObjectType>()
+            //When retrieving only Names, we should take all Distinct values...
+            => SelectionFieldsFor<TObjectType>()?.Select(s => s.SelectionMemberNameOrDefault).Distinct().ToList();
+
         public virtual IReadOnlyList<string> SelectionNames
             //When retrieving only Names, we should take all Distinct values...
             => AllSelectionFields?.Select(s => s.SelectionName).Distinct().ToList();
@@ -43,5 +47,9 @@ namespace HotChocolate.PreProcessedExtensions
         //TODO: TEST lazy loading for Struct Type CursorPagingArguments...
         public virtual CursorPagingArguments PagingArgs 
             => _pagingArgs ??= _resolverContext.GetCursorPagingArgsSafely();
+
+        public IReadOnlyList<string> SelectionMemberNames
+            //When retrieving only Names, we should take all Distinct values...
+            => AllSelectionFields?.Select(s => s.SelectionMemberNameOrDefault).Distinct().ToList();
     }
 }

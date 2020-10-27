@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
@@ -14,6 +15,7 @@ namespace StarWars.Characters
         /// <summary>
         /// The unique identifier for the character.
         /// </summary>
+        [GraphQLName("personalIdentifier")]
         int Id { get; }
 
         /// <summary>

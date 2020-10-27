@@ -1,6 +1,7 @@
 # nullable enable
 
 using System.Collections.Generic;
+using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using RepoDb.Attributes;
@@ -33,6 +34,7 @@ namespace StarWars.Characters
         }
 
         /// <inheritdoc />
+        [GraphQLName("personalIdentifier")]
         public int Id { get; set;  }
 
         /// <inheritdoc />
