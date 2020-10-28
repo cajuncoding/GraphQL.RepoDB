@@ -50,6 +50,7 @@ namespace StarWars
                 //  supportability in Serverless architecture...
                 //.AddType<ReviewSubscriptions>()
                 .AddType<Human>()
+                .AddType<HumanFieldResolvers>()
                 .AddType<Droid>()
                 .AddType<Starship>()
                 //*******************************************************************************************

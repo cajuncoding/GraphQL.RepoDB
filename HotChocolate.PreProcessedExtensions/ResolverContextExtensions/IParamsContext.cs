@@ -1,10 +1,19 @@
 ﻿using HotChocolate.PreProcessedExtensions.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
+using System;
 using System.Collections.Generic;
 
 namespace HotChocolate.PreProcessedExtensions
 {
+    [Flags]
+    public enum SelectionNameFlags: short
+    {
+        SelectedNames = 0,
+        DependencyNames = 1,
+        All = SelectedNames | DependencyNames
+    };
+
     public interface IParamsContext
     {
         IResolverContext ResolverContext { get; }
@@ -16,39 +25,40 @@ namespace HotChocolate.PreProcessedExtensions
         IReadOnlyList<IPreProcessingSelection> AllSelectionFields { get; }
 
         /// <summary>
+        /// The original GraphQL Selections based on GraphQL Schema names.
+        /// </summary>
+        IReadOnlyList<string> AllSelectionNames { get; }
+
+        /// <summary>
+        /// Dependency Links that may have been configured for various fields included in the current Selection;
+        /// for example if a dynamic/virtual resolver field is selected it may be dependent on the Id of the Parent,
+        /// and if configured properly this will return the Dependency Link details.
+        /// </summary>
+        IReadOnlyList<PreProcessingDependencyLink> SelectionDependencies { get;  }
+
+
+        /// <summary>
         /// The underlying Selection Fields of a Specific Type, from HotChocolate, for the 
         /// original GraphQL Selections based on GraphQL Schema names.
         /// Interface Types & Union Types may have multipel objects that share parital common 
         /// fields, along with unique fields, and this will get all selections valid for the specific type.
         /// </summary>
-        IReadOnlyList<IPreProcessingSelection> SelectionFieldsFor<TObjectType>();
+        IReadOnlyList<IPreProcessingSelection> GetSelectionFieldsFor<TObjectType>();
 
         /// <summary>
-        /// The original GraphQL Selections based on GraphQL Schema names.
+        /// GatherSelectionNames based on provided parameters to simplify getting the specifid
         /// </summary>
-        IReadOnlyList<string> SelectionNames { get; }
+        /// <param name="includeDependencyNames"></param>
+        /// <returns></returns>
+        IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All);
 
         /// <summary>
-        /// The actual class property/member names as mapped from the GraphQL Schema Selections;
-        /// this may be different than the GraphQL Schema names based on GraphQL name mappings.
+        /// GatherSelectionNames based on provided parameters to simplify getting the specifid
         /// </summary>
-        IReadOnlyList<string> SelectionMemberNames { get; }
+        /// <param name="includeDependencyNames"></param>
+        /// <returns></returns>
+        IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All);
 
-        /// <summary>
-        /// The selections for a Specific Object Type based on original GraphQL Schema names.
-        /// Interface Types & Union Types may have multipel objects that share parital common 
-        /// fields, along with unique fields, and this will get all selections valid for the specific type.
-        /// </summary>
-        IReadOnlyList<string> SelectionNamesFor<TObjectType>();
-
-        /// <summary>
-        /// The acutal class property/member names for a Specific Object Type based as mapped from GraphQL Schema Selections;
-        /// this may be different than the GraphQL Schema names based on GraphQL name mappings.
-        /// Interface Types & Union Types may have multipel objects that share parital common 
-        /// fields, along with unique fields, and this will get all selections valid for the specific type.
-        /// </summary>
-        IReadOnlyList<string> SelectionMemberNamesFor<TObjectType>();
-        
         /// <summary>
         /// The Sort Arguments for the GraphQL request
         /// </summary>

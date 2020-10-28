@@ -25,7 +25,6 @@ namespace HotChocolate.RepoDb
 
         public GraphQLRepoDbMapper<TEntity> RepoDbMapper { get; protected set; }
 
-
         public IReadOnlyList<Field> SelectFields => _selectFields 
             ??= RepoDbMapper.GetSelectFields()?.ToList();
 

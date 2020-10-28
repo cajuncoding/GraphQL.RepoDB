@@ -41,7 +41,7 @@ namespace HotChocolate.RepoDb
         {
             //Get the Selection Member names -- the actual class property/member names mapped by GraphQL;
             //  this may be different than the GraphQL Schema names due to GraphQL name mapping.
-            IEnumerable<string> selectionNamesFilter = this.GraphQLParamsContext?.SelectionMemberNamesFor<TGraphQLEntity>();
+            IEnumerable<string> selectionNamesFilter = this.GraphQLParamsContext?.GetSelectionMappedNamesFor<TGraphQLEntity>(SelectionNameFlags.All);
 
             return GetSelectFields(selectionNamesFilter);
         }
@@ -62,7 +62,7 @@ namespace HotChocolate.RepoDb
         {
             //Get the Selection Member names -- the actual class property/member names mapped by GraphQL;
             //  this may be different than the GraphQL Schema names due to GraphQL name mapping.
-            IEnumerable<string> selectionNamesFilter = this.GraphQLParamsContext?.SelectionMemberNames;
+            IEnumerable<string> selectionNamesFilter = this.GraphQLParamsContext?.GetSelectionMappedNames(SelectionNameFlags.All);
 
             return GetSelectFields(selectionNamesFilter);
         }
