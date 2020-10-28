@@ -1,8 +1,16 @@
 # (Unofficial) HotChocolate v11 Extensions for working with Micro-ORM(s) instead of IQueryable
 
-# Work in Progress... main branch has not yet reached stable state...
-1. Still workign on Selections (support for Interfaces)
-2. Pending work on Filter Arguments...
+## Work in Progress...
+### Pending:
+1. Support for configuration of Selection/Projection Dependencies between resolvers so that if a Resolver requires a field that wasn't selected in the original query (e.g. Foreign Key ID), it is added to the Selecitons; but only when needed.
+2. Dynamic Filtering (WHERE clause) arguments support.
+
+### Completed:
+1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline for Sorting & Paging; eliminatues redundant processing and possilby incorrect results.
+2. Supports full service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 3. Implemented RepoDb as the primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
+4. Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!
+5. Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb.
+6. Support for Cursor based Pagination arguments down to the the Repository/Service layer & into Sql queries via RepoDb -- Relay spec cursors are fully implemented via Sql Server queries in RepoDb.
 
 ## Overview
 TODO...
