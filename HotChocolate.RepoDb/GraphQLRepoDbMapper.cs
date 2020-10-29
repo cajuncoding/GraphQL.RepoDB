@@ -1,5 +1,5 @@
-﻿using HotChocolate.PreProcessedExtensions;
-using HotChocolate.PreProcessedExtensions.Sorting;
+﻿using HotChocolate.PreProcessingExtensions;
+using HotChocolate.PreProcessingExtensions.Sorting;
 using RepoDb;
 using RepoDb.CursorPagination;
 using RepoDb.CustomExtensions;

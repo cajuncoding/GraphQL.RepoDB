@@ -16,7 +16,7 @@
     <PackageReference Include="RepoDb.SqlServer" Version="1.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HotChocolate.PreProcessedExtensions\HotChocolate.PreProcessedExtensions.csproj" />
+    <ProjectReference Include="..\HotChocolate.PreProcessingExtensions\HotChocolate.PreProcessingExtensions.csproj" />
     <ProjectReference Include="..\HotChocolate.RepoDb\HotChocolate.RepoDb.SqlServer.csproj" />
   </ItemGroup>
   <ItemGroup>

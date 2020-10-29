@@ -1,6 +1,6 @@
 using System.Reflection;
-using HotChocolate.PreProcessedExtensions;
-using HotChocolate.PreProcessedExtensions.Pagination;
+using HotChocolate.PreProcessingExtensions;
+using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.RepoDb;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;

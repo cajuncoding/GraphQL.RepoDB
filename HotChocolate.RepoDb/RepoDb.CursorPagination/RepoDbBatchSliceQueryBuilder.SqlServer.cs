@@ -1,4 +1,4 @@
-﻿using HotChocolate.PreProcessedExtensions.Pagination;
+﻿using HotChocolate.PreProcessingExtensions.Pagination;
 using RepoDb;
 using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;

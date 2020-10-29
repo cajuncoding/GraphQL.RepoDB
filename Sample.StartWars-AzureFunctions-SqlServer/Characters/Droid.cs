@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using HotChocolate;
-using HotChocolate.PreProcessedExtensions;
+using HotChocolate.PreProcessingExtensions;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 

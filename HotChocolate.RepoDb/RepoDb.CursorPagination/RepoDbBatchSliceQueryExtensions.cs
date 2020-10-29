@@ -1,4 +1,4 @@
-﻿using HotChocolate.PreProcessedExtensions.Pagination;
+﻿using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.RepoDb;
 using HotChocolate.RepoDb.SqlServer.Reflection;
 using RepoDb;

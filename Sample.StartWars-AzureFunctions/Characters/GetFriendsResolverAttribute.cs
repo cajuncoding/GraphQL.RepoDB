@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Reflection;
-using HotChocolate.PreProcessedExtensions;
-using HotChocolate.PreProcessedExtensions.Pagination;
+using HotChocolate.PreProcessingExtensions;
+using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
 using StarWars.Repositories;

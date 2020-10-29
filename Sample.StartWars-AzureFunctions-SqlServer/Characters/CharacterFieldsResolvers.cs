@@ -1,5 +1,5 @@
 ﻿using HotChocolate;
-using HotChocolate.PreProcessedExtensions;
+using HotChocolate.PreProcessingExtensions;
 using HotChocolate.Types;
 using StarWars.Characters;
 using StarWars.Repositories;

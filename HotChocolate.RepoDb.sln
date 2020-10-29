@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.RepoDb.SqlServer", "HotChocolate.RepoDb\HotChocolate.RepoDb.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.PreProcessedExtensions", "HotChocolate.PreProcessedExtensions\HotChocolate.PreProcessedExtensions.csproj", "{747B95FC-FFA7-4966-A0F9-7FA315D7F823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotChocolate.PreProcessingExtensions", "HotChocolate.PreProcessingExtensions\HotChocolate.PreProcessingExtensions.csproj", "{747B95FC-FFA7-4966-A0F9-7FA315D7F823}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "Sample.StartWars-AzureFunctions\StarWars-AzureFunctions.csproj", "{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}"
 EndProject

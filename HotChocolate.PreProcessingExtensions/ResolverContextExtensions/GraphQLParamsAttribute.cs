@@ -1,9 +1,9 @@
-﻿using HotChocolate.PreProcessingExtensions;
+﻿using HotChocolate;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace HotChocolate.RepoDb
+namespace HotChocolate.PreProcessingExtensions
 {
     /// <summary>
     /// Convenience Attribute to support Local Injecting of GraphQL Parameters
@@ -12,9 +12,9 @@ namespace HotChocolate.RepoDb
     /// or lower layer of code (e.g. Service/Repository).
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
-    public class GrapQLRepoDbParamsAttribute : LocalStateAttribute
+    public class GraphQLParamsAttribute : LocalStateAttribute
     {
-        public GrapQLRepoDbParamsAttribute() : base(nameof(GrapQLRepoDbParamsAttribute))
+        public GraphQLParamsAttribute() : base(nameof(GraphQLParamsContext))
         {
         }
     }

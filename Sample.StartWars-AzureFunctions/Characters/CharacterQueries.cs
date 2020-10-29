@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.PreProcessedExtensions;
+using HotChocolate.PreProcessingExtensions;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using StarWars.Repositories;
 using System.Linq;
 using System.ComponentModel;
-using HotChocolate.PreProcessedExtensions.Sorting;
-using HotChocolate.PreProcessedExtensions.Pagination;
+using HotChocolate.PreProcessingExtensions.Sorting;
+using HotChocolate.PreProcessingExtensions.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 using HotChocolate.Types.Pagination;
 
