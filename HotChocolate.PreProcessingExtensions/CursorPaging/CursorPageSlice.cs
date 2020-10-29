@@ -72,7 +72,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// cermenonial code for new'ing up the results.
         /// </summary>
         /// <returns></returns>
-        public IPreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice()
+        public PreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice()
         {
             return new PreProcessedCursorSlice<TEntity>(this);
         }

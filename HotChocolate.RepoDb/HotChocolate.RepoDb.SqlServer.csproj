@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>11.0.0</Version>
+    <Version>11.0.0.1</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
     <Description>A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, &amp; Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.</Description>
@@ -11,7 +11,9 @@
     <PackageProjectUrl>https://github.com/cajuncoding/HotChocolate.RepoDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cajuncoding/HotChocolate.RepoDb</RepositoryUrl>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <PackageReleaseNotes>Initial release for HotChocolate v11 API with support for Selections/Projections, Sort arguments, and Cursor Paging with fully Relay spec compatible Batch Query/Slice api for Sql Server.  It leverages the PreProcessedExtensions package as the facade to HotChocolate and provides RepoDb specific helpers/mapping functionality and extensed API(s) for querying Sql Server. Version is synced up with the upcoming major version release for HotChocolate v11.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added support for TableName override (to use Sql Views) in Cursor Paging API extensions.</PackageReleaseNotes>
+    <AssemblyVersion>11.0.0.1</AssemblyVersion>
+    <FileVersion>11.0.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

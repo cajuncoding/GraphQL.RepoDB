@@ -23,7 +23,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
         /// Will return null if the order arguments/info is not available.
         /// </summary>
         /// <returns></returns>
-        public static List<ISortOrderField>? GetSortingArgsSafely(this IResolverContext context, string orderByArgName = null)
+        public static List<ISortOrderField>? GetSortingArgsSafely(this IResolverContext context, string orderByArgName = null!)
         {
             //Unfortunately the Try/Catch is required to make this safe for easier coding when the argument is not specified,
             //  because the ResolverContext doesn't expose a method to check if an argument exists...

@@ -66,6 +66,28 @@ namespace StarWars.Repositories
             return convertedSlice;
         }
 
+        public async Task<ICursorPageSlice<Human>> GetPagedHumanCharactersAsync(
+            IEnumerable<Field> selectFields,
+            IEnumerable<OrderField> sortFields,
+            IRepoDbCursorPagingParams pagingParams
+        )
+        {
+            var sqlConn = CreateConnection();
+
+            var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
+                orderBy: sortFields,
+                fields: selectFields,
+                where: c => c.Id >=1000 && c.Id <= 1999,
+                afterCursor: pagingParams.AfterIndex!,
+                beforeCursor: pagingParams.BeforeIndex!,
+                firstTake: pagingParams.First,
+                lastTake: pagingParams.Last
+            );
+
+            var convertedSlice = pageSlice.AsMappedType(r => (Human)MapDbModelToCharacterModel(r));
+            return convertedSlice;
+        }
+
         public async Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(int[] ids)
         {
             var sqlConn = CreateConnection();

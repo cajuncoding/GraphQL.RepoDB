@@ -37,10 +37,10 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class;
 
         /// <summary>
-        /// Conveniene method to Wrap the current Page Slice as PreProcessedCursorSliceResults; to eliminate
+        /// Convenience method to Wrap the current Page Slice as PreProcessedCursorSliceResults; to eliminate
         /// cermenonial code for new'ing up the results.
         /// </summary>
         /// <returns></returns>
-        IPreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice();
+        PreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice();
     }
 }

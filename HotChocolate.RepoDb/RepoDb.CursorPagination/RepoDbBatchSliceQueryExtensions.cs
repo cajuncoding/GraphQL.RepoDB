@@ -53,6 +53,7 @@ namespace RepoDb.CursorPagination
             Expression<Func<TEntity, bool>> where,
             int? afterCursor = null, int? firstTake = null,
             int? beforeCursor = null, int? lastTake = null,
+            string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
             IDbTransaction transaction = null,
@@ -71,6 +72,7 @@ namespace RepoDb.CursorPagination
                     where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
                     hints: hints,
                     fields: fields,
+                    tableName: tableName,
                     transaction: transaction,
                     cancellationToken: cancellationToken
                 );
@@ -111,6 +113,7 @@ namespace RepoDb.CursorPagination
             int? beforeCursor = null, int? lastTake = null,
             string hints = null,
             IEnumerable<Field> fields = null,
+            string tableName = null,
             IDbTransaction transaction = null,
             CancellationToken cancellationToken = default
         )
@@ -132,6 +135,7 @@ namespace RepoDb.CursorPagination
                     where: where,
                     hints: hints,
                     fields: fields,
+                    tableName: tableName,
                     transaction: transaction,
                     cancellationToken: cancellationToken
                 );
@@ -238,6 +242,7 @@ namespace RepoDb.CursorPagination
             int? beforeCursor = null, int? lastTake = null,
             string hints = null,
             IEnumerable<Field> fields = null,
+            string tableName = null,
             IDbTransaction transaction = null,
             CancellationToken cancellationToken = default
         )
@@ -247,7 +252,9 @@ namespace RepoDb.CursorPagination
             if (orderBy == null)
                 throw new ArgumentNullException("A sort order must be specified to provide valid cursor paging results.", nameof(orderBy));
 
-            var tableName = ClassMappedNameCache.Get<TEntity>();
+            var dbTableName = string.IsNullOrWhiteSpace(tableName)
+                                ? ClassMappedNameCache.Get<TEntity>()
+                                : tableName;
 
             //Ensure we have default fields; default is to include All Fields...
             var selectFields = fields?.Any() == true
@@ -256,7 +263,7 @@ namespace RepoDb.CursorPagination
 
             //Retrieve only the select fields that are valid for the Database query!
             //NOTE: We guard against duplicate values as a convenience.
-            var validSelectFields = await dbConnection.GetValidatedDbFields(tableName, selectFields.Distinct());
+            var validSelectFields = await dbConnection.GetValidatedDbFields(dbTableName, selectFields.Distinct());
 
             //Dynamically hanlde RepoDb where filters (QueryGroup)...
             object whereParams = where != null
@@ -265,7 +272,7 @@ namespace RepoDb.CursorPagination
 
             //Build the Cursor Paging query...
             var query = RepoDbCursorPagingQueryBuilder.BuildSqlServerBatchSliceQuery<TEntity>(
-                tableName: tableName,
+                tableName: dbTableName,
                 fields: validSelectFields,
                 orderBy: orderBy,
                 where: where,

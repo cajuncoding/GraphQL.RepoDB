@@ -56,7 +56,39 @@ namespace StarWars.Characters
             //       down to the Repository (and underlying Database) layer.
             var charactersSlice = await repository.GetPagedCharactersAsync(
                 repoDbParams.SelectFields,
-                repoDbParams.SortOrderFields ?? new List<OrderField> { new OrderField("name", Order.Ascending) },
+                repoDbParams.SortOrderFields ?? OrderField.Parse(new { Name = Order.Ascending }),
+                repoDbParams.PagingParameters
+            );
+
+            //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
+            //  it will not have additional post-processing in the HotChocolate pipeline!
+            //NOTE: Filtering can be applied but ONLY to the results we are now returning;
+            //       Because this would normally be pushed down to the Sql Database layer.
+            return charactersSlice.AsPreProcessedCursorSlice();
+            //********************************************************************************
+        }
+
+        [UsePaging]
+        //[UseFiltering]
+        [UseSorting]
+        [GraphQLName("humans")]
+        public async Task<IPreProcessedCursorSlice<Human>> GetHumansPaginatedAsync(
+            [Service] ICharacterRepository repository,
+            //THIS is now injected by Pre-Processed extensions middleware...
+            [GraphQLParams] IParamsContext graphQLParams
+        )
+        {
+            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
+
+            //********************************************************************************
+            //Get the data and convert to List() to ensure it's an Enumerable
+            //  and no longer using IQueryable to successfully simulate 
+            //  pre-processed results.
+            //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
+            //       down to the Repository (and underlying Database) layer.
+            var charactersSlice = await repository.GetPagedHumanCharactersAsync(
+                repoDbParams.SelectFields,
+                repoDbParams.SortOrderFields ?? OrderField.Parse(new { Name = Order.Ascending }),
                 repoDbParams.PagingParameters
             );
 

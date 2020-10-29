@@ -8,9 +8,9 @@
     <None Include="..\README.md" Link="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.162" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.176" />
     <PackageReference Include="HotChocolate.AzureFunctionsProxy" Version="11.0.0-preview.162" />
-    <PackageReference Include="HotChocolate.Data" Version="11.0.0-preview.162" />
+    <PackageReference Include="HotChocolate.Data" Version="11.0.0-preview.176" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.9" />
     <PackageReference Include="RepoDb.SqlServer" Version="1.1.1" />
