@@ -98,5 +98,13 @@ BEGIN
 		(2001,1002),
 		(2001,1003)
 END
+GO
 
+--Create A View to greatly simplify the Code view into the Friends relationship...
+CREATE OR ALTER VIEW ViewStarWarsFriends AS
+	SELECT c.*, f.Id as FriendOfId
+	FROM StarWarsCharacters c 
+		join StarWarsFriends j on c.Id = j.CharacterId
+		join StarWarsCharacters f on j.FriendId = f.Id;
+GO
 

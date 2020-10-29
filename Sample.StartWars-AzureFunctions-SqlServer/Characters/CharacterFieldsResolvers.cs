@@ -2,8 +2,10 @@
 using HotChocolate.PreProcessedExtensions;
 using HotChocolate.Types;
 using StarWars.Characters;
+using StarWars.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,12 +16,15 @@ namespace StarWars.Characters
     {
         [GraphQLName("droids")]
         [PreProcessingParentDependencies(nameof(ICharacter.Id))]
-        public Task<Droid> GetDroidsAsync(
-            [GraphQLParams] IParamsContext graphQLParams    
+        public async Task<IEnumerable<Droid>> GetDroidsAsync(
+            [Service] ICharacterRepository repository,
+            [Parent] ICharacter character
+            //[GraphQLParams] IParamsContext graphQLParams    
         )
         {
-            var parent = graphQLParams.ResolverContext.Parent<ICharacter>();
-            return Task.FromResult(new Droid(parent.Id, "BB-8", "Astromech"));
+            var friends = await repository.GetCharacterFriendsAsync(character.Id);
+            var droids = friends.OfType<Droid>();
+            return droids;
         }
     }
 }

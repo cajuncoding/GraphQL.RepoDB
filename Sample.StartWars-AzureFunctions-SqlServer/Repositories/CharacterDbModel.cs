@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace StarWars.Characters
+namespace StarWars.Characters.DbModels
 {
     [Map("StarWarsCharacters")]
     public class CharacterDbModel

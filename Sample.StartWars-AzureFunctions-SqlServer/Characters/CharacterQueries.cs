@@ -4,13 +4,13 @@ using HotChocolate.Data;
 using HotChocolate.PreProcessedExtensions;
 using HotChocolate.Types;
 using StarWars.Repositories;
-using System.Linq;
 using HotChocolate.PreProcessedExtensions.Sorting;
 using HotChocolate.PreProcessedExtensions.Pagination;
 using System.Threading.Tasks;
 using HotChocolate.RepoDb;
 using RepoDb;
 using RepoDb.Enumerations;
+using StarWars.Characters.DbModels;
 
 namespace StarWars.Characters
 {

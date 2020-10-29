@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using HotChocolate;
+using HotChocolate.PreProcessedExtensions;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using RepoDb.Attributes;
@@ -48,6 +49,9 @@ namespace StarWars.Characters
         /// <inheritdoc />
         [UsePaging(type: typeof(InterfaceType<ICharacter>))]
         [GetFriendsResolver]
+        //Establish configured link to required Selection for Character.Id for 
+        //  resolvers that implement pre-processed results within the Repository Layer.
+        [PreProcessingParentDependencies(nameof(ICharacter.Id))]
         public IReadOnlyList<ICharacter>? Friends { get; set; }
 
         /// <inheritdoc />

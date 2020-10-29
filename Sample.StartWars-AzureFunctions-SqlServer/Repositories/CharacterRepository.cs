@@ -11,6 +11,7 @@ using RepoDb;
 using RepoDb.CursorPagination;
 using RepoDb.Enumerations;
 using StarWars.Characters;
+using StarWars.Characters.DbModels;
 
 namespace StarWars.Repositories
 {
@@ -39,37 +40,8 @@ namespace StarWars.Repositories
                 orderBy: sortFields
             );
 
-            var convertedResults = results.Select(r =>
-            {
-                return r.IsHuman
-                    ? (ICharacter)new Human(r.Id, r.Name, r.HomePlanet)
-                    : (ICharacter)new Droid(r.Id, r.Name, r.PrimaryFunction);
-            });
-
-            return convertedResults;
-
-            //var safeSelectClause = await sqlConn.GetValidatedSelectClause(TableNames.StarWarsCharacters, selectFields);
-            //var safeOrderByClause = await sqlConn.GetValidatedOrderByClause(TableNames.StarWarsCharacters, sortFields);
-
-            //var query = await sqlConn.ExecuteQueryMultipleAsync(
-            //    commandText: @$"
-            //        --Query Humans (by ID Convention)
-            //        SELECT {safeSelectClause} FROM [{TableNames.StarWarsCharacters}] c 
-            //            WHERE c.Id BETWEEN 1000 and 1999 
-            //            {safeOrderByClause};
-
-            //        --Query Droids (by ID Convention)
-            //        SELECT {safeSelectClause} FROM [{TableNames.StarWarsCharacters}] c 
-            //            WHERE c.Id BETWEEN 2000 and 2999;
-            //            {safeOrderByClause};
-            //    "
-            //);
-
-            //var results = new List<ICharacter>();
-            //results.AddRange(query.Extract<Human>());
-            //results.AddRange(query.Extract<Droid>());
-
-            //return results;
+            var mappedResults = MapDbModelsToCharacterModels(results);
+            return mappedResults;
         }
 
 
@@ -90,13 +62,7 @@ namespace StarWars.Repositories
                 fields: selectFields
             );
 
-            var convertedSlice = pageSlice.AsMappedType<ICharacter>(r =>
-            {
-                return r.IsHuman
-                    ? (ICharacter)new Human(r.Id, r.Name, r.HomePlanet)
-                    : (ICharacter)new Droid(r.Id, r.Name, r.PrimaryFunction);
-            });
-
+            var convertedSlice = pageSlice.AsMappedType(r => MapDbModelToCharacterModel(r));
             return convertedSlice;
         }
 
@@ -104,23 +70,38 @@ namespace StarWars.Repositories
         {
             var sqlConn = CreateConnection();
             var results = await sqlConn.QueryAsync<CharacterDbModel>(c => ids.Contains(c.Id));
-
-            return results.Select(r =>
-            {
-                return r.IsHuman
-                    ? (ICharacter)new Human(r.Id, r.Name, r.HomePlanet)
-                    : (ICharacter)new Droid(r.Id, r.Name, r.PrimaryFunction);
-            });
+            
+            var mappedResults = MapDbModelsToCharacterModels(results);
+            return mappedResults;
         }
 
-        public async Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(ICharacter character)
+        public async Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(int characterId)
         {
-
-            throw new NotImplementedException();
-
-            //var sqlConn = CreateConnection();
-            //return await sqlConn.QueryAsync<Character>(c => ids.Contains(c.Id));
+            var sqlConn = CreateConnection();
+            var results = await sqlConn.QueryAsync<CharacterFriendDbModel>(
+                where: f => f.FriendOfId == characterId,
+                //Always include a Default Sort Order (for paging)
+                orderBy: new List<OrderField> () { new OrderField(nameof(CharacterFriendDbModel.Name), Order.Ascending) }
+            );
+            
+            var mappedResults = MapDbModelsToCharacterModels(results);
+            return mappedResults;
         }
+
+        private IEnumerable<ICharacter> MapDbModelsToCharacterModels(IEnumerable<CharacterDbModel> dbModels)
+        {
+            var results = dbModels.Select(r => MapDbModelToCharacterModel(r));
+            return results;
+        }
+
+        private ICharacter MapDbModelToCharacterModel(CharacterDbModel dbModel)
+        {
+            var m = dbModel;
+            return m.IsHuman
+                ? (ICharacter)new Human(m.Id, m.Name, m.HomePlanet)
+                : (ICharacter)new Droid(m.Id, m.Name, m.PrimaryFunction);
+        }
+
 
         public async Task<ICharacter> GetHeroAsync(Episode episode)
         {
