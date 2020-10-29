@@ -12,12 +12,8 @@ namespace StarWars.Characters
     /// <summary>
     /// A human character in the Star Wars universe.
     /// </summary>
-    [Map("StarWarsCharacters")]
     public class Human : ICharacter
     {
-        //RepoDb will need an Empty Constructor
-        public Human() { }
-
         public Human(
             int id,
             string name,

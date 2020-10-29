@@ -54,12 +54,12 @@ namespace StarWars.Repositories
             var sqlConn = CreateConnection();
 
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
+                orderBy: sortFields,
+                fields: selectFields,
                 afterCursor: pagingParams.AfterIndex!,
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
-                lastTake: pagingParams.Last,
-                orderBy: sortFields,
-                fields: selectFields
+                lastTake: pagingParams.Last
             );
 
             var convertedSlice = pageSlice.AsMappedType(r => MapDbModelToCharacterModel(r));
@@ -81,10 +81,27 @@ namespace StarWars.Repositories
             var results = await sqlConn.QueryAsync<CharacterFriendDbModel>(
                 where: f => f.FriendOfId == characterId,
                 //Always include a Default Sort Order (for paging)
-                orderBy: new List<OrderField> () { new OrderField(nameof(CharacterFriendDbModel.Name), Order.Ascending) }
+                orderBy: OrderField.Parse(new { Name = Order.Ascending })
             );
             
             var mappedResults = MapDbModelsToCharacterModels(results);
+            return mappedResults;
+        }
+
+        public async Task<ICursorPageSlice<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams)
+        {
+            var sqlConn = CreateConnection();
+            var results = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterFriendDbModel>(
+                where: f => f.FriendOfId == characterId,
+                //Always include a Default Sort Order (for paging)
+                orderBy: OrderField.Parse(new { Name = Order.Ascending }),
+                afterCursor: pagingParams.AfterIndex,
+                firstTake: pagingParams.First,
+                beforeCursor: pagingParams.BeforeIndex,
+                lastTake: pagingParams.Last
+            );
+
+            var mappedResults = results.AsMappedType(c => MapDbModelToCharacterModel(c));
             return mappedResults;
         }
 

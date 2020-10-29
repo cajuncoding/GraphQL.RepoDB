@@ -27,13 +27,13 @@ namespace StarWars.Characters
                 //********************************************************************************
                 //Perform some pre-processed retrieval of data from the Repository... 
                 //Notice Pagination processing is pushed down to the Repository layer also!
+
+                //Get RepoDb specific mapper for the GraphQL parameter context...
+                //Note: It's important that we map to the DB Model (not the GraphQL model).
                 var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
 
-                var friends = await repository.GetCharacterFriendsAsync(character.Id);
-
-                //TODO: Fix this so that the paging implementation is pushed to the SQL Query, currently 
-                //      not available until Where Filtering is added to the RepoDb GraphQLBatchSliceQury method...
-                var pagedFriends = friends.SliceAsCursorPage(graphQLParams.PagingArgs);
+                //Now we can retrieve the related and paginated data from the Repo...
+                var pagedFriends = await repository.GetCharacterFriendsAsync(character.Id, repoDbParams.PagingParameters);
                 return new PreProcessedCursorSlice<ICharacter>(pagedFriends);
                 //********************************************************************************
             });

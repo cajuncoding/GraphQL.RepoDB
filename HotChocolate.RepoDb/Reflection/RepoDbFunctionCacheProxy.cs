@@ -82,7 +82,7 @@ namespace RepoDb.CustomExtensions
             if(_getDataReaderToTypeCompiledFunctionProxy == null && _getDataReaderToDataEntityFunctionProxy == null)
                 throw new Exception(
                     $"Could not initialize the [{nameof(RepoDbFunctionCacheProxy<TEntity>)}];" +
-                    $" the method to be proxied for [{nameof(GetDataReaderToDataEntityFunctionCompatible)}] is null and/or could not be foudn." +
+                    $" the method to be proxied for [{nameof(GetDataReaderToDataEntityFunctionCompatible)}] is null and/or could not be found." +
                     $" This could be related to change in RepoDb version (source code has changed); please verify the version or update" +
                     $" this method to account for any differences."
                 );

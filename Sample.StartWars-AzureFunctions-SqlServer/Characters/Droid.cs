@@ -13,9 +13,6 @@ namespace StarWars.Characters
     /// </summary>
     public class Droid : ICharacter
     {
-        //RepoDb will need an Empty Constructor
-        public Droid() { }
-
         public Droid(
             int id,
             string name,

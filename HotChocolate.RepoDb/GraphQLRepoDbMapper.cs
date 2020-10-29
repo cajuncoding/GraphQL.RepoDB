@@ -116,7 +116,7 @@ namespace HotChocolate.RepoDb
             var graphQLSortFields = this.GraphQLParamsContext?.SortArgs;
 
             //Ensure we are null safe and return null if no fields are specified...
-            if (graphQLSortFields?.FirstOrDefault() == null)
+            if (graphQLSortFields?.Any() != true)
                 return null;
 
             //NOTE: the RepDb PropertyCache provides mapping lookups, but only by mapped name (e.g. Database name)
@@ -129,7 +129,9 @@ namespace HotChocolate.RepoDb
             var orderByFields = graphQLSortFields
                 .Select(sf => new {
                     //Null safe checking for the mapped field from RepoDb...
-                    RepoDbField = mappingLookup[sf.FieldName.ToLower()]?.FirstOrDefault()?.AsField(),
+                    //NOTE: We map based on the actual class property/member name not the fieldname which is
+                    //      from the GraphQL schema and may be different than the underlying class property/member.
+                    RepoDbField = mappingLookup[sf.MemberName.ToLower()]?.FirstOrDefault()?.AsField(),
                     //We test for Descencing so that Ascending is always the default for a mismatch.
                     RepoDbOrder = sf.IsDescending() ? Order.Descending : Order.Ascending
                 })

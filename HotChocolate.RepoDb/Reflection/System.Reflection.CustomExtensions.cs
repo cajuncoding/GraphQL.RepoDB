@@ -145,11 +145,27 @@ namespace System.Reflection.CustomExtensions
         /// </summary>
         public class SimpleTypeComparer : IEqualityComparer<Type>
         {
+            public bool IsObjectPlaceholderMatchingEnabled { get; }
+
+            private Type _typeOfObject = typeof(object);
+
+            public SimpleTypeComparer(bool objectPlaceholderMatchingEnabled = false)
+            {
+                IsObjectPlaceholderMatchingEnabled = objectPlaceholderMatchingEnabled;
+            }
+
             public bool Equals(Type x, Type y)
             {
-                return x.Assembly == y.Assembly &&
-                    x.Namespace == y.Namespace &&
-                    x.Name == y.Name;
+                if (IsObjectPlaceholderMatchingEnabled && (x == _typeOfObject || y == _typeOfObject))
+                {
+                    return true;
+                }
+                else
+                {
+                    return x.Assembly == y.Assembly
+                            && x.Namespace == y.Namespace
+                            && x.Name == y.Name;
+                }
             }
 
             public int GetHashCode(Type obj)
@@ -162,7 +178,7 @@ namespace System.Reflection.CustomExtensions
         /// BBernard
         /// Static Type Comparer instance used by the Extension Methods.
         /// </summary>
-        private static readonly SimpleTypeComparer _simpleTypeComparer = new SimpleTypeComparer();
+        private static readonly SimpleTypeComparer _simpleTypeComparer = new SimpleTypeComparer(true);
 
         /// <summary>
         /// BBernard
@@ -282,6 +298,38 @@ namespace System.Reflection.CustomExtensions
             //  typed Delegate for high performance Execution!
             var dynamicDelegate = delegateMethodInfo.CreateDelegate(dynamicDelegateType);
             return dynamicDelegate as TDelegate;
+        }
+
+        /// <summary>
+        /// BBernard
+        /// Dynamically create a Delegate for high performance execution of a method found via Reflection; this supports both 
+        ///     standard Methods or Generic Method definitions!
+        /// For Generic method definitions, we convert the method definition of the Generic method
+        ///     into a full generic implementation using the specified Type[] array.
+        /// NOTE: With the dynamic Delegate we create, Reflection will no longer be called when invoking the Function!
+        /// </summary>
+        /// <typeparam name="TDelegate"></typeparam>
+        /// <param name="methodInfo">A Reflection based Method Info defnition to use to creat the dynamic Delegate from</param>
+        /// <param name="delegateDefinitionStub">Stub Func<> or Delegate defining the definition of the Delegate we want to create</param>
+        /// <param name="genericArgTypes">Types for each Generic Argument to suport Generic Methods</param>
+        /// <returns></returns>
+        public static Delegate CreateDynamicDelegate(this MethodInfo methodInfo, params Type[] genericArgTypes)
+        {
+            //BBernard
+            //Handle Generic Methods which must be converted to their non-generic strongly typed form 
+            //  before Delegate can be created!
+            var delegateMethodInfo = methodInfo.IsGenericMethodDefinition && genericArgTypes.Length >= 1
+                                        ? methodInfo.MakeGenericMethod(genericArgTypes)
+                                        : methodInfo;
+
+            //We must create the Dynamic Delegate Type AFTER we've converted the Generic method definition 
+            //  into a Generic method Implementation.
+            var dynamicDelegateType = delegateMethodInfo.CreateDynamicDelegateType();
+
+            //Once we have a full Generic method implementation (not the definition) we can create a strongly 
+            //  typed Delegate for high performance Execution!
+            var dynamicDelegate = delegateMethodInfo.CreateDelegate(dynamicDelegateType);
+            return dynamicDelegate;
         }
 
         /// <summary>

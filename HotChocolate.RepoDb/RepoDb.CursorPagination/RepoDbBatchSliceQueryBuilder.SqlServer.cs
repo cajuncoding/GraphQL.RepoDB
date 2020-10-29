@@ -30,7 +30,7 @@ namespace RepoDb.CursorPagination
             string tableName,
             IEnumerable<Field> fields,
             IEnumerable<OrderField> orderBy,
-            QueryGroup whereGroup = null,
+            QueryGroup where = null,
             string hints = null,
             int? afterCursorIndex = null,
             int? firstTake = null,
@@ -65,9 +65,7 @@ namespace RepoDb.CursorPagination
                         .FieldsFrom(cteFields, dbSetting)
                     .From().TableNameFrom(tableName, dbSetting)
                     .HintsFrom(hints)
-                //TODO: NOT IMPLEMENTED YET due to the utilties to easily map the QueryGroup to a query param object 
-                //  being 'internal' scoped; that we will need to access....
-                //.WhereFrom(whereGroup, dbSetting)
+                .WhereFrom(where, dbSetting)
                 .CloseParen()
                 .Select()
                     .FieldsFrom(selectFields, dbSetting)
@@ -92,7 +90,7 @@ namespace RepoDb.CursorPagination
                     .Count(countField, dbSetting)
                     .From().TableNameFrom(tableName, dbSetting)
                     .HintsFrom(hints)
-                    .WhereFrom(whereGroup, dbSetting)
+                    .WhereFrom(where, dbSetting)
                 .End();
             }
 
