@@ -9,7 +9,6 @@ A set of extensions for working with HotChocolate GraphQL and Database access wi
 A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, & Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.
 
 
-
 ## Work in Progress...
 ### Pending:
 1. Offset Paging support in the Facade is pending.
@@ -40,23 +39,25 @@ for Sorting, Paging, etc. as you would with a micro-orm for working with an exte
 functionality can now leverage the simplified facade to HotChocolate provided by *HotChocolate.PreprocessingExtensions*.
 2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb and a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
 and Repository layer with no dependency on IQueryable.
+    * As a fully integrated DB example, the schema & sample data has been scripted and provided in:
+      **DatabaseScripts/CreateStarWarsSchema.sql**   
 
 ### NOTES: 
 1. **NOTE:** This is not necessarily the only, nor do I claim it's the best, approach to working
 with GraphQL or HotChocolate specifically -- but it greatly simplifies the amount of work and effort needed to
 use it in with a Service or Repository pattern of encapsulated data access.
 2. In most enterprises it's very common to have constraints such as:
-  * Existing logic that needs to be re-used from business layer, and/or existing service or 
-  * repository classes.
-  * Properly enabling IQueryable for exist code can be extra-ordinarily complex.
-  * The heavy weight ORM(s) that support IQueryable may not be an option for various reasons (e.g.
+    * Existing logic that needs to be re-used from business layer, and/or existing service or 
+    * repository classes.
+    * Properly enabling IQueryable for exist code can be extra-ordinarily complex.
+    * The heavy weight ORM(s) that support IQueryable may not be an option for various reasons (e.g.
 it may be incongruent with existing tech. stack, or tech. team).
-  * Many use-cases require more bare-metal control over Sql queries actual execution that 
+    * Many use-cases require more bare-metal control over Sql queries actual execution that 
 is only availalbe in a lighter weight (bare-metal) ORM like Dapper or RepoDb.
-  * Architecturally, you need to maintain a greater decoupling of your processing logic from
+    * Architecturally, you need to maintain a greater decoupling of your processing logic from
 being depending on HotChocolate post-processing of IQueryable yet still have Sorting/Paging, etc.
 middleware as part of v11. :-)
-3. **WARNING: Limited Testing has been done on this but I am actively using it on projects, 
+3. **DISCLAIMER: Limited Testing has been done on this but I am actively using it on projects, 
 and will update with any findings. And features are being added as this project evolves.**
 
 ## Goals
@@ -84,15 +85,14 @@ this by using Decorator classes/interfaces only as needed.
 
 
 ## Implementation:
-TODO...
+*TODO... add implementation summary*
 
-/NOTE: The HotChocolate default behaviour will occur anytime a normal IEnumerable or IQueryable result
+*NOTE: The HotChocolate default behaviour will occur anytime a normal IEnumerable or IQueryable result
 is returned. This ia accomplished by ensuring that the new Sorring/Paging Providers have 
 "right of first refusal" for handling, but will always default back to the existing HotChocolate Queryable 
-implementations.
+implementations.*
 
-
-## Key Elements:
+## Configuration and Use:
 ### Startup Configuration - HotChocolate.PreprocessingExtensions
 1. Add the following initializer into the Startup.cs to enable these extensions.
   * All other elements of HotChocolate initialization are the same using the v11 API. 
@@ -107,8 +107,7 @@ implementations.
 2. Now you can Dependency Inject the new **IParamsContext** into your Resolvers:
 This greatly simplifies access to key parameters such as selection names, sort arguments, and cursor
 paging arguments.
-
-*NOTE: The selection/projection names will map to the GraphQL schema names and the class model properties/members
+    * *NOTE: The selection/projection names will map to the GraphQL schema names and the class model properties/members
 of the entity model, but these may not be the same as your Database fields for SELECT clauses. The same applies for the 
 sort arguments.  These likely need to be mapped to the real field names of the underlying data source; a micro-orm like RepoDb makes this easy, but
 other orm's may be different -- but at least now, these are surfaced as defined in the GraphQL Schema
