@@ -72,7 +72,7 @@ namespace StarWars.Characters
         //[UseFiltering]
         [UseSorting]
         [GraphQLName("humans")]
-        public async Task<IPreProcessedCursorSlice<Human>> GetHumansPaginatedAsync(
+        public async Task<PreProcessedCursorSlice<Human>> GetHumansPaginatedAsync(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams

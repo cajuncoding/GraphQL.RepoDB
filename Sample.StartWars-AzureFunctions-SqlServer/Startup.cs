@@ -59,7 +59,9 @@ namespace StarWars
                 //NOTE This allows all OOTB behaviors except for when we want to control the processing
                 //  of results for sorting, paging, etc. and do not want redundant post-processing to occur
                 //  by HotChocolate internals...
-                //NOTE: This Adds Sorting & Paging providers/conventions by default!
+                //NOTE: This Adds Sorting & Paging providers/conventions by default!  Do not AddPaging() & 
+                //      AddSorting() in addition to '.AddPreProcessedResultsExtensions()', or the HotChocolate 
+                //       Pipeline will not work as expected!
                 .AddPreProcessedResultsExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************

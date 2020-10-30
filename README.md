@@ -101,6 +101,9 @@ implementations.*
             .AddGraphQLServer()
             .AddQueryType<YourQueryResolverClass>()
             //This Below is the initializer to be added...
+            //NOTE: This Adds Sorting & Paging providers/conventions by default!  Do not AddPaging() & 
+            //      AddSorting() in addition to '.AddPreProcessedResultsExtensions()', or the HotChocolate 
+            //      Pipeline will not work as expected!
             .AddPreProcessedResultsExtensions()
 ```
 
