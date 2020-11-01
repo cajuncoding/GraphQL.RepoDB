@@ -42,17 +42,12 @@ namespace HotChocolate.PreProcessingExtensions
         public virtual IReadOnlyList<ISortOrderField> SortArgs 
             => _sortArgs ??= _resolverContext.GetSortingArgsSafely();
 
-        /// <summary>
-        /// The default paging method is Cursor based paging which matches HotChocolate UsePaging default;
-        ///     use OffsetPagingArgs otherwise.
-        /// </summary>
-        public virtual CursorPagingArguments PagingArgs => CursorPagingArgs ?? new CursorPagingArguments();
+        public virtual CursorPagingArguments PagingArgs => CursorPagingArgs;
 
-        //TODO: TEST lazy loading for Struct Type CursorPagingArguments...
-        public virtual CursorPagingArguments? CursorPagingArgs
+        public virtual CursorPagingArguments CursorPagingArgs
             => _cursorPagingArgs ??= LoadCursorPagingArgsHelper();
 
-        public virtual OffsetPagingArguments? OffsetPagingArgs
+        public virtual OffsetPagingArguments OffsetPagingArgs
             => _offsetPagingArgs ??= LoadOffsetPagingArgsHelper();
 
 
@@ -80,20 +75,20 @@ namespace HotChocolate.PreProcessingExtensions
             return results;
         }
 
-        protected CursorPagingArguments? LoadCursorPagingArgsHelper()
+        protected CursorPagingArguments LoadCursorPagingArgsHelper()
         {
             var cursorPagingArgs = _resolverContext.GetCursorPagingArgsSafely();
             return cursorPagingArgs.IsPagingArgumentsValid()
                     ? cursorPagingArgs
-                    : (CursorPagingArguments?)null;
+                    : new CursorPagingArguments();
         }
 
-        protected OffsetPagingArguments? LoadOffsetPagingArgsHelper()
+        protected OffsetPagingArguments LoadOffsetPagingArgsHelper()
         {
             var offsetPagingArgs = _resolverContext.GetOffsetPagingArgsSafely();
             return offsetPagingArgs.IsPagingArgumentsValid()
                     ? offsetPagingArgs
-                    : (OffsetPagingArguments?)null;
+                    : new OffsetPagingArguments(-1, -1);
         }
 
         protected IEnumerable<string> GatherSelectionNamesInternal(IEnumerable<IPreProcessingSelection> baseEnumerable, SelectionNameFlags flags)

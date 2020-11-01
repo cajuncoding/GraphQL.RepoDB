@@ -150,7 +150,7 @@ namespace StarWars.Characters
         {
             //With HotChocolate.RepoDb package we can easily map the inputs from GraphQL
             //  IParamsContext into the RepoDb specific helper for DB mapping:
-            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
+            var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
 
             //********************************************************************************//
             // Push the Selections, SortArgumetns, and Paging Arguments down to our Repository

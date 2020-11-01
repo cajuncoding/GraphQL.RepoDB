@@ -46,7 +46,7 @@ namespace StarWars.Characters
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
-            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
+            var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
 
             //********************************************************************************
             //Get the data and convert to List() to ensure it's an Enumerable
@@ -55,9 +55,9 @@ namespace StarWars.Characters
             //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
             //       down to the Repository (and underlying Database) layer.
             var charactersSlice = await repository.GetPagedCharactersAsync(
-                repoDbParams.SelectFields,
-                repoDbParams.SortOrderFields ?? OrderField.Parse(new { Name = Order.Ascending }),
-                repoDbParams.PagingParameters
+                repoDbParams.GetSelectFields(),
+                repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
+                repoDbParams.GetCursorPagingParameters()
             );
 
             //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
@@ -83,7 +83,7 @@ namespace StarWars.Characters
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
-            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
+            var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
 
             //********************************************************************************
             //Get the data and convert to List() to ensure it's an Enumerable
@@ -92,9 +92,9 @@ namespace StarWars.Characters
             //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
             //       down to the Repository (and underlying Database) layer.
             var charactersSlice = await repository.GetPagedCharactersAsync(
-                repoDbParams.SelectFields,
-                repoDbParams.SortOrderFields ?? OrderField.Parse(new { Name = Order.Ascending }),
-                repoDbParams.PagingParameters
+                repoDbParams.GetSelectFields(),
+                repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
+                repoDbParams.GetCursorPagingParameters()
             );
 
             //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
@@ -115,7 +115,7 @@ namespace StarWars.Characters
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
-            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
+            var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
 
             //********************************************************************************
             //Get the data and convert to List() to ensure it's an Enumerable
@@ -124,9 +124,9 @@ namespace StarWars.Characters
             //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
             //       down to the Repository (and underlying Database) layer.
             var charactersSlice = await repository.GetPagedHumanCharactersAsync(
-                repoDbParams.SelectFields,
-                repoDbParams.SortOrderFields ?? OrderField.Parse(new { Name = Order.Ascending }),
-                repoDbParams.PagingParameters
+                repoDbParams.GetSelectFields(),
+                repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
+                repoDbParams.GetCursorPagingParameters()
             );
 
             //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
@@ -144,11 +144,11 @@ namespace StarWars.Characters
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
-            var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
+            var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
 
             var sortedCharacters = await repository.GetAllSortedCharactersAsync(
-                selectFields: repoDbParams.SelectFields, 
-                sortFields: repoDbParams.SortOrderFields
+                selectFields: repoDbParams.GetSelectFields(), 
+                sortFields: repoDbParams.GetSortOrderFields()
             );
 
             return sortedCharacters.AsPreProcessedSortResults();

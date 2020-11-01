@@ -30,10 +30,10 @@ namespace StarWars.Characters
 
                 //Get RepoDb specific mapper for the GraphQL parameter context...
                 //Note: It's important that we map to the DB Model (not the GraphQL model).
-                var repoDbParams = new GraphQLRepoDbParams<CharacterDbModel>(graphQLParams);
+                var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
 
                 //Now we can retrieve the related and paginated data from the Repo...
-                var pagedFriends = await repository.GetCharacterFriendsAsync(character.Id, repoDbParams.PagingParameters);
+                var pagedFriends = await repository.GetCharacterFriendsAsync(character.Id, repoDbParams.GetCursorPagingParameters());
                 return new PreProcessedCursorSlice<ICharacter>(pagedFriends);
                 //********************************************************************************
             });

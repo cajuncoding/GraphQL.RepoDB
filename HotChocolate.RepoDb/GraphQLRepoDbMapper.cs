@@ -147,8 +147,9 @@ namespace HotChocolate.RepoDb
         /// <summary>
         /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
         /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
-        /// The default paging method is Cursor based paging which matches HotChocolate UsePaging default;
-        ///     use GetOffsetPagingParameters() otherwise.
+        /// The naming convention matches the correct usage along with the [UsePaging] HotChocolate attribute; 
+        /// whereby the default paging method is Cursor based paging. 
+        /// Otherwise use OffsetPagingArgs with the [UseOffsetPaging] attribute.
         /// </summary>
         /// <returns></returns>
 
@@ -156,42 +157,44 @@ namespace HotChocolate.RepoDb
 
         /// <summary>
         /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
-        /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
+        /// Null is returned if the value is undefined and/or invalid and cannot be mapped. 
+        /// This will return the same results a GetPagingParameters() matching the same Cursor based
+        /// paging default as HotChocolate does with the [UsePaging] attribute.
         /// </summary>
         /// <returns></returns>
         public IRepoDbCursorPagingParams GetCursorPagingParameters()
         {
-            var graphQLPagingArgs = this.GraphQLParamsContext?.CursorPagingArgs;
+            var graphQLPagingArgs = this.GraphQLParamsContext.CursorPagingArgs;
 
-            if (!graphQLPagingArgs.HasValue || !graphQLPagingArgs.Value.IsPagingArgumentsValid() == true)
+            if (!graphQLPagingArgs.IsPagingArgumentsValid())
             {
                 return null;
             }
 
             return new RepoDbCursorPagingParams(
-                first: graphQLPagingArgs.Value.First,
-                after: graphQLPagingArgs.Value.After,
-                before: graphQLPagingArgs.Value.Before,
-                last: graphQLPagingArgs.Value.Last
+                first: graphQLPagingArgs.First,
+                after: graphQLPagingArgs.After,
+                before: graphQLPagingArgs.Before,
+                last: graphQLPagingArgs.Last
             );
         }
 
         /// <summary>
-        /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
+        /// Map the HotChocolate OffsetPagingArguments into the RepoDb specific offset paging parameter.
         /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
+        /// The naming convention matches the correct usage along with the [UseOffsetPaging] HotChocolate attribute.
         /// </summary>
         /// <returns></returns>
         public RepoDbOffsetPagingParams GetOffsetPagingParameters()
         {
-            var graphQLPagingArgs = this.GraphQLParamsContext?.OffsetPagingArgs;
+            var graphQLPagingArgs = this.GraphQLParamsContext.OffsetPagingArgs;
 
-            if (!graphQLPagingArgs.HasValue || !graphQLPagingArgs.Value.IsPagingArgumentsValid() == true)
+            if (!graphQLPagingArgs.IsPagingArgumentsValid() == true)
             {
                 return null;
             }
 
-            var pagingArgs = graphQLPagingArgs.Value;
-            return RepoDbOffsetPagingParams.FromSkipTake(pagingArgs.Take, pagingArgs.Skip ?? 0);
+            return RepoDbOffsetPagingParams.FromSkipTake(graphQLPagingArgs.Take, graphQLPagingArgs.Skip ?? 0);
         }
     }
 }

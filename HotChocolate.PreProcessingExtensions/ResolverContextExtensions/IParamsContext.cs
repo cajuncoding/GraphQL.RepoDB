@@ -66,19 +66,21 @@ namespace HotChocolate.PreProcessingExtensions
         IReadOnlyList<ISortOrderField> SortArgs { get; }
 
         /// <summary>
-        /// The Paging arguments for the GrqphQL request
-        /// </summary>
-        CursorPagingArguments? CursorPagingArgs { get; }
-
-        /// <summary>
-        /// The Offset Paging arguments for the GrqphQL request (if available)
-        /// </summary>
-        OffsetPagingArguments? OffsetPagingArgs { get; }
-
-        /// <summary>
-        /// The default paging method is Cursor based paging which matches HotChocolate UsePaging default;
-        ///     use OffsetPagingArgs otherwise.
+        /// The Cursor Paging arguments for the GrqphQL request; the default paging method is Cursor based paging which 
+        /// matches HotChocolate [UsePaging] attribute. Otherwise use OffsetPagingArgs with the [UseOffsetPaging] attribute.
         /// </summary>
         CursorPagingArguments PagingArgs { get; }
+
+        /// <summary>
+        /// The Cursor Paging arguments for the GrqphQL request; same results as PagingArgs which use Cursor paging as default
+        /// via the [UsePaging] HotChocolate attribute.
+        /// </summary>
+        CursorPagingArguments CursorPagingArgs { get; }
+
+        /// <summary>
+        /// The Offset Paging arguments for the GrqphQL request (if available); naming convention matches the [UseOffsetPaging]
+        /// HotChocolate attribute.
+        /// </summary>
+        OffsetPagingArguments OffsetPagingArgs { get; }
     }
 }
