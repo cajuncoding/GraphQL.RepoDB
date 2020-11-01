@@ -1,4 +1,5 @@
-﻿using HotChocolate.PreProcessingExtensions.Sorting;
+﻿using HotChocolate.PreProcessingExtensions.Pagination;
+using HotChocolate.PreProcessingExtensions.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using System;
@@ -66,6 +67,17 @@ namespace HotChocolate.PreProcessingExtensions
 
         /// <summary>
         /// The Paging arguments for the GrqphQL request
+        /// </summary>
+        CursorPagingArguments? CursorPagingArgs { get; }
+
+        /// <summary>
+        /// The Offset Paging arguments for the GrqphQL request (if available)
+        /// </summary>
+        OffsetPagingArguments? OffsetPagingArgs { get; }
+
+        /// <summary>
+        /// The default paging method is Cursor based paging which matches HotChocolate UsePaging default;
+        ///     use OffsetPagingArgs otherwise.
         /// </summary>
         CursorPagingArguments PagingArgs { get; }
     }

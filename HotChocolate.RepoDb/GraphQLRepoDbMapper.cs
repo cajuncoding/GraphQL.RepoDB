@@ -1,5 +1,7 @@
 ﻿using HotChocolate.PreProcessingExtensions;
+using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.PreProcessingExtensions.Sorting;
+using HotChocolate.Types;
 using RepoDb;
 using RepoDb.CursorPagination;
 using RepoDb.CustomExtensions;
@@ -145,16 +147,24 @@ namespace HotChocolate.RepoDb
         /// <summary>
         /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
         /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
+        /// The default paging method is Cursor based paging which matches HotChocolate UsePaging default;
+        ///     use GetOffsetPagingParameters() otherwise.
         /// </summary>
         /// <returns></returns>
-        public IRepoDbCursorPagingParams GetPagingParameters()
-        {
-            var graphQLPagingArgs = this.GraphQLParamsContext?.PagingArgs;
 
-            if (graphQLPagingArgs == null)
+        public IRepoDbCursorPagingParams GetPagingParameters() => GetCursorPagingParameters();
+
+        /// <summary>
+        /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
+        /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
+        /// </summary>
+        /// <returns></returns>
+        public IRepoDbCursorPagingParams GetCursorPagingParameters()
+        {
+            var graphQLPagingArgs = this.GraphQLParamsContext?.CursorPagingArgs;
+
+            if (!graphQLPagingArgs.HasValue || !graphQLPagingArgs.Value.IsPagingArgumentsValid() == true)
             {
-                //If no Paging args are availble and/or both Before & After cursor params are null
-                //  then we don't have a valid paging parameter so we return null.
                 return null;
             }
 
@@ -164,6 +174,24 @@ namespace HotChocolate.RepoDb
                 before: graphQLPagingArgs.Value.Before,
                 last: graphQLPagingArgs.Value.Last
             );
+        }
+
+        /// <summary>
+        /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
+        /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
+        /// </summary>
+        /// <returns></returns>
+        public RepoDbOffsetPagingParams GetOffsetPagingParameters()
+        {
+            var graphQLPagingArgs = this.GraphQLParamsContext?.OffsetPagingArgs;
+
+            if (!graphQLPagingArgs.HasValue || !graphQLPagingArgs.Value.IsPagingArgumentsValid() == true)
+            {
+                return null;
+            }
+
+            var pagingArgs = graphQLPagingArgs.Value;
+            return RepoDbOffsetPagingParams.FromSkipTake(pagingArgs.Take, pagingArgs.Skip ?? 0);
         }
     }
 }

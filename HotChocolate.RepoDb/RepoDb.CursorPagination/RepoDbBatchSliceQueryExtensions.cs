@@ -314,7 +314,7 @@ namespace RepoDb.CursorPagination
             {
                 if (transaction == null)
                 {
-                    connection.Dispose();
+                    connection?.Dispose();
                 }
             }
         }

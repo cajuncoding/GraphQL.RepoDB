@@ -12,7 +12,8 @@ namespace HotChocolate.PreProcessingExtensions
     public class GraphQLParamsContext : IParamsContext
     {
         protected IResolverContext _resolverContext;
-        protected CursorPagingArguments? _pagingArgs;
+        protected CursorPagingArguments? _cursorPagingArgs;
+        protected OffsetPagingArguments? _offsetPagingArgs;
         protected IReadOnlyList<ISortOrderField> _sortArgs;
         protected IReadOnlyList<IPreProcessingSelection> _selectionFields;
         protected IReadOnlyList<PreProcessingDependencyLink> _selectionDependencies;
@@ -40,10 +41,20 @@ namespace HotChocolate.PreProcessingExtensions
 
         public virtual IReadOnlyList<ISortOrderField> SortArgs 
             => _sortArgs ??= _resolverContext.GetSortingArgsSafely();
-        
+
+        /// <summary>
+        /// The default paging method is Cursor based paging which matches HotChocolate UsePaging default;
+        ///     use OffsetPagingArgs otherwise.
+        /// </summary>
+        public virtual CursorPagingArguments PagingArgs => CursorPagingArgs ?? new CursorPagingArguments();
+
         //TODO: TEST lazy loading for Struct Type CursorPagingArguments...
-        public virtual CursorPagingArguments PagingArgs 
-            => _pagingArgs ??= _resolverContext.GetCursorPagingArgsSafely();
+        public virtual CursorPagingArguments? CursorPagingArgs
+            => _cursorPagingArgs ??= LoadCursorPagingArgsHelper();
+
+        public virtual OffsetPagingArguments? OffsetPagingArgs
+            => _offsetPagingArgs ??= LoadOffsetPagingArgsHelper();
+
 
         /// <summary>
         /// Get the selection names mapped to underlying class property/member id values, and include
@@ -67,6 +78,22 @@ namespace HotChocolate.PreProcessingExtensions
         {
             var results = GatherSelectionNamesInternal(GetSelectionFieldsFor<TObjectType>(), flags);
             return results;
+        }
+
+        protected CursorPagingArguments? LoadCursorPagingArgsHelper()
+        {
+            var cursorPagingArgs = _resolverContext.GetCursorPagingArgsSafely();
+            return cursorPagingArgs.IsPagingArgumentsValid()
+                    ? cursorPagingArgs
+                    : (CursorPagingArguments?)null;
+        }
+
+        protected OffsetPagingArguments? LoadOffsetPagingArgsHelper()
+        {
+            var offsetPagingArgs = _resolverContext.GetOffsetPagingArgsSafely();
+            return offsetPagingArgs.IsPagingArgumentsValid()
+                    ? offsetPagingArgs
+                    : (OffsetPagingArguments?)null;
         }
 
         protected IEnumerable<string> GatherSelectionNamesInternal(IEnumerable<IPreProcessingSelection> baseEnumerable, SelectionNameFlags flags)
