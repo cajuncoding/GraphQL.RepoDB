@@ -98,7 +98,7 @@ implementations.*
 ## Configuration and Use:
 ### Startup Configuration - HotChocolate.PreprocessingExtensions
 1. Add the following initializer into the Startup.cs to enable these extensions.
-  * All other elements of HotChocolate initialization are the same using the v11 API. 
+   - All other elements of HotChocolate initialization are the same using the v11 API. 
 ```csharp
         builder.Services
             .AddGraphQLServer()
