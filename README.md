@@ -1,7 +1,6 @@
-# Packages in this Repo 
+## Overview 
 *(Unofficial) HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
-## Overview
 ### *HotChocolate.PreprocessingExtensions*
 A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).
 
@@ -162,7 +161,7 @@ namespace StarWars.Characters
             //   a 'Page Slice' model.
             var charactersSlice = await repository.GetPagedCharactersAsync(
                 repoDbParams.SelectFields,
-                repoDbParams.SortOrderFields ?? new List<OrderField> { new OrderField("name", Order.Ascending) },
+                repoDbParams.SortOrderFields ?? OrderField.Parse(new { name = Order.Ascending })
                 repoDbParams.PagingParameters
             );
 
@@ -178,9 +177,6 @@ namespace StarWars.Characters
 }
 
 ```
-
-
-
 ## Disclaimers:
 - Subscriptions were disabled in the example project(s) due to unknown supportability in a serverless environment. 
   - The StarWars example uses in-memory subscriptions which are incongruent with the serverless paradigm of AzureFunctions.
