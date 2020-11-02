@@ -11,8 +11,11 @@ A set of extensions for working with HotChocolate GraphQL and RepoDb as the data
 
 ## Work in Progress...
 ### Pending:
-1. Offset Paging support in the Facade is pending.
-1. Dynamic Filtering in the Facade (WHERE clause) arguments support is pending.
+1. Support for Default Paging options use in IParamsContext... 
+2. Offset Paging support in the Facade is pending....
+
+### Planned:
+1. Dynamic Filtering in the Facade (WHERE clause) arguments support will be added as time permits.
 
 ### Completed:
 1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
