@@ -1,17 +1,19 @@
 ## Overview 
 *(Unofficial) HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
+*Note: Updated Repo & Package names to eliminate conflicts with the core HotChocolate packages.*
 
-### *HotChocolate.PreprocessingExtensions*
+### *GraphQL.PreprocessingExtensions*
 A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).
 
-### *HotChocolate.RepoDb.SqlServer*
+### *GraphQL.RepoDb.SqlServer*
 A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, & Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.
 
 
 ## Work in Progress...
 ### Pending:
-1. Support for Default Paging options use in IParamsContext... 
-2. Offset Paging support in the Facade is pending....
+1. Fixing repo & package names to fix conflicts with HotChocolate core packages.
+2. Support for Default Paging options use in IParamsContext... 
+3. Offset Paging support in the Facade is pending....
 
 ### Planned:
 1. Dynamic Filtering in the Facade (WHERE clause) arguments support will be added as time permits.
