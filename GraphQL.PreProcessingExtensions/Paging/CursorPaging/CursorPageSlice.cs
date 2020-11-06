@@ -39,10 +39,9 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         public CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class
         {
             var results = this.CursorResults?.Select(r => {
-                if (r?.Entity is TTargetType)
-                    return new CursorResult<TTargetType>(r.Entity as TTargetType, r.CursorIndex);
-                else
-                    return null;
+                return r?.Entity is TTargetType
+                    ? new CursorResult<TTargetType>(r.Entity as TTargetType, r.CursorIndex)
+                    : null;
             })
             .Where(cr => cr != null);
             

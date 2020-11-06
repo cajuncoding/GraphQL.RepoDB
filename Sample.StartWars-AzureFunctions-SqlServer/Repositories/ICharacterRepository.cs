@@ -15,10 +15,16 @@ namespace StarWars.Repositories
             IEnumerable<OrderField> sortFields
         );
 
-        Task<ICursorPageSlice<ICharacter>> GetPagedCharactersAsync(
+        Task<ICursorPageSlice<ICharacter>> GetCursorPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
             IRepoDbCursorPagingParams pagingParams
+        );
+
+        Task<IOffsetPageResults<ICharacter>> GetOffsetPagedCharactersAsync(
+            IEnumerable<Field> selectFields,
+            IEnumerable<OrderField> sortFields,
+            IRepoDbOffsetPagingParams pagingParams
         );
 
         Task<ICursorPageSlice<Human>> GetPagedHumanCharactersAsync(

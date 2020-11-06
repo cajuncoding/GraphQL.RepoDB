@@ -8,9 +8,11 @@
     <Description>A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).</Description>
     <Copyright>Copyright ©  2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/cajuncoding/HotChocolate.RepoDb</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/cajuncoding/HotChocolate.RepoDb</RepositoryUrl>
-    <PackageReleaseNotes>Initial release for HotChocolate v11 API with support for Selections/Projections, Sort arguments, and Cursor Paging (Offset paging &amp; Filtering arguments are not implemented yet).  Version is synced up with the upcoming major version release for HotChocolate v11.</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
+    <PackageReleaseNotes>Updates to Repo, Packages and Project naming to eliminate any risk of conflicts with HotChocolate core project packages.
+
+Initial release for HotChocolate v11 API with support for Selections/Projections, Sort arguments, and Cursor Paging (Offset paging &amp; Filtering arguments are not implemented yet).  Version is synced up with the upcoming major version release for HotChocolate v11.</PackageReleaseNotes>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
     <AssemblyVersion>11.0.0.2</AssemblyVersion>
     <FileVersion>11.0.0.2</FileVersion>
@@ -21,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.Data" Version="11.0.0-preview.176" />
+    <PackageReference Include="HotChocolate.Data" Version="11.0.0-rc.0" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,5 @@
 ﻿using HotChocolate.PreProcessingExtensions.Pagination;
-using HotChocolate.RepoDb;
 using HotChocolate.RepoDb.SqlServer.Reflection;
-using RepoDb;
 using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;
 using RepoDb.Extensions;
@@ -50,6 +48,7 @@ namespace RepoDb.CursorPagination
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
+            //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> where,
             int? afterCursor = null, int? firstTake = null,
             int? beforeCursor = null, int? lastTake = null,
@@ -183,6 +182,7 @@ namespace RepoDb.CursorPagination
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
+            //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> where,
             int? afterCursor = null, int? firstTake = null,
             int? beforeCursor = null, int? lastTake = null,

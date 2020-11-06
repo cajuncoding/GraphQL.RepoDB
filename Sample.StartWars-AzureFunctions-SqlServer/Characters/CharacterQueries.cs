@@ -54,7 +54,7 @@ namespace StarWars.Characters
             //  pre-processed results.
             //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
             //       down to the Repository (and underlying Database) layer.
-            var charactersSlice = await repository.GetPagedCharactersAsync(
+            var charactersSlice = await repository.GetCursorPagedCharactersAsync(
                 repoDbParams.GetSelectFields(),
                 repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
                 repoDbParams.GetCursorPagingParameters()
@@ -77,7 +77,7 @@ namespace StarWars.Characters
         //[UseFiltering]
         [UseSorting]
         [GraphQLName("charactersOffsetPaging")]
-        public async Task<IPreProcessedCursorSlice<ICharacter>> GetCharactersOffsetPaginatedAsync(
+        public async Task<IPreProcessedOffsetPageResults<ICharacter>> GetCharactersOffsetPaginatedAsync(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
@@ -91,17 +91,17 @@ namespace StarWars.Characters
             //  pre-processed results.
             //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
             //       down to the Repository (and underlying Database) layer.
-            var charactersSlice = await repository.GetPagedCharactersAsync(
+            var charactersPage = await repository.GetOffsetPagedCharactersAsync(
                 repoDbParams.GetSelectFields(),
                 repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
-                repoDbParams.GetCursorPagingParameters()
+                repoDbParams.GetOffsetPagingParameters()
             );
 
             //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering can be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return charactersSlice.AsPreProcessedCursorSlice();
+            return charactersPage.AsPreProcessedPageResults();
             //********************************************************************************
         }
 

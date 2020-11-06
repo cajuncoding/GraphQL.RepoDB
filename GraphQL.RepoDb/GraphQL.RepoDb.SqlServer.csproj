@@ -8,10 +8,12 @@
     <Description>A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, &amp; Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.</Description>
     <Copyright>Copyright ©  2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/cajuncoding/HotChocolate.RepoDb</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/cajuncoding/HotChocolate.RepoDb</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <PackageReleaseNotes>Added support for TableName override (to use Sql Views) in Cursor Paging API extensions.</PackageReleaseNotes>
+    <PackageReleaseNotes>Updates to Repo, Packages and Project naming to eliminate any risk of conflicts with HotChocolate core project packages.
+
+Added support for TableName override (to use Sql Views) in Cursor Paging API extensions.</PackageReleaseNotes>
     <AssemblyVersion>11.0.0.2</AssemblyVersion>
     <FileVersion>11.0.0.2</FileVersion>
   </PropertyGroup>
@@ -25,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HotChocolate.PreProcessingExtensions\HotChocolate.PreProcessingExtensions.csproj" />
+    <ProjectReference Include="..\GraphQL.PreProcessingExtensions\GraphQL.PreProcessingExtensions.csproj" />
   </ItemGroup>
 
 </Project>

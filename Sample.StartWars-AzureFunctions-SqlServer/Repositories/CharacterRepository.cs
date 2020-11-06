@@ -45,7 +45,7 @@ namespace StarWars.Repositories
         }
 
 
-        public async Task<ICursorPageSlice<ICharacter>> GetPagedCharactersAsync(
+        public async Task<ICursorPageSlice<ICharacter>> GetCursorPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
             IRepoDbCursorPagingParams pagingParams
@@ -54,8 +54,8 @@ namespace StarWars.Repositories
             var sqlConn = CreateConnection();
 
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
-                orderBy: sortFields,
                 fields: selectFields,
+                orderBy: sortFields,
                 afterCursor: pagingParams.AfterIndex!,
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
@@ -64,6 +64,25 @@ namespace StarWars.Repositories
 
             var convertedSlice = pageSlice.AsMappedType(r => MapDbModelToCharacterModel(r));
             return convertedSlice;
+        }
+
+        public async Task<IOffsetPageResults<ICharacter>> GetOffsetPagedCharactersAsync(
+            IEnumerable<Field> selectFields,
+            IEnumerable<OrderField> sortFields,
+            IRepoDbOffsetPagingParams pagingParams
+        )
+        {
+            var sqlConn = CreateConnection();
+
+            var offsetPageResults = await sqlConn.GraphQLBatchOffsetPagingQueryAsync<CharacterDbModel>(
+                page: pagingParams.Page,
+                rowsPerBatch: pagingParams.RowsPerBatch,
+                orderBy: sortFields,
+                fields: selectFields
+            );
+
+            var convertedPage = offsetPageResults.AsMappedType(r => MapDbModelToCharacterModel(r));
+            return convertedPage;
         }
 
         public async Task<ICursorPageSlice<Human>> GetPagedHumanCharactersAsync(
