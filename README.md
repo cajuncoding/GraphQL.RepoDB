@@ -1,5 +1,6 @@
 ## Overview 
 *(Unofficial) HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
+
 *Note: Updated Repo & Package names to eliminate conflicts with the core HotChocolate packages.*
 
 ### *GraphQL.PreprocessingExtensions*
