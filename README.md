@@ -1,29 +1,34 @@
-# Packages in this Repo 
+## Overview 
 *(Unofficial) HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
-## Overview
-### *HotChocolate.PreprocessingExtensions*
+*Note: Updated Repo & Package names to eliminate conflicts with the core HotChocolate packages.*
+
+### *GraphQL.PreprocessingExtensions*
 A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).
 
-### *HotChocolate.RepoDb.SqlServer*
+### *GraphQL.RepoDb.SqlServer*
 A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, & Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.
 
 
 ## Work in Progress...
 ### Pending:
-1. Offset Paging support in the Facade is pending.
-1. Dynamic Filtering in the Facade (WHERE clause) arguments support is pending.
+1. Fixing repo & package names to fix conflicts with HotChocolate core packages.
+2. Support for Default Paging options use in IParamsContext... 
+3. Offset Paging support in the Facade is pending....
+
+### Planned:
+1. Dynamic Filtering in the Facade (WHERE clause) arguments support will be added as time permits.
 
 ### Completed:
 1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
 2. Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
 3. Provides abstraction facade with *HotChocolate.PreprocessingExtensions* package that can be used for any micro-orm.
-3. Implemented RepoDb on top of HotChocolate.PreprocessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
-4. Supports abstracted facade for: 
-  * Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!  And supports correct GraphQL Schema to Class property mapping.
-  * Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
-  * Support for Cursor based Pagination arguments down to the the Repository/Service layer & into Sql queries via RepoDb -- Relay spec cursors are fully implemented via Sql Server api extensions to RepoDb.
-5. Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
+4. Implemented RepoDb on top of HotChocolate.PreprocessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
+5. Supports abstracted facade for: 
+   - Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!  And supports correct GraphQL Schema to Class property mapping.
+   - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
+   - Support for Cursor based Pagination arguments down to the the Repository/Service layer & into Sql queries via RepoDb -- Relay spec cursors are fully implemented via Sql Server api extensions to RepoDb.
+6. Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
 
 
 ## Demo Site (Star Wars)
@@ -39,7 +44,7 @@ for Sorting, Paging, etc. as you would with a micro-orm for working with an exte
 functionality can now leverage the simplified facade to HotChocolate provided by *HotChocolate.PreprocessingExtensions*.
 2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb and a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
 and Repository layer with no dependency on IQueryable.
-    * As a fully integrated DB example, the schema & sample data has been scripted and provided in:
+   - As a fully integrated DB example, the schema & sample data has been scripted and provided in:
       **DatabaseScripts/CreateStarWarsSchema.sql**   
 
 ### NOTES: 
@@ -47,14 +52,14 @@ and Repository layer with no dependency on IQueryable.
 with GraphQL or HotChocolate specifically -- but it greatly simplifies the amount of work and effort needed to
 use it in with a Service or Repository pattern of encapsulated data access.
 2. In most enterprises it's very common to have constraints such as:
-    * Existing logic that needs to be re-used from business layer, and/or existing service or 
-    * repository classes.
-    * Properly enabling IQueryable for exist code can be extra-ordinarily complex.
-    * The heavy weight ORM(s) that support IQueryable may not be an option for various reasons (e.g.
+   - Existing logic that needs to be re-used from business layer, and/or existing service or 
+   - repository classes.
+   - Properly enabling IQueryable for exist code can be extra-ordinarily complex.
+   - The heavy weight ORM(s) that support IQueryable may not be an option for various reasons (e.g.
 it may be incongruent with existing tech. stack, or tech. team).
-    * Many use-cases require more bare-metal control over Sql queries actual execution that 
+   - Many use-cases require more bare-metal control over Sql queries actual execution that 
 is only availalbe in a lighter weight (bare-metal) ORM like Dapper or RepoDb.
-    * Architecturally, you need to maintain a greater decoupling of your processing logic from
+   - Architecturally, you need to maintain a greater decoupling of your processing logic from
 being depending on HotChocolate post-processing of IQueryable yet still have Sorting/Paging, etc.
 middleware as part of v11. :-)
 3. **DISCLAIMER: Limited Testing has been done on this but I am actively using it on projects, 
@@ -62,25 +67,25 @@ and will update with any findings. And features are being added as this project 
 
 ## Goals
 
-* To provide a working approach that simplifies the use of HotChocolate with lower level micro-orms
+- To provide a working approach that simplifies the use of HotChocolate with lower level micro-orms
 and/or bare-metal Sql (database) mechanisms, while preventing duplicate post-processing by 
 HotChocolate existing processes. 
-* At the same time I want to use as much of the existing functionality of HotChocolate for 
+- At the same time I want to use as much of the existing functionality of HotChocolate for 
 dynamically generating schema elements, arguments, etc. for Sorting, Paging, etc.
-  * I do not want to have to create more code/classes/ceremonial elements than necessary.
-* And as a critical benefit, all pre-processed result extensions should not interfere with existing
+  - I do not want to have to create more code/classes/ceremonial elements than necessary.
+- And as a critical benefit, all pre-processed result extensions should not interfere with existing
 out-of-the-box functionality except when we explicitly want it to (via our Decorators and Conventions);
-  * Otherwise in all other cases the original HotChocolate behavior should work as expected - 
+  - Otherwise in all other cases the original HotChocolate behavior should work as expected - 
 correctly processing both IQueryable & IEnumerable results.
-* Keep this code encapsulated (to the extent possible) so that the data processing isn't 
+- Keep this code encapsulated (to the extent possible) so that the data processing isn't 
 tightly coupled with HotChocolate by way of dependency on functionality (IQueryable) or by
 dependency on types (classes, etc.)
 switching to the official Middleware will be as
 painless and simple as possible *(with a few design assumptions aside)*.
-* Provide at least one layer of abstraction between HotChocolate and the RepoDb specific Extensions;
+- Provide at least one layer of abstraction between HotChocolate and the RepoDb specific Extensions;
 which is maintained in the HotChocolate.PreProcessedExtensions project (e.g. using this only a set of 
 helpers for Dapper could be similarly created).
-* Have NO requirement for special inerfaces to be defined on the Entity Model's themselves, mitigate
+- Have NO requirement for special inerfaces to be defined on the Entity Model's themselves, mitigate
 this by using Decorator classes/interfaces only as needed.
 
 
@@ -95,7 +100,7 @@ implementations.*
 ## Configuration and Use:
 ### Startup Configuration - HotChocolate.PreprocessingExtensions
 1. Add the following initializer into the Startup.cs to enable these extensions.
-  * All other elements of HotChocolate initialization are the same using the v11 API. 
+   - All other elements of HotChocolate initialization are the same using the v11 API. 
 ```csharp
         builder.Services
             .AddGraphQLServer()
@@ -129,7 +134,7 @@ is an easy to consume form.*
 
 ```
 
-3. Here's a full overview of a Resolver and the parts that these packages make significantly easier:
+3. Here's a full overview of a Resolver and what these packages make significantly easier:
 
 ```csharp
 //Sample Extraced from StarWars-AzureFunctions-RepoDb example project:
@@ -159,7 +164,7 @@ namespace StarWars.Characters
             //   a 'Page Slice' model.
             var charactersSlice = await repository.GetPagedCharactersAsync(
                 repoDbParams.SelectFields,
-                repoDbParams.SortOrderFields ?? new List<OrderField> { new OrderField("name", Order.Ascending) },
+                repoDbParams.SortOrderFields ?? OrderField.Parse(new { name = Order.Ascending })
                 repoDbParams.PagingParameters
             );
 
@@ -171,19 +176,14 @@ namespace StarWars.Characters
             return charactersSlice.AsPreProcessedCursorSlice();
             //*******************************************************************************//
         }
-    {}
+    }
 }
 
 ```
-
-
-
 ## Disclaimers:
-* Subscriptions were disabled in the example project(s) due to unknown supportability in a 
-serverless environment. 
-  * The StarWars example uses in-memory subscriptions which are incongruent with the serverless
-paradigm of AzureFunctions.
+- Subscriptions were disabled in the example project(s) due to unknown supportability in a serverless environment. 
+  - The StarWars example uses in-memory subscriptions which are incongruent with the serverless paradigm of AzureFunctions.
 
 ## Credits:
-* The [HotChocolage Slack channel](https://join.slack.com/t/hotchocolategraphql/shared_invite/enQtNTA4NjA0ODYwOTQ0LTViMzA2MTM4OWYwYjIxYzViYmM0YmZhYjdiNzBjOTg2ZmU1YmMwNDZiYjUyZWZlMzNiMTk1OWUxNWZhMzQwY2Q)
+- The [HotChocolage Slack channel](https://join.slack.com/t/hotchocolategraphql/shared_invite/enQtNTA4NjA0ODYwOTQ0LTViMzA2MTM4OWYwYjIxYzViYmM0YmZhYjdiNzBjOTg2ZmU1YmMwNDZiYjUyZWZlMzNiMTk1OWUxNWZhMzQwY2Q)
 was helpful for searching and getting some feedback to iron this out effectively.
