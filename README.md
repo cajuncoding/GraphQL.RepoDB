@@ -12,9 +12,8 @@ A set of extensions for working with HotChocolate GraphQL and RepoDb as the data
 
 ## Work in Progress...
 ### Pending:
-1. Fixing repo & package names to fix conflicts with HotChocolate core packages.
-2. Support for Default Paging options use in IParamsContext... 
-3. Offset Paging support in the Facade is pending....
+1. Support for Default Paging options use in IParamsContext... 
+2. Offset Paging support in the Facade is pending....
 
 ### Planned:
 1. Dynamic Filtering in the Facade (WHERE clause) arguments support will be added as time permits.
@@ -29,6 +28,7 @@ A set of extensions for working with HotChocolate GraphQL and RepoDb as the data
    - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
    - Support for Cursor based Pagination arguments down to the the Repository/Service layer & into Sql queries via RepoDb -- Relay spec cursors are fully implemented via Sql Server api extensions to RepoDb.
 6. Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
+7. Fixed repo & package names to eliminate conflicts with HotChocolate core packages (as requested by HotChocolate team).
 
 
 ## Demo Site (Star Wars)
