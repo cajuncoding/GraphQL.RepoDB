@@ -111,7 +111,7 @@ implementations.*
             //      Pipeline will not work as expected!
             .AddPreProcessedResultsExtensions()
 ```
-
+### Simplified Facade for key elements of the request [GraphQLParams]
 2. Now you can Dependency Inject the new **IParamsContext** into your Resolvers:
 This greatly simplifies access to key parameters such as selection names, sort arguments, and cursor
 paging arguments.
@@ -133,7 +133,7 @@ is an easy to consume form.*
         {
 
 ```
-
+### Putting it all Together...
 3. Here's a full overview of a Resolver and what these packages make significantly easier:
 
 ```csharp
