@@ -6,6 +6,10 @@
 ### *GraphQL.PreprocessingExtensions*
 A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).
 
+#### Nuget Package (>=.netcoreapp3.0)
+To use this in your project, add the [GraphQL.PreprocessingExtensions](https://www.nuget.org/packages/GraphQL.PreProcessingExtensions/) 
+NuGet package to your project and wire up your Starup  middleware and inject / instantiate params in your resolvers as outlined below...
+
 ### *GraphQL.RepoDb.SqlServer*
 A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, & Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.
 
@@ -44,10 +48,11 @@ Two versions of the Example Project included:
 but all encapsulated in the Query/Repository layer and no longer using the IQueryable interface.  This simulates the use of lower layer logic
 for Sorting, Paging, etc. as you would with a micro-orm for working with an external data source, and helps show how any micro-orm or other
 functionality can now leverage the simplified facade to HotChocolate provided by *HotChocolate.PreprocessingExtensions*.
-2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb and a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
+2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb as a fully fledged micro-orm implemenation. 
+And illustrates a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
 and Repository layer with no dependency on IQueryable.
    - As a fully integrated DB example, the schema & sample data has been scripted and provided in:
-      **DatabaseScripts/CreateStarWarsSchema.sql**   
+      **DatabaseScripts/CreateStarWarsSchema.sql**
 
 ### NOTES: 
 1. **NOTE:** This is not necessarily the only, nor do I claim it's the best, approach to working
@@ -137,6 +142,7 @@ is an easy to consume form.*
 ```
 
 3. Here's a full overview of a Resolver and what these packages make significantly easier:
+   * NOTE: This sample uses dynamic injection for elegant/easy consumtion of the IParamsContext, but it can also be instantiated (see below).
 
 ```csharp
 //Sample Extraced from StarWars-AzureFunctions-RepoDb example project:
@@ -184,6 +190,23 @@ namespace StarWars.Characters
 }
 
 ```
+
+4. If you aren't using Pure Code First and/or just need access to the IParamsContext anywhere else, it can be easily
+ instantiated anytime you have a valid IResolverContext from HotChocolate:
+   * NOTE: This sample uses dynamic injection for elegant/easy consuming of the IParamsContext, but it can also be instantiated (see below).
+
+```csharp
+    public class QueryResolverHelpers
+    {
+        public SomeResult DoSomethingWithTheResovlerContext(IResolverContext resolverContext)
+        {
+                var paramsContext = new GraphQLParamsContext(resolverContext);
+                
+                ...... now you can work with selections, sort args, etc. easily.....
+        {
+```
+
+
 ## Disclaimers:
 - Subscriptions were disabled in the example project(s) due to unknown supportability in a serverless environment. 
   - The StarWars example uses in-memory subscriptions which are incongruent with the serverless paradigm of AzureFunctions.

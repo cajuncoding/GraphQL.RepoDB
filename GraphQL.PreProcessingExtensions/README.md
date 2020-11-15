@@ -38,10 +38,11 @@ Two versions of the Example Project included:
 but all encapsulated in the Query/Repository layer and no longer using the IQueryable interface.  This simulates the use of lower layer logic
 for Sorting, Paging, etc. as you would with a micro-orm for working with an external data source, and helps show how any micro-orm or other
 functionality can now leverage the simplified facade to HotChocolate provided by *HotChocolate.PreprocessingExtensions*.
-2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb and a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
+2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb as a fully fledged micro-orm implemenation. 
+And illustrates a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
 and Repository layer with no dependency on IQueryable.
    - As a fully integrated DB example, the schema & sample data has been scripted and provided in:
-      **DatabaseScripts/CreateStarWarsSchema.sql**   
+      **DatabaseScripts/CreateStarWarsSchema.sql**
 
 ### NOTES: 
 1. **NOTE:** This is not necessarily the only, nor do I claim it's the best, approach to working
@@ -131,6 +132,7 @@ is an easy to consume form.*
 ```
 
 3. Here's a full overview of a Resolver and what these packages make significantly easier:
+   * NOTE: This sample uses dynamic injection for elegant/easy consumption of the IParamsContext, but it can also be instantiated (see below).
 
 ```csharp
 //Sample Extraced from StarWars-AzureFunctions-RepoDb example project:
@@ -177,6 +179,22 @@ namespace StarWars.Characters
     }
 }
 
+```
+
+
+4. If you aren't using Pure Code First and/or just need access to the IParamsContext anywhere else, it can be easily
+ instantiated anytime you have a valid IResolverContext from HotChocolate:
+   * NOTE: This sample uses dynamic injection for elegant/easy consuming of the IParamsContext, but it can also be instantiated (see below).
+
+```csharp
+    public class QueryResolverHelpers
+    {
+        public SomeResult DoSomethingWithTheResovlerContext(IResolverContext resolverContext)
+        {
+                var paramsContext = new GraphQLParamsContext(resolverContext);
+                
+                ...... now you can work with selections, sort args, etc. easily.....
+        {
 ```
 ## Disclaimers:
 - Subscriptions were disabled in the example project(s) due to unknown supportability in a serverless environment. 
