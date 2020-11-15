@@ -1,13 +1,8 @@
 ## Overview 
-*(Unofficial) HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
-
-*Note: Updated Repo & Package names to eliminate conflicts with the core HotChocolate packages.*
+*HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
 ### *GraphQL.PreprocessingExtensions*
 A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).
-
-### *GraphQL.RepoDb.SqlServer*
-A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, & Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.
 
 
 ## Work in Progress...
@@ -24,7 +19,6 @@ A set of extensions for working with HotChocolate GraphQL and RepoDb as the data
 1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
 2. Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
 3. Provides abstraction facade with *HotChocolate.PreprocessingExtensions* package that can be used for any micro-orm.
-4. Implemented RepoDb on top of HotChocolate.PreprocessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
 5. Supports abstracted facade for: 
    - Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!  And supports correct GraphQL Schema to Class property mapping.
    - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
