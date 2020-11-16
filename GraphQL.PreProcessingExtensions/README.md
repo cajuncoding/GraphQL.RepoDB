@@ -1,9 +1,34 @@
 ## Overview 
 *HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
-### *GraphQL.PreprocessingExtensions*
-A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).
+This library greatly simplifies working with HotChocolate to **_pre-processes_** data for
+selecting/projecting, sorting, filtering, etc. before returning the data to HotChocolate from the resolver; 
+this is in contrast to the often documented deferred execution via IQueryable whereby control over the execution
+is delegated to the HotChocolate (& EntityFramework) internals.
 
+*Note: Updated Repo & Package names to eliminate conflicts with the core HotChocolate packages.*
+
+### *GraphQL.PreprocessingExtensions*
+A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as 
+RepoDb (or Dapper).  Micro ORMs normally require (and encourage) encapsulated data access that **_pre-processes_** 
+the results prior to returning results from the resolvers to HotChocolate.
+
+This is in contrast to how many existing tutorials illustrate deferred execution of database queries via IQueryable
+. Because IQueryable is pretty much only supported by Entity Framework, it may be incongruent with existing tech-stacks
+and/or be much to large (bloated) of a dependency -- in addition to removing control over the SQL queries.  
+
+In these cases, and in other cases where existing repository/service layer code already exists, the data is
+'pre-processed', and is already filtered, sorted, paginated, etc. before being returned from the GraphQL
+resolvers.
+
+This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging 
+arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that 
+encapsulate all data access (without dependency on IQueryable and execution outside 
+of the devs control).
+
+#### Nuget Package (>=.netcoreapp3.0)
+To use this in your project, add the [GraphQL.PreprocessingExtensions](https://www.nuget.org/packages/GraphQL.PreProcessingExtensions/) 
+NuGet package to your project and wire up your Starup  middleware and inject / instantiate params in your resolvers as outlined below...
 
 ## Work in Progress...
 ### Pending:
