@@ -6,7 +6,7 @@ using System.Text;
 namespace HotChocolate.PreProcessingExtensions
 {
     /// <summary>
-    /// Decorator/Adapter class for Projection Dependencies between field selecionts for pre-processing
+    /// Decorator/Adapter class for Projection Dependencies between field selections for pre-processing
     /// of selection fields.
     /// </summary>
     public class PreProcessingDependencyLink
@@ -19,8 +19,6 @@ namespace HotChocolate.PreProcessingExtensions
         /// </summary>
         public string DependencyMemberName { get; protected set; }
 
-        public MemberInfo ResolverMethod { get; protected set; }
-
         /// <summary>
         /// Create the Dependency Link to an actual Class Property/Member name of the dependent (e.g. Parent) model; 
         /// this is not the GraphQL Schema name, because this is for internal dependency mapping between 
@@ -29,10 +27,9 @@ namespace HotChocolate.PreProcessingExtensions
         /// </summary>
         /// <param name="selectionMemberName"></param>
         /// <param name="resolverMethod"></param>
-        public PreProcessingDependencyLink(string selectionMemberName, MemberInfo resolverMethod)
+        public PreProcessingDependencyLink(string selectionMemberName)
         {
             this.DependencyMemberName = selectionMemberName;
-            this.ResolverMethod = resolverMethod;
         }
     }
 }

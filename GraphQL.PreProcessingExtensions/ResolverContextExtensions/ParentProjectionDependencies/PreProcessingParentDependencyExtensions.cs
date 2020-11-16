@@ -15,18 +15,18 @@ namespace HotChocolate.PreProcessingExtensions
     }
 
     /// <summary>
-    /// Configuratino Extensions for "Code First" configuration of Parent Selection/Project
+    /// Configuration Extensions for "Code First" configuration of Parent Selection/Project
     /// dependencies for child resolver methods. By specifying Selection names here
     /// we make it easy for the GraphQLParamsContext to resolve dependent Selection field
     /// names dynamically.
     /// </summary>
     public static class ExtensionDataExtensionsForPreProcessingProjectionDependencies
     {
-        public static ExtensionData AddPreProcessingParentProjectionDependencies(this ExtensionData configure, MemberInfo memberInfo, params string[] selectionDependencies)
+        public static ExtensionData AddPreProcessingParentProjectionDependencies(this ExtensionData configure, params string[] selectionDependencies)
         {
             //Create list of Dependency Links...
             IReadOnlyList<PreProcessingDependencyLink> dependencies = selectionDependencies
-                .Select(s => new PreProcessingDependencyLink(s, memberInfo))
+                .Select(s => new PreProcessingDependencyLink(s))
                 .ToList();
             
             //Add to the pre-compiled Field Context for future use/retrieval.

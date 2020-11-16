@@ -322,11 +322,11 @@ namespace RepoDb.CursorPagination
 
         /// <summary>
         /// Internal query execution method for Slice Queries based on TEntity model. We attempt to use as much as possible
-        ///     from RepoDb, with the caveat that some resources/utitlies are internal and requrie brute force via relfection
+        ///     from RepoDb, with the caveat that some resources/utilities are internal and require brute force via reflection
         ///     to access.
         ///     
         /// NOTE: We must manually construct our Reader as the Helpers from RepoDb are 'internal' scope
-        ///      and not readily accessible, though for this it's important taht we have access to the reader
+        ///      and not readily accessible, though for this it's important that we have access to the reader
         ///      so that we can manually extract the CursorIndex that was dynamically added via the Query!
         /// NOTE: Since this doesn't have access to all RepoDb internals, there are some less optimal things such as:
         ///          - RepoDb CreateDbCommandForExecution() method isn't accessible and it performs greater validation.

@@ -41,7 +41,7 @@ namespace StarWars
                 .AddQueryType(d => d.Name("Query"))
                 .AddMutationType(d => d.Name("Mutation"))
                 //Disabled Subscriptions for v11 and Azure Functions Example due to 
-                //  supportability in Serverless architecture...
+                //  supportability in Server-less architecture...
                 //.AddSubscriptionType(d => d.Name("Subscription"))
                 .AddType<CharacterQueries>()
                 .AddType<ReviewQueries>()

@@ -25,9 +25,8 @@ namespace HotChocolate.PreProcessingExtensions
             //Dynamically pipe the specified Dependencies into the custom ContextData for this Field!
             descriptor.ConfigureContextData(c =>
             {
-                c.AddPreProcessingParentProjectionDependencies(member, this.SelectionDependencies);   
+                c.AddPreProcessingParentProjectionDependencies(this.SelectionDependencies);   
             });
-
         }
     }
 

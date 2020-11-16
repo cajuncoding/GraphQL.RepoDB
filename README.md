@@ -215,7 +215,10 @@ namespace StarWars.Characters
         add it ot the list of Projection/Selection fields when requested via `paramsContext.GetSelectFields()`.
    * With this in place you don't have to worry about these dependencies or the ceremonial code to handle
         them in all of your field resolvers.
+   * You can also configure a dependency for any Field via the IObjectFieldDescriptor.ConfigureContextData() method
+        and the custom extension provided by this project as shown below.
 
+##### PreProcessingDependencies - Pure Code First
 ```csharp
     //Here we define an extension to the Human Query and expose a 'droids' field via our virtual resolver.
     [ExtendObjectType(nameof(Human))]
@@ -223,12 +226,13 @@ namespace StarWars.Characters
     {
         //However, we MUST have the Id field of the parent entity `Character.Id` as part of the original
         //  selection in order to get related droid data!  This is done by defining a dependency here
-        //  with the [PreProcessingDependencies(....)] attribute; we state taht this resolver is dependent
+        //  with the [PreProcessingDependencies(....)] attribute; we state that this resolver is dependent
         //  on the Character entity's Id field!
-        //NOTE: Using Pure Code First, the mappping of the Model property to GraphQL field is handled.
-        //NOTE: The original resolver for the paraent Character entities will know about this dependency
-        //       automatically (auto-magically) because the `Id` field will be  appended as a dependent
-        //      field when it calls paramsContext.GetSelectFields().
+        //NOTE: The original resolver for the parent Character entities will know about this dependency
+        //       automatically (auto-magically) because the `Id` field will be included in the selection fields,
+        //       anytime the 'droids' field is requested, due to this dependency, and will be readily available
+         //      field when the parent resolver calls paramsContext.GetSelectFields().
+        //NOTE: You can specify any number of dependencys (as string names) in the one attribute via the params aray.
         [GraphQLName("droids")]
         [PreProcessingParentDependencies(nameof(ICharacter.Id))]
         public async Task<IEnumerable<Droid>> GetDroidsAsync(
@@ -244,6 +248,33 @@ namespace StarWars.Characters
             return droids;
         }
     }
+```
+
+##### PreProcessingDependencies - (Code First) Manually wire-up via HotChocolate Configuration
+```csharp
+public class HumanType : ObjectType<Human>
+{
+    protected override void Configure(IObjectTypeDescriptor<Human> descriptor)
+    {
+        descriptor.Name("human");
+        descriptor.Field(t => t.Name).Type<NonNullType<StringType>>();
+        descriptor.Field(t => t.Friends).Name("friends")
+            .ConfigureContextData(d =>
+            {
+                //Manually define a Selection/Projection dependency on the "Id" field of
+                //  the parent entity so that it is always provided to the parent resolver.
+                //This helps ensure that the value is not null in our resolver anytime "friends"
+                //  is part of the selection, and the parent "Id" field is not.
+                d.AddPreProcessingParentProjectionDependencies(nameof(Human.Id));
+            })
+            .Resolver(ctx =>
+            {
+                var repository = ctx.Service<IRepository>();
+                var parentHumanId = ctx.Parent<Human>().Id;
+                return repository.GetHuman();
+            });
+    }
+}
 ```
 
 ## Disclaimers:
