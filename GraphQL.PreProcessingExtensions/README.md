@@ -241,7 +241,7 @@ namespace StarWars.Characters
     }
 ```
 
-##### PreProcessingDependencies - (Code First) Manually wire-up via HotChocolate Configuration
+##### PreProcessingDependencies - Code First (Manually wire-up via HotChocolate Configuration)
 ```csharp
 public class HumanType : ObjectType<Human>
 {
