@@ -34,7 +34,7 @@ A set of extensions for working with HotChocolate GraphQL and RepoDb as the data
    - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
    - Support for Cursor based Pagination arguments down to the the Repository/Service layer & into Sql queries via RepoDb -- Relay spec cursors are fully implemented via Sql Server api extensions to RepoDb.
 6. Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
-7. Fixed/Changed repo & package names to fix conflicts with HotChocolate core packages.
+7. Fixed/Changed repo & package names to address conflicts with HotChocolate core packages.
 
 
 ## Demo Site (Star Wars)
@@ -118,7 +118,7 @@ implementations.*
             //      Pipeline will not work as expected!
             .AddPreProcessedResultsExtensions()
 ```
-
+### Simplified Facade for key elements of the request [GraphQLParams]
 2. Now you can Dependency Inject the new **IParamsContext** into your Resolvers:
 This greatly simplifies access to key parameters such as selection names, sort arguments, and cursor
 paging arguments.
@@ -140,7 +140,7 @@ is an easy to consume form.*
         {
 
 ```
-
+### Putting it all Together...
 3. Here's a full overview of a Resolver and what these packages make significantly easier:
    * NOTE: This sample uses dynamic injection for elegant/easy consumtion of the IParamsContext, but it can also be instantiated (see below).
 
