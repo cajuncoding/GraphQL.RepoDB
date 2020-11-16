@@ -206,6 +206,45 @@ namespace StarWars.Characters
         {
 ```
 
+5. A Common use case that will occur is that a GraqhQL query may requested a realated child entity but not
+    necessarily request the dependenty fields on the Parent entity that are required to correctly retrieve the
+    child/related data.  In a Pure Code First implementation, this can be handled easily by defining dependencies with the [PreProcessingParentDepdencies(...)]
+    attribute:
+   * This will enforce the fact that anytime this Field is requested then the Selections List
+        will have the dependent Selections (as defined on the Pure Code First model), and automatically
+        add it ot the list of Projection/Selection fields when requested via `paramsContext.GetSelectFields()`.
+   * With this in place you don't have to worry about these dependencies or the ceremonial code to handle
+        them in all of your field resolvers.
+
+```csharp
+    //Here we define an extension to the Human Query and expose a 'droids' field via our virtual resolver.
+    [ExtendObjectType(nameof(Human))]
+    public class HumanFieldResolvers
+    {
+        //However, we MUST have the Id field of the parent entity `Character.Id` as part of the original
+        //  selection in order to get related droid data!  This is done by defining a dependency here
+        //  with the [PreProcessingDependencies(....)] attribute; we state taht this resolver is dependent
+        //  on the Character entity's Id field!
+        //NOTE: Using Pure Code First, the mappping of the Model property to GraphQL field is handled.
+        //NOTE: The original resolver for the paraent Character entities will know about this dependency
+        //       automatically (auto-magically) because the `Id` field will be  appended as a dependent
+        //      field when it calls paramsContext.GetSelectFields().
+        [GraphQLName("droids")]
+        [PreProcessingParentDependencies(nameof(ICharacter.Id))]
+        public async Task<IEnumerable<Droid>> GetDroidsAsync(
+            [Service] ICharacterRepository repository,
+            [Parent] ICharacter character
+        )
+        {
+            //NOW we can rely on the fact that Character.Id won't be null because the parent Resolver
+            //      had it as a field to be selected and populated.
+            //NOTE: Error checking isn't a bad idea anyway...
+            var friends = await repository.GetCharacterFriendsAsync(character.Id);
+            var droids = friends.OfType<Droid>();
+            return droids;
+        }
+    }
+```
 
 ## Disclaimers:
 - Subscriptions were disabled in the example project(s) due to unknown supportability in a serverless environment. 
