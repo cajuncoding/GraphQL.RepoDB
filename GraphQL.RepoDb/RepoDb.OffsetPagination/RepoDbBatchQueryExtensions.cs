@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using RepoDb.Interfaces;
 
 namespace RepoDb.CursorPagination
 {
@@ -19,16 +20,16 @@ namespace RepoDb.CursorPagination
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDbConnection"></typeparam>
-        /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
+        /// <param name="baseRepo"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="page"></param>
+        /// <param name="rowsPerBatch"></param>
+        /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="transaction"></param>
+        /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchOffsetPagingQueryAsync<TEntity, TDbConnection>(
@@ -42,6 +43,7 @@ namespace RepoDb.CursorPagination
             string hints = null,
             IEnumerable<Field> fields = null,
             IDbTransaction transaction = null,
+            ITrace trace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
@@ -57,6 +59,7 @@ namespace RepoDb.CursorPagination
                     fields: fields,
                     tableName: tableName,
                     transaction: transaction,
+                    trace: trace,
                     cancellationToken: cancellationToken
                 );
         }
@@ -66,17 +69,18 @@ namespace RepoDb.CursorPagination
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDbConnection"></typeparam>
-        /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
+        /// <param name="baseRepo"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="page"></param>
+        /// <param name="rowsPerBatch"></param>
+        /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="transaction"></param>
+        /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
+
         /// <returns></returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchOffsetPagingQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
@@ -88,6 +92,7 @@ namespace RepoDb.CursorPagination
             IEnumerable<Field> fields = null,
             string tableName = null,
             IDbTransaction transaction = null,
+            ITrace trace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
@@ -108,6 +113,7 @@ namespace RepoDb.CursorPagination
                     fields: fields,
                     tableName: tableName,
                     transaction: transaction,
+                    trace: trace,
                     cancellationToken: cancellationToken
                 );
 
@@ -130,16 +136,16 @@ namespace RepoDb.CursorPagination
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends DbConnection directly</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="page"></param>
+        /// <param name="rowsPerBatch"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="transaction"></param>
+        /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
+
         /// <returns></returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchOffsetPagingQueryAsync<TEntity>(
             this DbConnection dbConnection,
@@ -151,6 +157,7 @@ namespace RepoDb.CursorPagination
             string hints = null,
             IEnumerable<Field> fields = null,
             IDbTransaction transaction = null,
+            ITrace trace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
@@ -164,6 +171,7 @@ namespace RepoDb.CursorPagination
                 hints: hints,
                 fields: fields,
                 transaction: transaction,
+                trace: trace,
                 cancellationToken: cancellationToken
             );
         }
@@ -173,15 +181,15 @@ namespace RepoDb.CursorPagination
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends DbConnection directly</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="page"></param>
+        /// <param name="rowsPerBatch"></param>
+        /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="transaction"></param>
+        /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchOffsetPagingQueryAsync<TEntity>(
@@ -194,28 +202,31 @@ namespace RepoDb.CursorPagination
             IEnumerable<Field> fields = null,
             string tableName = null,
             IDbTransaction transaction = null,
+            ITrace trace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
             if (orderBy == null)
-                throw new ArgumentNullException("A sort order must be specified to provide valid paging results.", nameof(orderBy));
+                throw new ArgumentNullException(nameof(orderBy), "A sort order must be specified to provide valid paging results.");
 
             var dbTableName = string.IsNullOrWhiteSpace(tableName)
                                 ? ClassMappedNameCache.Get<TEntity>()
                                 : tableName;
 
+            var fieldsList = fields.ToList();
+
             //Ensure we have default fields; default is to include All Fields...
-            var selectFields = fields?.Any() == true
-                ? fields
+            var selectFields = fieldsList?.Any() == true
+                ? fieldsList
                 : FieldCache.Get<TEntity>();
 
             //Retrieve only the select fields that are valid for the Database query!
             //NOTE: We guard against duplicate values as a convenience.
             var validSelectFields = await dbConnection.GetValidatedDbFields(dbTableName, selectFields.Distinct());
 
-            //Dynamically hanlde RepoDb where filters (QueryGroup)...
+            //Dynamically handle RepoDb where filters (QueryGroup)...
             object whereParams = where != null
                 ? RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(where)
                 : null;
@@ -227,8 +238,10 @@ namespace RepoDb.CursorPagination
                 fields: validSelectFields,
                 orderBy: orderBy,
                 where: whereParams,
+                hints: hints,
                 cancellationToken: cancellationToken,
-                transaction: transaction
+                transaction: transaction,
+                trace: trace
             );
 
             //TODO: Implement Logic to determine HasNextPage, HasPreviousPage, and get Total Count or Not!
@@ -241,8 +254,11 @@ namespace RepoDb.CursorPagination
         /// Disposes an <see cref="IDbConnection"/> object if there is no <see cref="IDbTransaction"/> object connected
         /// and if the current <see cref="ConnectionPersistency"/> value is <see cref="ConnectionPersistency.PerCall"/>.
         /// </summary>
-        /// <param name="connection">The instance of <see cref="IDbConnection"/> object.</param>
-        /// <param name="transaction">The instance of <see cref="IDbTransaction"/> object.</param>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDbConnection"></typeparam>
+        /// <param name="baseRepo"></param>
+        /// <param name="connection"></param>
+        /// <param name="transaction"></param>
         private static void DisposeConnectionForPerCallExtension<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IDbConnection connection,

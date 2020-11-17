@@ -178,6 +178,7 @@ is an easy to consume form.*
 3. Here's a full overview of a Resolver and what these packages make significantly easier:
    * NOTE: This sample uses dynamic injection for elegant/easy consumtion of the IParamsContext, but it can also be instantiated (see below).
 
+##### Dynamic Injection of IParamsContext 
 ```csharp
 //Sample Extraced from StarWars-AzureFunctions-RepoDb example project:
 namespace StarWars.Characters
@@ -229,6 +230,7 @@ namespace StarWars.Characters
  instantiated anytime you have a valid IResolverContext from HotChocolate:
    * NOTE: This sample uses dynamic injection for elegant/easy consuming of the IParamsContext, but it can also be instantiated (see below).
 
+##### Direct Instantiation of IParamsContext 
 ```csharp
     public class QueryResolverHelpers
     {

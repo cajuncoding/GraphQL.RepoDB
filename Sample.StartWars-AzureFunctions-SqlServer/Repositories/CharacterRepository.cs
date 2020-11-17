@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.PreProcessingExtensions.Pagination;
@@ -59,7 +60,8 @@ namespace StarWars.Repositories
                 afterCursor: pagingParams.AfterIndex!,
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
-                lastTake: pagingParams.Last
+                lastTake: pagingParams.Last,
+                logTrace: s => Debug.WriteLine(s)
             );
 
             var convertedSlice = pageSlice.AsMappedType(r => MapDbModelToCharacterModel(r));

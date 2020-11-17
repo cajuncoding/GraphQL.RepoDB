@@ -7,11 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.RepoDb;
+using RepoDb.Interfaces;
 
 namespace RepoDb.CursorPagination
 {
@@ -40,9 +43,11 @@ namespace RepoDb.CursorPagination
         /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
@@ -56,6 +61,7 @@ namespace RepoDb.CursorPagination
             string hints = null,
             IEnumerable<Field> fields = null,
             IDbTransaction transaction = null,
+            Action<string> logTrace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
@@ -73,6 +79,7 @@ namespace RepoDb.CursorPagination
                     fields: fields,
                     tableName: tableName,
                     transaction: transaction,
+                    logTrace: logTrace,
                     cancellationToken: cancellationToken
                 );
         }
@@ -101,7 +108,9 @@ namespace RepoDb.CursorPagination
         /// <param name="where"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
+        /// <param name="tableName"></param>
         /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
@@ -114,6 +123,7 @@ namespace RepoDb.CursorPagination
             IEnumerable<Field> fields = null,
             string tableName = null,
             IDbTransaction transaction = null,
+            Action<string> logTrace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
@@ -136,6 +146,7 @@ namespace RepoDb.CursorPagination
                     fields: fields,
                     tableName: tableName,
                     transaction: transaction,
+                    logTrace: logTrace,
                     cancellationToken: cancellationToken
                 );
 
@@ -177,6 +188,7 @@ namespace RepoDb.CursorPagination
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
@@ -189,6 +201,7 @@ namespace RepoDb.CursorPagination
             string hints = null,
             IEnumerable<Field> fields = null,
             IDbTransaction transaction = null,
+            Action<string> logTrace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
@@ -204,6 +217,7 @@ namespace RepoDb.CursorPagination
                 hints: hints,
                 fields: fields,
                 transaction: transaction,
+                logTrace: logTrace,
                 cancellationToken: cancellationToken
             );
         }
@@ -231,7 +245,9 @@ namespace RepoDb.CursorPagination
         /// <param name="where"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
+        /// <param name="tableName"></param>
         /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
@@ -244,28 +260,30 @@ namespace RepoDb.CursorPagination
             IEnumerable<Field> fields = null,
             string tableName = null,
             IDbTransaction transaction = null,
+            Action<string> logTrace = null,
             CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
             if (orderBy == null)
-                throw new ArgumentNullException("A sort order must be specified to provide valid cursor paging results.", nameof(orderBy));
+                throw new ArgumentNullException(nameof(orderBy), "A sort order must be specified to provide valid cursor paging results.");
 
             var dbTableName = string.IsNullOrWhiteSpace(tableName)
                                 ? ClassMappedNameCache.Get<TEntity>()
                                 : tableName;
 
             //Ensure we have default fields; default is to include All Fields...
-            var selectFields = fields?.Any() == true
-                ? fields
+            var fieldsList = fields?.ToList();
+            var selectFields = fieldsList?.Any() == true
+                ? fieldsList
                 : FieldCache.Get<TEntity>();
 
             //Retrieve only the select fields that are valid for the Database query!
             //NOTE: We guard against duplicate values as a convenience.
             var validSelectFields = await dbConnection.GetValidatedDbFields(dbTableName, selectFields.Distinct());
 
-            //Dynamically hanlde RepoDb where filters (QueryGroup)...
+            //Dynamically handle RepoDb where filters (QueryGroup)...
             object whereParams = where != null
                 ? RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(where)
                 : null;
@@ -289,6 +307,7 @@ namespace RepoDb.CursorPagination
                 commandText: query,
                 queryParams: whereParams,
                 cancellationToken: cancellationToken,
+                logTrace: logTrace,
                 transaction: transaction
             );
 
@@ -338,9 +357,10 @@ namespace RepoDb.CursorPagination
         /// <param name="dbConn"></param>
         /// <param name="commandText"></param>
         /// <param name="queryParams"></param>
+        /// <param name="tableName"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
-        /// <param name="tableName"></param>
+        /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
@@ -351,9 +371,13 @@ namespace RepoDb.CursorPagination
             string tableName = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
+            Action<string> logTrace = null,
             CancellationToken cancellationToken = default
         ) where TEntity : class
         {
+            logTrace?.Invoke($"Query: {commandText}");
+
+            var timer = Stopwatch.StartNew();
 
             //Get the Fields from Cache first (as this can't be done after Reader is opened...
             var tableNameForCache = tableName ?? ClassMappedNameCache.Get<TEntity>();
@@ -361,7 +385,9 @@ namespace RepoDb.CursorPagination
             var dbFieldsForCache = await DbFieldCache.GetAsync(dbConn, tableNameForCache, transaction, false, cancellationToken);
 
             //Ensure that the DB Connection is open (RepoDb provided extension)...
-            await dbConn.EnsureOpenAsync();
+            await dbConn.EnsureOpenAsync(cancellationToken);
+
+            logTrace?.Invoke($"DB Connection Established in: {timer.ToElapsedTimeDescriptiveFormat()}");
 
             //Re-use the RepoDb Execute Reader method to get benefits of Command & Param caches, etc.
             using (var reader = (DbDataReader)await dbConn.ExecuteReaderAsync(
@@ -371,7 +397,7 @@ namespace RepoDb.CursorPagination
                 transaction: transaction,
                 commandTimeout: commandTimeout,
                 cancellationToken: cancellationToken
-                ))
+            ))
             {
                 //BBernard
                 //We NEED to manually process the Reader externally here!
@@ -383,7 +409,7 @@ namespace RepoDb.CursorPagination
                 {
                     string cursorIndexName = nameof(IHaveCursor.CursorIndex);
 
-                    //Initialie the RepoDb compiled entity mapping function (via Brute Force Proxy class; it's marked 'internal'.
+                    //Initialize the RepoDb compiled entity mapping function (via Brute Force Proxy class; it's marked 'internal'.
                     var functionCacheProxy = new RepoDbFunctionCacheProxy<TEntity>();
                     var repoDbMappingFunc = functionCacheProxy.GetDataReaderToDataEntityFunctionCompatible(
                         reader, dbConn, transaction, true, dbFieldsForCache, dbSetting
@@ -405,13 +431,16 @@ namespace RepoDb.CursorPagination
 
                     //Now attempt to step to the Total Count query result...
                     //Note: We know to attempt getting the TotalCount if there is a second result set avaialble.
-                    if (await reader.NextResultAsync() && await reader.ReadAsync())
+                    if (await reader.NextResultAsync(cancellationToken) && await reader.ReadAsync(cancellationToken))
                     {
                         //This is a Scalar query so the first ordinal value is the Total Count!
                         totalCount = Convert.ToInt32(reader.GetValue(0));
                     }
 
                 }
+
+                timer.Stop();
+                logTrace?.Invoke($"Query Execution Time: {timer.ToElapsedTimeDescriptiveFormat()}");
 
                 //Return a CursorPagedResult decorator for the results along with the Total Count!
                 var cursorPage = new CursorPageSlice<TEntity>(results, totalCount);

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace StarWars.Characters.DbModels
 {
-    [Map("StarWarsCharacters")]
+    [Map("[dbo].[StarWarsCharacters]")]
     public class CharacterDbModel
     {
         public int Id { get; set; }

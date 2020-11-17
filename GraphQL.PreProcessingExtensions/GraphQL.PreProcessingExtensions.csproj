@@ -23,7 +23,7 @@ Initial release for HotChocolate v11 API with support for Selections/Projections
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.Data" Version="11.0.0-rc.0" />
+    <PackageReference Include="HotChocolate.Data" Version="11.0.0-rc.2" />
   </ItemGroup>
 
 </Project>

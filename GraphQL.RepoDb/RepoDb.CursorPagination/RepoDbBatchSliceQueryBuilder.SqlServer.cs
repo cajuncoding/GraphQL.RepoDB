@@ -19,12 +19,16 @@ namespace RepoDb.CursorPagination
         ///         to allow us to return the RowNumber as the CursorIndex!
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
+        /// <param name="tableName"></param>
         /// <param name="fields"></param>
-        /// <param name="page"></param>
-        /// <param name="rowsPerBatch"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
         /// <param name="hints"></param>
+        /// <param name="afterCursorIndex"></param>
+        /// <param name="firstTake"></param>
+        /// <param name="beforeCursorIndex"></param>
+        /// <param name="lastTake"></param>
+        /// <param name="includeTotalCountQuery"></param>
         /// <returns></returns>
         public static string BuildSqlServerBatchSliceQuery<TEntity>(
             string tableName,
@@ -46,14 +50,17 @@ namespace RepoDb.CursorPagination
             // Initialize the builder
             var builder = new QueryBuilder();
 
+            var fieldsList = fields.ToList();
+            var orderByList = orderBy.ToList();
+
             //Ensure that we Remove any risk of Name conflicts with the CursorIndex field on the CTE
             //  because we are dynamically adding ROW_NUMBER() as [CursorInex]!
-            var cteFields = fields
+            var cteFields = fieldsList
                 .Where(f => !f.Name.Equals(cursorIndexName, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
             var selectFields = new List<Field>();
-            selectFields.AddRange(fields);
+            selectFields.AddRange(fieldsList);
             selectFields.Add(new Field(cursorIndexName));
 
             // Build the base Paginated Query
@@ -61,7 +68,7 @@ namespace RepoDb.CursorPagination
                 .With()
                 .WriteText("CTE").As().OpenParen()
                     .Select()
-                        .RowNumber().Over().OpenParen().OrderByFrom(orderBy, dbSetting).CloseParen().As($"[{cursorIndexName}],")
+                        .RowNumber().Over().OpenParen().OrderByFrom(orderByList, dbSetting).CloseParen().As($"[{cursorIndexName}],")
                         .FieldsFrom(cteFields, dbSetting)
                     .From().TableNameFrom(tableName, dbSetting)
                     .HintsFrom(hints)
@@ -72,7 +79,7 @@ namespace RepoDb.CursorPagination
                 .From().WriteText("CTE")
                 //Implement Relay Spec Cursor Slicing Algorithm!
                 .WriteText(BuildRelaySpecWhereCondition(cursorIndexName, afterCursorIndex, beforeCursorIndex, firstTake, lastTake))
-                .OrderByFrom(orderBy, dbSetting)
+                .OrderByFrom(orderByList, dbSetting)
                 .End();
 
             if (includeTotalCountQuery)

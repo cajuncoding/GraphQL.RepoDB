@@ -207,11 +207,11 @@ namespace StarWars.Characters
 
 ```
 
-##### Direct Instantiation of IParamsContext 
 4. If you aren't using Pure Code First and/or just need access to the IParamsContext anywhere else, it can be easily
  instantiated anytime you have a valid IResolverContext from HotChocolate:
    * NOTE: This sample uses dynamic injection for elegant/easy consuming of the IParamsContext, but it can also be instantiated (see below).
 
+##### Direct Instantiation of IParamsContext 
 ```csharp
     public class QueryResolverHelpers
     {
