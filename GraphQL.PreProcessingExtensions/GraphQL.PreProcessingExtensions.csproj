@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>11.0.0.2</Version>
+    <Version>11.0.0.3-preview02</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
     <Description>A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).</Description>
@@ -10,12 +10,10 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
-    <PackageReleaseNotes>Updates to Repo, Packages and Project naming to eliminate any risk of conflicts with HotChocolate core project packages.
-
-Initial release for HotChocolate v11 API with support for Selections/Projections, Sort arguments, and Cursor Paging (Offset paging &amp; Filtering arguments are not implemented yet).  Version is synced up with the upcoming major version release for HotChocolate v11.</PackageReleaseNotes>
+    <PackageReleaseNotes>OffsetPaging is not working, it's still work in progress. But this release provides ability to trace log out some details for the query, execution time, etc. Also improves support for cancellation token throughout DB calls and minor optimizations and cleanup.</PackageReleaseNotes>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <AssemblyVersion>11.0.0.2</AssemblyVersion>
-    <FileVersion>11.0.0.2</FileVersion>
+    <AssemblyVersion>11.0.0.3</AssemblyVersion>
+    <FileVersion>11.0.0.3</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +21,7 @@ Initial release for HotChocolate v11 API with support for Selections/Projections
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.Data" Version="11.0.0-rc.2" />
+    <PackageReference Include="HotChocolate.Data" Version="11.0.0-rc.3" />
   </ItemGroup>
 
 </Project>

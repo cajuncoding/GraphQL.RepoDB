@@ -52,12 +52,23 @@ namespace RepoDb.CursorPagination
 
             var fieldsList = fields.ToList();
             var orderByList = orderBy.ToList();
+            var orderByLookup = orderByList.ToLookup(o => o.Name.ToLower());
 
             //Ensure that we Remove any risk of Name conflicts with the CursorIndex field on the CTE
-            //  because we are dynamically adding ROW_NUMBER() as [CursorInex]!
-            var cteFields = fieldsList
-                .Where(f => !f.Name.Equals(cursorIndexName, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            //  because we are dynamically adding ROW_NUMBER() as [CursorIndex]! And, ensure
+            //  that there are no conflicts with the OrderBy
+            var cteFields = new List<Field>(fieldsList);
+            cteFields.RemoveAll(f => f.Name.Equals(cursorIndexName, StringComparison.OrdinalIgnoreCase));
+
+            //We must ensure that all OrderBy fields are also part of the CTE Select Clause so that they are
+            //  actually available to be sorted on (or else 'Invalid Column Errors' will occur if the field is not 
+            //  originally part of the Select Fields list.
+            var missingSortFieldNames = orderByList.Select(o => o.Name).Except(cteFields.Select(f => f.Name)).ToList();
+            if (missingSortFieldNames.Count > 0)
+            {
+                cteFields.AddRange(missingSortFieldNames.Select(n => new Field(n)));
+            }
+
 
             var selectFields = new List<Field>();
             selectFields.AddRange(fieldsList);
