@@ -134,7 +134,7 @@ namespace HotChocolate.RepoDb
                     //NOTE: We map based on the actual class property/member name not the fieldname which is
                     //      from the GraphQL schema and may be different than the underlying class property/member.
                     RepoDbField = mappingLookup[sf.MemberName.ToLower()]?.FirstOrDefault()?.AsField(),
-                    //We test for Descencing so that Ascending is always the default for a mismatch.
+                    //We test for Descending so that Ascending is always the default for a mismatch.
                     RepoDbOrder = sf.IsDescending() ? Order.Descending : Order.Ascending
                 })
                 //Filter out if the RepoDbField is null; meaning it's invalid and/or doesn't exist.

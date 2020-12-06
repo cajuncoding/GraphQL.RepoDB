@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using HotChocolate;
+using HotChocolate.Data;
 using HotChocolate.Data.Sorting;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.PreProcessingExtensions;
