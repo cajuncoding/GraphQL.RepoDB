@@ -26,7 +26,7 @@ arguments in a significantly simplified facade so this logic can be leveraged in
 encapsulate all data access (without dependency on IQueryable and execution outside 
 of the devs control).
 
-###Usage for IParamsContext only:
+### Usage for IParamsContext only:
 If all you want to use is the greatly simplified facade for accessing Selections, etc., then you may leverage this package only as a lightweight facade
 that can be injected into Resolvers very easily as outlined in Steps [#1](https://github.com/cajuncoding/GraphQL.RepoDb#startup-configuration---hotchocolatepreprocessingextensions) & [#2](https://github.com/cajuncoding/GraphQL.RepoDb#simplified-facade-for-key-elements-of-the-request-graphqlparams) below for easy access to **IParamsContext**.
 
