@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>11.0.1.1</Version>
+    <Version>11.0.2.1</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
     <Description>A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged in the Serivces/Repositories that encapsulate all data access (without dependency on IQueryable and execution outside of the devs control).</Description>
@@ -10,15 +10,17 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
-    <PackageReleaseNotes>Bump to HotChocolate v11.0.1 which now resolves a bug that we helped identify with interfaces in the initial release of v11.0.0. 
+    <PackageReleaseNotes>- Bump version to HotChocolate v11.0.2.
+- Fixed new issue due to changes in Sort arguments in HotChocolate core; sort arguments are resolved correctly again.
 
 OffsetPaging is still not fully functional, it's still work in progress. 
 
 Prior Releases Notes:
+- Bump to HotChocolate v11.0.1 which now resolves a bug that we helped identify with interfaces in the initial release of v11.0.0. 
 - Provide ability to trace log out some details for the query, execution time, etc. Also improves support for cancellation token throughout DB calls and minor optimizations and cleanup.</PackageReleaseNotes>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <AssemblyVersion>11.0.0.3</AssemblyVersion>
-    <FileVersion>11.0.1.1</FileVersion>
+    <AssemblyVersion>11.0.2.1</AssemblyVersion>
+    <FileVersion>11.0.2.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +28,7 @@ Prior Releases Notes:
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.Data" Version="11.0.1" />
+    <PackageReference Include="HotChocolate.Data" Version="11.0.2" />
   </ItemGroup>
 
 </Project>

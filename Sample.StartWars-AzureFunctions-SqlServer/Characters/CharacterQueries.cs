@@ -35,6 +35,7 @@ namespace StarWars.Characters
         /// Gets all character.
         /// </summary>
         /// <param name="repository"></param>
+        /// <param name="graphQLParams"></param>
         /// <returns>The character.</returns>
         [UsePaging]
         //[UseFiltering]

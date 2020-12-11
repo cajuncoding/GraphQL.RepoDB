@@ -39,17 +39,27 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
                 ObjectValueNode sortArgValue = context.ArgumentLiteral<ObjectValueNode>(orderArgName);
 
                 //Validate that we have some sort args specified and that the Type is correct (ListType of SortInputType values)...
-                if (sortArgValue != null && sortArgField.Type is ListType lt
-                    && lt.ElementType is SortInputType sortInput)
+                //NOTE: The Following processing logic was adapted from 'QueryableSortProvider' implementation in HotChocolate.Data core.
+                //FIX: The types changed in v11.0.1/v11.0.2 the Sort Field types need to be checked with IsNull() method, and
+                //      then against NonNullType.NamedType() is ISortInputType instead.
+                if (!sortArgValue.IsNull()
+                    && sortArgField.Type is ListType lt
+                    && lt.ElementType is NonNullType nn 
+                    && nn.NamedType() is ISortInputType sortInputType)
                 {
                     //Create a Lookup for the Fields...
-                    var sortFieldLookup = sortInput.Fields.OfType<SortField>().ToLookup(f => f.Name.ToString().ToLower());
+                    var sortFieldLookup = sortInputType.Fields.OfType<SortField>().ToLookup(f => f.Name.ToString().ToLower());
 
                     //Now only process the values provided, but initialize with the corresponding Field (metadata) for each value...
                     var sortOrderFields = sortArgValue.Fields.Select(
                         f => new SortOrderField(sortFieldLookup[f.Name.ToString().ToLower()].FirstOrDefault(), f.Value.ToString())
                     );
-                    
+
+                    ////Now only process the values provided, but initialize with the corresponding Field (metadata) for each value...
+                    //var sortOrderFields = sortArgValue.Fields.Select(
+                    //    f => new SortOrderField(sortFieldLookup[f.Name.ToString().ToLower()].FirstOrDefault(), f.Value.ToString())
+                    //);
+
                     results.AddRange(sortOrderFields);
                 }
 
