@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepoDb", "Sample.StartWars-AzureFunctions-SqlServer\StarWars-AzureFunctions-RepoDb.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.PreProcessingExtensions.Tests", "GraphQL.PreProcessingExtensions.Tests\GraphQL.PreProcessingExtensions.Tests.csproj", "{2334C956-DC54-4A52-8277-0FA6A269C330}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D7F71A73-473A-4C26-95F1-3AC699491A8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7F71A73-473A-4C26-95F1-3AC699491A8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7F71A73-473A-4C26-95F1-3AC699491A8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2334C956-DC54-4A52-8277-0FA6A269C330}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2334C956-DC54-4A52-8277-0FA6A269C330}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2334C956-DC54-4A52-8277-0FA6A269C330}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2334C956-DC54-4A52-8277-0FA6A269C330}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
