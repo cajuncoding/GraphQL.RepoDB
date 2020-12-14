@@ -41,7 +41,7 @@ namespace HotChocolate.PreProcessingExtensions
         /// <summary>
         /// The underlying Selection Fields of a Specific Type, from HotChocolate, for the 
         /// original GraphQL Selections based on GraphQL Schema names.
-        /// Interface Types & Union Types may have multipel objects that share parital common 
+        /// Interface Types & Union Types may have multiple objects that share partial common 
         /// fields, along with unique fields, and this will get all selections valid for the specific type.
         /// </summary>
         IReadOnlyList<IPreProcessingSelection> GetSelectionFieldsFor<TObjectType>();
@@ -50,6 +50,7 @@ namespace HotChocolate.PreProcessingExtensions
         /// GatherSelectionNames based on provided parameters to simplify getting the specifid
         /// </summary>
         /// <param name="includeDependencyNames"></param>
+        /// <param name="flags"></param>
         /// <returns></returns>
         IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All);
 
@@ -57,6 +58,7 @@ namespace HotChocolate.PreProcessingExtensions
         /// GatherSelectionNames based on provided parameters to simplify getting the specifid
         /// </summary>
         /// <param name="includeDependencyNames"></param>
+        /// <param name="flags"></param>
         /// <returns></returns>
         IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All);
 
@@ -72,13 +74,13 @@ namespace HotChocolate.PreProcessingExtensions
         CursorPagingArguments PagingArgs { get; }
 
         /// <summary>
-        /// The Cursor Paging arguments for the GrqphQL request; same results as PagingArgs which use Cursor paging as default
+        /// The Cursor Paging arguments for the GraphQL request; same results as PagingArgs which use Cursor paging as default
         /// via the [UsePaging] HotChocolate attribute.
         /// </summary>
         CursorPagingArguments CursorPagingArgs { get; }
 
         /// <summary>
-        /// The Offset Paging arguments for the GrqphQL request (if available); naming convention matches the [UseOffsetPaging]
+        /// The Offset Paging arguments for the GraphQL request (if available); naming convention matches the [UseOffsetPaging]
         /// HotChocolate attribute.
         /// </summary>
         OffsetPagingArguments OffsetPagingArgs { get; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.Data;
 using HotChocolate.Types;
 
 namespace GraphQL.PreProcessingExtensions.Tests
@@ -10,6 +11,7 @@ namespace GraphQL.PreProcessingExtensions.Tests
     [ExtendObjectType(Name = "Query")]
     public class StarWarsCharacterResolver
     {
+        [UseSorting]
         [GraphQLName("starWarsCharacters")]
         public Task<IEnumerable<IStarWarsCharacter>> GetStarWarsCharactersAsync()
         {

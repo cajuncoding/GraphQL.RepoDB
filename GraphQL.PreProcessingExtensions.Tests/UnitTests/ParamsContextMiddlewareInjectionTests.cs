@@ -1,20 +1,23 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using HotChocolate;
+using HotChocolate.PreProcessingExtensions;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace GraphQL.PreProcessingExtensions.Tests
 {
     [TestClass]
-    public class BasicQueryTests : GraphQLTestBase
+    public class ParamsContextTests : GraphQLTestBase
     {
-        public BasicQueryTests() : base(new GraphQLTestServerFactory())
+        public ParamsContextTests() : base(new GraphQLTestServerFactory())
         {
         }
 
         [TestMethod]
-        public async Task TestHelloWorldQuery()
+        public async Task TestParamsContextMiddlewareInjectionSimpleExample()
         {
             // arrange
             var server = CreateHelloWorldTestServer();
@@ -24,15 +27,11 @@ namespace GraphQL.PreProcessingExtensions.Tests
 
             // assert
             Assert.IsNotNull(result?.Data, "Query Execution Failed");
-
-            //Data results are JObjects/JArrays
-            var helloResult = result.Data["hello"].ToString();
-            Assert.IsFalse(string.IsNullOrWhiteSpace(helloResult));
-            Assert.AreEqual("Hello World!", helloResult);
+            Assert.IsTrue(server.ParamsContextLookup.Count == 1);
         }
 
         [TestMethod]
-        public async Task TestStarWarsCharactersQuery()
+        public async Task TestParamsContextExecutionForAllFieldsOfAllResults()
         {
             // arrange
             var server = CreateStarWarsTestServer();
@@ -48,11 +47,10 @@ namespace GraphQL.PreProcessingExtensions.Tests
             // assert
             Assert.IsNotNull(result?.Data, "Query Execution Failed");
 
-            //Data results are JObjects/JArrays
+            //SHOULD Execute Once for the main resolver, and again for each field since it is injected as FieldMiddleware!
             var starWarsResults = (JArray)result.Data["starWarsCharacters"];
-            Assert.IsNotNull(starWarsResults);
-            Assert.IsTrue(starWarsResults.Count > 1);
+            var resultCount = starWarsResults.Count;
+            Assert.AreEqual(server.ParamsContextList.Count, 1 + (resultCount * 2));
         }
-
     }
 }
