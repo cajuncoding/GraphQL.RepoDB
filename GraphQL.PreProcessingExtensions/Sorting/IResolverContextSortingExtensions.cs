@@ -1,14 +1,9 @@
 ﻿# nullable enable
 
-# nullable enable
-
 using HotChocolate.Data.Sorting;
-using HotChocolate.Data.Sorting.Expressions;
-using HotChocolate.Execution.Processing;
 using HotChocolate.Language;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
-using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +18,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
         /// Will return null if the order arguments/info is not available.
         /// </summary>
         /// <returns></returns>
-        public static List<ISortOrderField>? GetSortingArgsSafely(this IResolverContext context, string orderByArgName = null!)
+        public static List<ISortOrderField>? GetSortingArgsSafely(this IResolverContext context, string sortOrderArgName = null!)
         {
             var results = new List<ISortOrderField>();
 
@@ -31,15 +26,15 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
             //  because the ResolverContext doesn't expose a method to check if an argument exists...
             try
             {
-                var orderArgName = orderByArgName ?? SortConventionDefinition.DefaultArgumentName;
+                var sortArgName = sortOrderArgName ?? SortConventionDefinition.DefaultArgumentName;
 
                 //Get Sort Argument Fields and current Values...
                 //NOTE: In order to correctly be able to Map names from GraphQL Schema to property/member names
                 //      we need to get both the Fields (Schema) and the current order values...
                 //NOTE: Not all Queries have Fields (e.g. no Selections, just a literal result), so .Field may
                 //      throw internal NullReferenceException, hence we have the wrapper Try/Catch.
-                IInputField sortArgField = context.Field.Arguments[orderArgName];
-                ObjectValueNode sortArgValue = context.ArgumentLiteral<ObjectValueNode>(orderArgName);
+                IInputField sortArgField = context.Field.Arguments[sortArgName];
+                ObjectValueNode sortArgValue = context.ArgumentLiteral<ObjectValueNode>(sortArgName);
 
                 //Validate that we have some sort args specified and that the Type is correct (ListType of SortInputType values)...
                 //NOTE: The Following processing logic was adapted from 'QueryableSortProvider' implementation in HotChocolate.Data core.

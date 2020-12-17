@@ -61,8 +61,8 @@ NuGet package to your project and wire up your Starup  middleware and inject / i
 ### Completed:
 1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
 2. Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
-3. Provides abstraction facade with *HotChocolate.PreprocessingExtensions* package that can be used for any micro-orm.
-4. Implemented RepoDb on top of HotChocolate.PreprocessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
+3. Provides abstraction facade with *GraphQL.PreProcessingExtensions* package that can be used for any micro-orm.
+4. Implemented RepoDb on top of GraphQL.PreProcessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
 5. Supports abstracted facade for: 
    - Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!  And supports correct GraphQL Schema to Class property mapping.
    - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
@@ -81,7 +81,7 @@ Two versions of the Example Project included:
 1. **StarWars-AzureFunctions:** A version using Pre-processing extensions only along with in-memory processing with Linq over IEnumerable, 
 but all encapsulated in the Query/Repository layer and no longer using the IQueryable interface.  This simulates the use of lower layer logic
 for Sorting, Paging, etc. as you would with a micro-orm for working with an external data source, and helps show how any micro-orm or other
-functionality can now leverage the simplified facade to HotChocolate provided by *HotChocolate.PreprocessingExtensions*.
+functionality can now leverage the simplified facade to HotChocolate provided by *GraphQL.PreProcessingExtensions*.
 2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb as a fully fledged micro-orm implemenation. 
 And illustrates a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
 and Repository layer with no dependency on IQueryable.
@@ -139,7 +139,7 @@ is returned. This ia accomplished by ensuring that the new Sorring/Paging Provid
 implementations.*
 
 ## Configuration and Use:
-### Startup Configuration - HotChocolate.PreprocessingExtensions
+### Startup Configuration - GraphQL.PreProcessingExtensions
 1. Add the following initializer into the Startup.cs to enable these extensions.
    - All other elements of HotChocolate initialization are the same using the v11 API. 
 ```csharp
@@ -211,7 +211,7 @@ namespace StarWars.Characters
                 repoDbParams.SelectFields,
                 repoDbParams.SortOrderFields ?? OrderField.Parse(new { name = Order.Ascending })
                 repoDbParams.PagingParameters
-            );
+            ).ConfigureAwait(false);
 
             //Now With a valid Page/Slice we can return a PreProcessed Cursor Result so that
             //  it will not have any additional post-processing in the HotChocolate pipeline!
@@ -279,7 +279,7 @@ namespace StarWars.Characters
             //NOW we can rely on the fact that Character.Id won't be null because the parent Resolver
             //      had it as a field to be selected and populated.
             //NOTE: Error checking isn't a bad idea anyway...
-            var friends = await repository.GetCharacterFriendsAsync(character.Id);
+            var friends = await repository.GetCharacterFriendsAsync(character.Id).ConfigureAwait(false);
             var droids = friends.OfType<Droid>();
             return droids;
         }

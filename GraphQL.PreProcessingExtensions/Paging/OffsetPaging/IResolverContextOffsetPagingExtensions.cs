@@ -3,6 +3,7 @@
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using System;
+using HotChocolate.PreProcessingExtensions.Arguments;
 
 
 namespace HotChocolate.PreProcessingExtensions.Pagination

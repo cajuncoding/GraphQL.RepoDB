@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Types;
 
-namespace GraphQL.PreProcessingExtensions.Tests.GraphQL
+namespace HotChocolate.PreProcessingExtensions.Tests.GraphQL
 {
     [ExtendObjectType(Name = "Query")]
     public class HelloWorldResolver

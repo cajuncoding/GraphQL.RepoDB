@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     /// <summary>
     /// A droid in the Star Wars universe.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace GraphQL.RepoDb
+namespace HotChocolate.RepoDb
 {
     public static class TimeSpanCustomExtensions
     {

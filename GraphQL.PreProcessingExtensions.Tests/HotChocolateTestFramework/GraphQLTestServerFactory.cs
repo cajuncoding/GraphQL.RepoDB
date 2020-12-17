@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     /// <summary>
     /// BBernard

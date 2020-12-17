@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     /// <summary>
     /// BBernard

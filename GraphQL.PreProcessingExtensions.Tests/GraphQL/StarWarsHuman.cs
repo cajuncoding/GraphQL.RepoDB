@@ -2,11 +2,11 @@
 #nullable enable
 
 using System.Collections.Generic;
-using GraphQL.PreProcessingExtensions.Tests;
+using HotChocolate.PreProcessingExtensions.Tests;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     /// <summary>
     /// A human character in the Star Wars universe.

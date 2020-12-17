@@ -6,7 +6,7 @@ using HotChocolate.PreProcessingExtensions;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     [TestClass]
     public class ParamsContextSortArgumentTests : GraphQLTestBase

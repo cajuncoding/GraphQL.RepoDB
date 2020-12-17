@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using HotChocolate.Types;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     [InterfaceType(Name = "Character")]
     public interface IStarWarsCharacter

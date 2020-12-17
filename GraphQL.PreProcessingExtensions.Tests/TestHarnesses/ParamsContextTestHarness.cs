@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using HotChocolate.Language;
 using HotChocolate.PreProcessingExtensions;
+using HotChocolate.PreProcessingExtensions.Arguments;
 using HotChocolate.PreProcessingExtensions.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using OffsetPagingArguments = HotChocolate.PreProcessingExtensions.Pagination.OffsetPagingArguments;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     public class ParamsContextTestHarness : IParamsContext
     {
-        private IParamsContext _internalParamsContext;
 
         public ParamsContextTestHarness(IParamsContext paramsContext)
         {
-            _internalParamsContext = paramsContext;
-
             //BBernard
             //THIS will force initialization of all data for Test cases
             //  to then have access to even if out of scope, since we have our own
             //  references here!
             this.ResolverContext = paramsContext.ResolverContext;
+            this.AllArgumentSchemaNames = paramsContext.AllArgumentSchemaNames;
+            this.AllArguments = paramsContext.AllArguments;
             this.AllSelectionFields = paramsContext.AllSelectionFields;
             this.AllSelectionNames = paramsContext.AllSelectionNames;
             this.SelectionDependencies = paramsContext.SelectionDependencies;
@@ -33,6 +34,9 @@ namespace GraphQL.PreProcessingExtensions.Tests
         }
 
         public IResolverContext ResolverContext { get; }
+
+        public IReadOnlyList<string> AllArgumentSchemaNames { get; }
+        public IReadOnlyList<IArgumentValue> AllArguments { get; }
         public IReadOnlyList<IPreProcessingSelection> AllSelectionFields { get; }
         public IReadOnlyList<string> AllSelectionNames { get; }
         public IReadOnlyList<PreProcessingDependencyLink> SelectionDependencies { get; }

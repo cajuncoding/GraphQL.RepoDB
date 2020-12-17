@@ -61,7 +61,8 @@ namespace StarWars.Repositories
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
                 lastTake: pagingParams.Last,
-                logTrace: s => Debug.WriteLine(s)
+                logTrace: s => Debug.WriteLine(s),
+                commandTimeout: 15
             );
 
             var convertedSlice = pageSlice.AsMappedType(r => MapDbModelToCharacterModel(r));
@@ -102,7 +103,8 @@ namespace StarWars.Repositories
                 afterCursor: pagingParams.AfterIndex!,
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
-                lastTake: pagingParams.Last
+                lastTake: pagingParams.Last,
+                commandTimeout: 15
             );
 
             var convertedSlice = pageSlice.AsMappedType(r => (Human)MapDbModelToCharacterModel(r));
@@ -141,7 +143,8 @@ namespace StarWars.Repositories
                 afterCursor: pagingParams.AfterIndex,
                 firstTake: pagingParams.First,
                 beforeCursor: pagingParams.BeforeIndex,
-                lastTake: pagingParams.Last
+                lastTake: pagingParams.Last,
+                commandTimeout: 15
             );
 
             var mappedResults = results.AsMappedType(c => MapDbModelToCharacterModel(c));

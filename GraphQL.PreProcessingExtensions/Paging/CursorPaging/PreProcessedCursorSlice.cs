@@ -20,10 +20,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     {
         public PreProcessedCursorSlice(ICursorPageSlice<TEntity> pageSlice)
         {
-            if (pageSlice == null)
-                throw new ArgumentNullException(nameof(pageSlice));
-
-            this.CursorPage = pageSlice;
+            this.CursorPage = pageSlice ?? throw new ArgumentNullException(nameof(pageSlice));
             this.TotalCount = pageSlice?.TotalCount ?? 0;
 
             var firstCursor = pageSlice?.CursorResults?.FirstOrDefault();

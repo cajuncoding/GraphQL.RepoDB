@@ -6,7 +6,7 @@ using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Types;
 
-namespace GraphQL.PreProcessingExtensions.Tests
+namespace HotChocolate.PreProcessingExtensions.Tests
 {
     [ExtendObjectType(Name = "Query")]
     public class StarWarsCharacterResolver

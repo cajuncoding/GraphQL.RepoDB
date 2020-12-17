@@ -1,10 +1,10 @@
 ﻿# nullable enable
 
-using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.PreProcessingExtensions.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions
 {

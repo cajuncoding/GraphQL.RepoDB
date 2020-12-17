@@ -28,6 +28,7 @@ namespace RepoDb.CursorPagination
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
@@ -42,6 +43,7 @@ namespace RepoDb.CursorPagination
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
+            int? commandTimeout = null,
             IDbTransaction transaction = null,
             ITrace trace = null,
             CancellationToken cancellationToken = default
@@ -58,10 +60,11 @@ namespace RepoDb.CursorPagination
                     hints: hints,
                     fields: fields,
                     tableName: tableName,
+                    commandTimeout: commandTimeout,
                     transaction: transaction,
                     trace: trace,
                     cancellationToken: cancellationToken
-                );
+                ).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -77,10 +80,10 @@ namespace RepoDb.CursorPagination
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
-
         /// <returns></returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchOffsetPagingQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
@@ -91,6 +94,7 @@ namespace RepoDb.CursorPagination
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
+            int? commandTimeout = null,
             IDbTransaction transaction = null,
             ITrace trace = null,
             CancellationToken cancellationToken = default
@@ -112,10 +116,11 @@ namespace RepoDb.CursorPagination
                     hints: hints,
                     fields: fields,
                     tableName: tableName,
+                    commandTimeout: commandTimeout,
                     transaction: transaction,
                     trace: trace,
                     cancellationToken: cancellationToken
-                );
+                ).ConfigureAwait(false);
 
                 return cursorPageResult;
             }
@@ -142,10 +147,10 @@ namespace RepoDb.CursorPagination
         /// <param name="rowsPerBatch"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
-
         /// <returns></returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchOffsetPagingQueryAsync<TEntity>(
             this DbConnection dbConnection,
@@ -156,6 +161,7 @@ namespace RepoDb.CursorPagination
             int? rowsPerBatch = null,
             string hints = null,
             IEnumerable<Field> fields = null,
+            int? commandTimeout = null,
             IDbTransaction transaction = null,
             ITrace trace = null,
             CancellationToken cancellationToken = default
@@ -170,10 +176,11 @@ namespace RepoDb.CursorPagination
                 where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
                 hints: hints,
                 fields: fields,
+                commandTimeout: commandTimeout,
                 transaction: transaction,
                 trace: trace,
                 cancellationToken: cancellationToken
-            );
+            ).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -188,6 +195,7 @@ namespace RepoDb.CursorPagination
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="trace"></param>
         /// <param name="cancellationToken"></param>
@@ -201,6 +209,7 @@ namespace RepoDb.CursorPagination
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
+            int? commandTimeout = null,
             IDbTransaction transaction = null,
             ITrace trace = null,
             CancellationToken cancellationToken = default
@@ -224,7 +233,9 @@ namespace RepoDb.CursorPagination
 
             //Retrieve only the select fields that are valid for the Database query!
             //NOTE: We guard against duplicate values as a convenience.
-            var validSelectFields = await dbConnection.GetValidatedDbFields(dbTableName, selectFields.Distinct());
+            var validSelectFields = await dbConnection
+                .GetValidatedDbFields(dbTableName, selectFields.Distinct())
+                .ConfigureAwait(false);
 
             //Dynamically handle RepoDb where filters (QueryGroup)...
             object whereParams = where != null
@@ -239,10 +250,11 @@ namespace RepoDb.CursorPagination
                 orderBy: orderBy,
                 where: whereParams,
                 hints: hints,
-                cancellationToken: cancellationToken,
+                commandTimeout: commandTimeout,
                 transaction: transaction,
-                trace: trace
-            );
+                trace: trace,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
 
             //TODO: Implement Logic to determine HasNextPage, HasPreviousPage, and get Total Count or Not!
             var offsetPageResults = new OffsetPageResults<TEntity>(batchResults, true, true, 0);
