@@ -17,6 +17,21 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         }
 
         [TestMethod]
+        public void TestParamsContextInterfaceImplementationsByAssemblyScan()
+        {
+            // arrange
+            var searchType = typeof(IParamsContext);
+            var searchAssembly = searchType.Assembly;
+
+            // act
+            var implementationTypes = searchAssembly.GetTypes().Where(t => t.IsClass && searchType.IsAssignableFrom(t)).ToList();
+
+            // assert
+            Assert.AreEqual(implementationTypes.Count, 1);
+            Assert.AreEqual(implementationTypes[0], typeof(GraphQLParamsContext));
+        }
+
+        [TestMethod]
         public async Task TestParamsContextMiddlewareInjectionSimpleExample()
         {
             // arrange
