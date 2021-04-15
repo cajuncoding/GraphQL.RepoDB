@@ -61,15 +61,13 @@ namespace HotChocolate.PreProcessingExtensions
         /// <summary>
         /// GatherSelectionNames based on provided parameters to simplify getting the specifid
         /// </summary>
-        /// <param name="includeDependencyNames"></param>
         /// <param name="flags"></param>
         /// <returns></returns>
         IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All);
 
         /// <summary>
-        /// GatherSelectionNames based on provided parameters to simplify getting the specifid
+        /// GatherSelectionNames based on provided parameters to simplify getting the specified
         /// </summary>
-        /// <param name="includeDependencyNames"></param>
         /// <param name="flags"></param>
         /// <returns></returns>
         IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All);
@@ -96,5 +94,16 @@ namespace HotChocolate.PreProcessingExtensions
         /// HotChocolate attribute.
         /// </summary>
         OffsetPagingArguments OffsetPagingArgs { get; }
+
+
+        /// <summary>
+        /// The Total Count selection field (a unique system selection only available when Paging is enabled).
+        /// </summary>
+        PreProcessingSelection TotalCountSelection { get; }
+
+        /// <summary>
+        /// Boolean that helps easily determine if the current query requested the TotalCount selection; which is only available when Paging is Enabled.
+        /// </summary>
+        bool IsTotalCountRequested { get; }
     }
 }

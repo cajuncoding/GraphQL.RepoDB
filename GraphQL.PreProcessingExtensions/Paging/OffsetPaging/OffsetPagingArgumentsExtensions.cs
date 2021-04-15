@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using HotChocolate.Types.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {

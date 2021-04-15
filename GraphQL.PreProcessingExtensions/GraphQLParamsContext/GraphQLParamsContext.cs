@@ -6,6 +6,7 @@ using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.PreProcessingExtensions.Selections;
 using HotChocolate.Language;
 using HotChocolate.PreProcessingExtensions.Arguments;
 using HotChocolate.PreProcessingExtensions.Selections;
@@ -22,7 +23,13 @@ namespace HotChocolate.PreProcessingExtensions
         protected OffsetPagingArguments? _offsetPagingArgs;
         protected IReadOnlyList<ISortOrderField> _sortArgs;
         protected IReadOnlyList<IPreProcessingSelection> _selectionFields;
+        protected IReadOnlyList<string> _selectionNames;
         protected IReadOnlyList<PreProcessingDependencyLink> _selectionDependencies;
+
+        //It's possible and common for TotalCount selection to not be defined (e.g. null), therefore we must support null value as valid state
+        //  while also preventing unnecessary lookups for performance; so we track state with an initialization boolean.
+        private bool _isTotalCountSelectionInitialized = false;
+        protected PreProcessingSelection _totalCountSelectionField;
 
         public GraphQLParamsContext(IResolverContext resolverContext)
         {
@@ -44,7 +51,7 @@ namespace HotChocolate.PreProcessingExtensions
 
         public virtual IReadOnlyList<string> AllSelectionNames
             //When retrieving only Names, we should take all Distinct values...
-            => AllSelectionFields?.Select(s => s.SelectionName).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            => _selectionNames ??= AllSelectionFields?.Select(s => s.SelectionName).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
         public virtual IReadOnlyList<PreProcessingDependencyLink> SelectionDependencies
             //When retrieving only Names, we should take all Distinct values...
@@ -65,13 +72,32 @@ namespace HotChocolate.PreProcessingExtensions
             => _offsetPagingArgs ??= LoadOffsetPagingArgsHelper();
 
 
+        public virtual PreProcessingSelection TotalCountSelection
+        {
+            get
+            {
+                //It's possible and common for TotalCount selection to not be defined (e.g. null), therefore we must support null value as valid state
+                //  while also preventing unnecessary lookups for performance; so we track state with an initialization boolean.
+                if (!_isTotalCountSelectionInitialized)
+                {
+                    _isTotalCountSelectionInitialized = true;
+                    _totalCountSelectionField ??= _resolverContext.GetTotalCountSelectionField();
+                }
+
+                return _totalCountSelectionField;
+            }
+        }
+
+        public virtual bool IsTotalCountRequested => TotalCountSelection != null;
+
+
         /// <summary>
         /// Get the selection names mapped to underlying class property/member id values, and include
         /// exclude specified selection names based on flags specified (e.g. SelectionNames, DependencyNames, All).
         /// </summary>
         /// <param name="flags"></param>
         /// <returns></returns>
-        public IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All)
+        public virtual IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All)
         {
             var results = GatherSelectionNamesInternal(AllSelectionFields, flags);
             return results;
@@ -83,13 +109,13 @@ namespace HotChocolate.PreProcessingExtensions
         /// </summary>
         /// <param name="flags"></param>
         /// <returns></returns>
-        public IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All)
+        public virtual IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All)
         {
             var results = GatherSelectionNamesInternal(GetSelectionFieldsFor<TObjectType>(), flags);
             return results;
         }
 
-        protected CursorPagingArguments LoadCursorPagingArgsHelper()
+        protected virtual CursorPagingArguments LoadCursorPagingArgsHelper()
         {
             var cursorPagingArgs = _resolverContext.GetCursorPagingArgsSafely();
             return cursorPagingArgs.IsPagingArgumentsValid()
@@ -97,7 +123,7 @@ namespace HotChocolate.PreProcessingExtensions
                     : new CursorPagingArguments();
         }
 
-        protected OffsetPagingArguments LoadOffsetPagingArgsHelper()
+        protected virtual OffsetPagingArguments LoadOffsetPagingArgsHelper()
         {
             var offsetPagingArgs = _resolverContext.GetOffsetPagingArgsSafely();
             return offsetPagingArgs.IsPagingArgumentsValid()
@@ -105,7 +131,7 @@ namespace HotChocolate.PreProcessingExtensions
                     : new OffsetPagingArguments(-1, -1);
         }
 
-        protected IEnumerable<string> GatherSelectionNamesInternal(IEnumerable<IPreProcessingSelection> baseEnumerable, SelectionNameFlags flags)
+        protected virtual IEnumerable<string> GatherSelectionNamesInternal(IEnumerable<IPreProcessingSelection> baseEnumerable, SelectionNameFlags flags)
         {
             var results = new List<string>();
 
@@ -127,7 +153,7 @@ namespace HotChocolate.PreProcessingExtensions
             return results.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         }
 
-        protected IReadOnlyList<PreProcessingDependencyLink> GatherDependencyLinks()
+        protected virtual IReadOnlyList<PreProcessingDependencyLink> GatherDependencyLinks()
         {
             if (AllSelectionFields == null)
                 return null;

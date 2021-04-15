@@ -15,7 +15,6 @@ namespace HotChocolate.PreProcessingExtensions.Arguments
         /// been provided in the current query.
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="includeOnlyArgsWithValues"></param>
         /// <returns></returns>
         public static IEnumerable<string> AllArgumentSchemaNamesSafely(this IResolverContext? context)
         {

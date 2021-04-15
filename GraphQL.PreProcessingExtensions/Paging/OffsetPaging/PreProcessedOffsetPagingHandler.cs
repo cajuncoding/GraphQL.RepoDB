@@ -10,18 +10,18 @@ using HotChocolate.Utilities;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
-    public class PreProcessedCursorPagingHandler<TEntity> : CursorPagingHandler
+    public class PreProcessedOffsetPagingHandler<TEntity> : OffsetPagingHandler
     {
         public PagingOptions PagingOptions { get; protected set; }
 
-        public PreProcessedCursorPagingHandler(PagingOptions pagingOptions)
+        public PreProcessedOffsetPagingHandler(PagingOptions pagingOptions)
             : base(pagingOptions)
         {
             this.PagingOptions = pagingOptions;
         }
 
         /// <summary>
-        /// Provides a No-Op (no post-processing) impelementation so that results are unchanged from
+        /// Provides a No-Op (no post-processing) implementation so that results are unchanged from
         /// what was returned by the Resolver (or lower layers); assumes that the results are correctly
         /// pre-processed as a IPreProcessedPagedResult
         /// </summary>
@@ -30,12 +30,12 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <param name="arguments"></param>
         /// <returns></returns>
         #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        protected override async ValueTask<Connection> SliceAsync(IResolverContext context, object source, CursorPagingArguments arguments)
+        protected override async ValueTask<CollectionSegment> SliceAsync(IResolverContext context, object source, OffsetPagingArguments arguments)
         #pragma warning restore CS1998 
         {
             //If Appropriate we handle the values here to ensure that no post-processing is done other than
-            //  correctly mapping the results into a GraphQL Connection as Edges with Cursors...
-            if (source is IPreProcessedCursorSlice<TEntity> pagedResults)
+            //  correctly mapping the results into a GraphQL Collection Segment with appropriate Paging Details...
+            if (source is IPreProcessedOffsetPageResults<TEntity> pagedResults)
             {
                 bool includeTotalCountEnabled = this.PagingOptions.IncludeTotalCount ?? PagingDefaults.IncludeTotalCount;
                 var graphQLParamsContext = new GraphQLParamsContext(context);
@@ -47,32 +47,23 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
                 int? totalCount = pagedResults.TotalCount;
 
                 //Ensure we are null safe and return a valid empty list by default.
-                IReadOnlyList<IndexEdge<TEntity>> selectedEdges = 
-                    pagedResults?.ToEdgeResults().ToList() ?? new List<IndexEdge<TEntity>>(); ;
+                var segmentResults = pagedResults?.ToList() ?? new List<TEntity>();
 
-                IndexEdge<TEntity>? firstEdge = selectedEdges.FirstOrDefault();
-                IndexEdge<TEntity>? lastEdge = selectedEdges.LastOrDefault();
-
-                var connectionPageInfo = new ConnectionPageInfo(
+                var collectionSegmentInfo = new CollectionSegmentInfo(
                     hasNextPage: pagedResults?.HasNextPage ?? false,
-                    hasPreviousPage: pagedResults?.HasPreviousPage ?? false,
-                    startCursor: firstEdge?.Cursor,
-                    endCursor: lastEdge?.Cursor,
-                    totalCount: totalCount ?? 0
+                    hasPreviousPage: pagedResults?.HasPreviousPage ?? false
                 );
 
-                var graphQLConnection = new Connection<TEntity>(
-                    selectedEdges,
-                    connectionPageInfo,
-                    ct => new ValueTask<int>(connectionPageInfo.TotalCount ?? 0)
+                var graphQLConnection = new CollectionSegment(
+                    (IReadOnlyCollection<object>)segmentResults,
+                    collectionSegmentInfo,
+                    ct => new ValueTask<int>(totalCount ?? throw new InvalidOperationException())
                 );
 
                 return graphQLConnection;
             }
 
-            throw new GraphQLException($"[{nameof(PreProcessedCursorPagingHandler<TEntity>)}] cannot handle the specified data source of type [{source.GetType().Name}].");
+            throw new GraphQLException($"[{nameof(PreProcessedOffsetPagingHandler<TEntity>)}] cannot handle the specified data source of type [{source.GetType().Name}].");
         }
-
-
     }
 }

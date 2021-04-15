@@ -26,7 +26,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
 
             // assert
             Assert.IsNotNull(result?.Data, "Query Execution Failed");
-            Assert.AreEqual(server.ParamsContextLookup.Count, 1);
+            Assert.AreEqual(1, server.ParamsContextList.Count);
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             Assert.IsTrue(paramsContext.SortArgs.Count == 1);
 
             var sortArt = paramsContext.SortArgs[0];
-            Assert.AreEqual(sortArt.FieldName, "name");
+            Assert.AreEqual("name", sortArt.FieldName);
             Assert.IsTrue(sortArt.IsAscending());
         }
 
@@ -118,7 +118,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             Assert.IsTrue(paramsContext.SortArgs.Count == 1);
 
             var sortArt = paramsContext.SortArgs[0];
-            Assert.AreEqual(sortArt.FieldName, "id");
+            Assert.AreEqual("id", sortArt.FieldName);
             Assert.IsTrue(sortArt.IsDescending());
         }
     }

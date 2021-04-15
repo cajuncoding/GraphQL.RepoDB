@@ -8,6 +8,7 @@ using HotChocolate.Execution.Configuration;
 using HotChocolate.PreProcessingExtensions;
 using HotChocolate.PreProcessingExtensions.Tests.GraphQL;
 using HotChocolate.Resolvers;
+using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,12 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                         .AddType<StarWarsCharacterResolver>()
                         .AddType<StarWarsHuman>()
                         .AddType<StarWarsDroid>()
+                        .SetPagingOptions(new PagingOptions()
+                        {
+                            DefaultPageSize = 5,
+                            IncludeTotalCount = true,
+                            MaxPageSize = 10
+                        })
                         .AddPreProcessedResultsExtensions();
 
                     return graphQLBuilder;

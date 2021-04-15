@@ -189,7 +189,7 @@ namespace HotChocolate.RepoDb
         {
             var graphQLPagingArgs = this.GraphQLParamsContext.OffsetPagingArgs;
 
-            if (!graphQLPagingArgs.IsPagingArgumentsValid() == true)
+            if (!graphQLPagingArgs.IsPagingArgumentsValid())
             {
                 return null;
             }

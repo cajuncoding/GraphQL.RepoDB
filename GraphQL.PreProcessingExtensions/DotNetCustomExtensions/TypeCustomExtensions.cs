@@ -18,7 +18,7 @@ namespace HotChocolate.PreProcessingExtensions
         {
             if (!parentType.IsGenericType)
             {
-                throw new ArgumentException("type must be generic", "parentType");
+                throw new ArgumentException("type must be generic", nameof(parentType));
             }
             else if (type == null || type == typeof(object))
             {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
-
     /// <summary>
     /// Interface representing a Decorator class for a set of Page of results any TEntity model provided.  
     /// This class represents a set of results/nodes of offset pagination.
@@ -25,7 +24,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 
         /// <summary>
         /// Convenience method to easily map/convert/project all types in the current page to a different object type
-        /// altogether, without losing the decorator paging details; Provide deffered execution via Linq Select().
+        /// altogether, without losing the decorator paging details; Provide deferred execution via Linq Select().
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc"></param>
@@ -34,7 +33,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 
         /// <summary>
         /// Convenience method to Wrap the current Page results as PreProcessedOffsetPageResults; to eliminate
-        /// cermenonial code for new'ing up the results.
+        /// ceremonial code for new-ing up the results.
         /// </summary>
         /// <returns></returns>
         PreProcessedOffsetPageResults<TEntity> AsPreProcessedPageResults();
