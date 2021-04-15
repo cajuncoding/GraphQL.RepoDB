@@ -5,15 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using HotChocolate.PreProcessingExtensions.Tests.GraphQL;
 using HotChocolate;
+using System;
 using HotChocolate.AspNetCore.Extensions;
 using HotChocolate.AspNetCore.Serialization;
 using HotChocolate.Execution.Configuration;
-using HotChocolate.PreProcessingExtensions;
-using HotChocolate.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
 {
@@ -23,17 +21,13 @@ namespace HotChocolate.PreProcessingExtensions.Tests
 
         public List<KeyValuePair<string, IParamsContext>> ParamsContextList { get; } = new List<KeyValuePair<string, IParamsContext>>();
 
-        private ILookup<string, IParamsContext> _paramsContextLookup;
-        public ILookup<string, IParamsContext> ParamsContextLookup
-        {
-            get
-            {
-                return _paramsContextLookup ??= ParamsContextList.ToLookup(kv => kv.Key, kv => kv.Value);
-            }
-        }
         public IParamsContext GetParamsContext(string fieldName)
         {
-            return ParamsContextLookup[fieldName].FirstOrDefault();
+            var paramsContext = ParamsContextList
+                .LastOrDefault(ctx => ctx.Key.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
+                .Value;
+
+            return paramsContext;
         }
 
         protected TestServer CreateTestServer(

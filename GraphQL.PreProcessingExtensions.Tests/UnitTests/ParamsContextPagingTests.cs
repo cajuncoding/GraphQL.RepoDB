@@ -1,11 +1,7 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.PreProcessingExtensions.Selections;
-using HotChocolate;
-using HotChocolate.PreProcessingExtensions;
-using HotChocolate.PreProcessingExtensions.Selections;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
@@ -42,47 +38,48 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             var cursorPagingParams = paramsContext.CursorPagingArgs;
 
             Assert.IsNotNull(cursorPagingParams);
-            Assert.AreEqual(cursorPagingParams.First, 2);
+            Assert.AreEqual(2, cursorPagingParams.First);
 
             var resultsJson = (JObject)result.Data[queryKey];
             var results = resultsJson[SelectionNodeName.Nodes];
 
-            Assert.AreEqual(results.Count(), 2);
-            Assert.AreEqual(results.FirstOrDefault()?["name"], "Luke Skywalker");
-            Assert.AreEqual(results.LastOrDefault()?["name"], "Darth Vader");
+            Assert.IsNotNull(results);
+            Assert.AreEqual(2, results.Count());
+            Assert.AreEqual("Luke Skywalker", results.FirstOrDefault()?["name"]);
+            Assert.AreEqual("Darth Vader", results.LastOrDefault()?["name"]);
         }
 
         //TODO: Implement a few more tests...
         //[TestMethod]
         //public async Task TestParamsContextCursorPagingMiddleSlice()
         //{
-            //// arrange
-            //var server = CreateStarWarsTestServer();
+        //// arrange
+        //var server = CreateStarWarsTestServer();
 
-            //// act
-            //var result = await server.PostQueryAsync(@"{
-            //    starWarsCharactersCursorPaginated(first:2) {
-            //        nodes {
-            //            id
-            //            name
-            //        }
-            //    }
-            //}");
+        //// act
+        //var result = await server.PostQueryAsync(@"{
+        //    starWarsCharactersCursorPaginated(first:2) {
+        //        nodes {
+        //            id
+        //            name
+        //        }
+        //    }
+        //}");
 
-            //// assert
-            //Assert.IsNotNull(result?.Data, "Query Execution Failed");
+        //// assert
+        //Assert.IsNotNull(result?.Data, "Query Execution Failed");
 
-            //var queryKey = "starWarsCharactersCursorPaginated";
-            //var paramsContext = server.GetParamsContext(queryKey);
-            //var cursorPagingParams = paramsContext.CursorPagingArgs;
-            //Assert.IsNotNull(cursorPagingParams);
-            //Assert.AreEqual(cursorPagingParams.First, 2);
+        //var queryKey = "starWarsCharactersCursorPaginated";
+        //var paramsContext = server.GetParamsContext(queryKey);
+        //var cursorPagingParams = paramsContext.CursorPagingArgs;
+        //Assert.IsNotNull(cursorPagingParams);
+        //Assert.AreEqual(2, cursorPagingParams.First);
 
-            //var resultsJson = (JObject)result.Data[queryKey];
-            //var results = resultsJson["nodes"];
-            //Assert.AreEqual(results.Count(), 2);
-            //Assert.AreEqual(results.FirstOrDefault()?["name"], "Luke Skywalker");
-            //Assert.AreEqual(results.LastOrDefault()?["name"], "Darth Vader");
+        //var resultsJson = (JObject)result.Data[queryKey];
+        //var results = resultsJson[SelectionNodeName.Nodes];
+        //Assert.AreEqual(2, results.Count());
+        //Assert.AreEqual("Luke Skywalker", results.FirstOrDefault()?["name"]);
+        //Assert.AreEqual("Darth Vader", results.LastOrDefault()?["name"]);
         //}
 
         [TestMethod]
@@ -109,15 +106,16 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             var offsetPagingParams = paramsContext.OffsetPagingArgs;
 
             Assert.IsNotNull(offsetPagingParams);
-            Assert.AreEqual(offsetPagingParams.Skip, 2);
-            Assert.AreEqual(offsetPagingParams.Take, 2);
+            Assert.AreEqual(2, offsetPagingParams.Skip);
+            Assert.AreEqual(2, offsetPagingParams.Take);
 
             var resultsJson = (JObject)result.Data[queryKey];
             var results = resultsJson[SelectionNodeName.Items];
 
-            Assert.AreEqual(results.Count(), 2);
-            Assert.AreEqual(results.FirstOrDefault()?["name"], "Han Solo");
-            Assert.AreEqual(results.LastOrDefault()?["name"], "Leia Organa");
+            Assert.IsNotNull(results);
+            Assert.AreEqual(2, results.Count());
+            Assert.AreEqual("Han Solo", results.FirstOrDefault()?["name"]);
+            Assert.AreEqual("Leia Organa", results.LastOrDefault()?["name"]);
         }
     }
 }

@@ -6,6 +6,7 @@ using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.PreProcessingExtensions.Selections;
 using HotChocolate.Language;
 using HotChocolate.PreProcessingExtensions.Arguments;
 using HotChocolate.PreProcessingExtensions.Selections;
@@ -22,7 +23,13 @@ namespace HotChocolate.PreProcessingExtensions
         protected OffsetPagingArguments? _offsetPagingArgs;
         protected IReadOnlyList<ISortOrderField> _sortArgs;
         protected IReadOnlyList<IPreProcessingSelection> _selectionFields;
+        protected IReadOnlyList<string> _selectionNames;
         protected IReadOnlyList<PreProcessingDependencyLink> _selectionDependencies;
+
+        //It's possible and common for TotalCount selection to not be defined (e.g. null), therefore we must support null value as valid state
+        //  while also preventing unnecessary lookups for performance; so we track state with an initialization boolean.
+        private bool _isTotalCountSelectionInitialized = false;
+        protected PreProcessingSelection _totalCountSelectionField;
 
         public GraphQLParamsContext(IResolverContext resolverContext)
         {
@@ -44,7 +51,7 @@ namespace HotChocolate.PreProcessingExtensions
 
         public virtual IReadOnlyList<string> AllSelectionNames
             //When retrieving only Names, we should take all Distinct values...
-            => AllSelectionFields?.Select(s => s.SelectionName).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            => _selectionNames ??= AllSelectionFields?.Select(s => s.SelectionName).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
         public virtual IReadOnlyList<PreProcessingDependencyLink> SelectionDependencies
             //When retrieving only Names, we should take all Distinct values...
@@ -63,6 +70,25 @@ namespace HotChocolate.PreProcessingExtensions
 
         public virtual OffsetPagingArguments OffsetPagingArgs
             => _offsetPagingArgs ??= LoadOffsetPagingArgsHelper();
+
+
+        public virtual PreProcessingSelection TotalCountSelection
+        {
+            get
+            {
+                //It's possible and common for TotalCount selection to not be defined (e.g. null), therefore we must support null value as valid state
+                //  while also preventing unnecessary lookups for performance; so we track state with an initialization boolean.
+                if (!_isTotalCountSelectionInitialized)
+                {
+                    _isTotalCountSelectionInitialized = true;
+                    _totalCountSelectionField ??= _resolverContext.GetTotalCountSelectionField();
+                }
+
+                return _totalCountSelectionField;
+            }
+        }
+
+        public virtual bool IsTotalCountRequested => TotalCountSelection != null;
 
 
         /// <summary>

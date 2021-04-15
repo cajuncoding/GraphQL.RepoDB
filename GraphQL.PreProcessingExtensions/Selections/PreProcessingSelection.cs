@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using GraphQL.PreProcessingExtensions.Selections;
 
 namespace HotChocolate.PreProcessingExtensions
 {
@@ -41,7 +42,7 @@ namespace HotChocolate.PreProcessingExtensions
         public string SelectionMemberNameOrDefault => ClassMemberInfo?.Name! ?? SelectionName;
 
         public NameString Name => GraphQLFieldSelection.ResponseName;
-
+        
         public override string ToString()
         {
             return $"{GraphQLObjectType.Name}:{SelectionName}";

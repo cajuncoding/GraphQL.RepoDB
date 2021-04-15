@@ -38,8 +38,12 @@ namespace HotChocolate.PreProcessingExtensions.Selections
 
                 //Handle paging cases; current Node is a Connection so we have to look for selections inside
                 //  ->edges->nodes, or inside the ->nodes (shortcut per Relay spec); both of which may exist(?)
-                if (lookup.Contains(SelectionNodeName.Nodes) || lookup.Contains(SelectionNodeName.Edges))
+                if (lookup.Contains(SelectionNodeName.Nodes) || lookup.Contains(SelectionNodeName.Edges) || lookup.Contains(SelectionNodeName.Items))
                 {
+                    //Cursor & Offset Paging are mutually exclusive so this small optimization prevents unnecessary processing...
+                    var searchOffsetPagingEnabled = true;
+
+                    //CURSOR PAGING SUPPORT - results are in either a 'Nodes' or 'Edges' Node!
                     //NOTE: nodes and edges are not mutually exclusive per Relay spec so
                     //          we gather from all if they are defined...
                     if (lookup.Contains(SelectionNodeName.Nodes))
@@ -47,13 +51,26 @@ namespace HotChocolate.PreProcessingExtensions.Selections
                         var nodesSelectionField = lookup[SelectionNodeName.Nodes].FirstOrDefault();
                         var childSelections = GatherChildSelections(context, nodesSelectionField);
                         selectionResults.AddRange(childSelections);
+
+                        searchOffsetPagingEnabled = false;
                     }
 
                     if (lookup.Contains(SelectionNodeName.Edges))
                     {
                         var edgesSelectionField = lookup[SelectionNodeName.Edges].FirstOrDefault();
-                        var nodeSelectionField = FindChildSelectionByName(context, SelectionNodeName.EdgeNode, edgesSelectionField);
-                        var childSelections = GatherChildSelections(context, nodeSelectionField);
+                        //If Edges are specified then Selections are actually inside a nested 'Node' (singular, not plural) that we need to traverse...
+                        var nodesSelectionField = FindChildSelectionByName(context, SelectionNodeName.EdgeNode, edgesSelectionField);
+                        var childSelections = GatherChildSelections(context, nodesSelectionField);
+                        selectionResults.AddRange(childSelections);
+                        
+                        searchOffsetPagingEnabled = false;
+                    }
+
+                    //OFFSET PAGING SUPPORT - results are in an 'Items' Node!
+                    if (searchOffsetPagingEnabled && lookup.Contains(SelectionNodeName.Items))
+                    {
+                        var nodesSelectionField = lookup[SelectionNodeName.Items].FirstOrDefault();
+                        var childSelections = GatherChildSelections(context, nodesSelectionField);
                         selectionResults.AddRange(childSelections);
                     }
                 }
@@ -67,8 +84,17 @@ namespace HotChocolate.PreProcessingExtensions.Selections
             return selectionResults;
         }
 
+        public static PreProcessingSelection GetTotalCountSelectionField(this IResolverContext? context)
+        {
+            if (context == null)
+                return null!;
+
+            var totalCountSelectionField = FindChildSelectionByName(context!, SelectionFieldName.TotalCount, null);
+            return totalCountSelectionField;
+        }
+
         /// <summary>
-        /// Find the selection that matches the speified name.
+        /// Find the selection that matches the specified name.
         /// For more info. on Node parsing logic see here:
         /// https://github.com/ChilliCream/hotchocolate/blob/a1f2438b74b19e965b560ca464a9a4a896dab79a/src/Core/Core.Tests/Execution/ResolverContextTests.cs#L83-L89
         /// </summary>
@@ -83,7 +109,7 @@ namespace HotChocolate.PreProcessingExtensions.Selections
 
             var childSelections = GatherChildSelections(context!, baseSelection);
             var resultSelection = childSelections?.FirstOrDefault(
-                s => s.SelectionName.ToString().Equals(selectionFieldName, StringComparison.OrdinalIgnoreCase)
+                s => s.SelectionName.Equals(selectionFieldName, StringComparison.OrdinalIgnoreCase)
             )!;
 
             return resultSelection!;
@@ -116,7 +142,7 @@ namespace HotChocolate.PreProcessingExtensions.Selections
                 ? baseISelection.SelectionSet
                 : null!;
 
-            //Get all possible ObjectType(s); InterfaceTypes & UnitionTypes will have more than one...
+            //Get all possible ObjectType(s); InterfaceTypes & UnionTypes will have more than one...
             var objectTypes = GetObjectTypesSafely(field.Type, context.Schema);
 
             //Map all object types into PreProcessingSelection (adapter classes)...

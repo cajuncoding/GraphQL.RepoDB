@@ -30,6 +30,8 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             this.PagingArgs = paramsContext.PagingArgs;
             this.CursorPagingArgs = paramsContext.CursorPagingArgs;
             this.OffsetPagingArgs = paramsContext.OffsetPagingArgs;
+            this.TotalCountSelection = paramsContext.TotalCountSelection;
+            this.IsTotalCountRequested = paramsContext.IsTotalCountRequested;
         }
 
         public IResolverContext ResolverContext { get; }
@@ -43,6 +45,8 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         public CursorPagingArguments PagingArgs { get; }
         public CursorPagingArguments CursorPagingArgs { get; }
         public OffsetPagingArguments OffsetPagingArgs { get; }
+        public PreProcessingSelection TotalCountSelection { get; }
+        public bool IsTotalCountRequested { get; }
 
         public IReadOnlyList<IPreProcessingSelection> GetSelectionFieldsFor<TObjectType>()
         {

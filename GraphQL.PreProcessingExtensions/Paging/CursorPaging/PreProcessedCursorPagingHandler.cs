@@ -37,10 +37,12 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
             //  correctly mapping the results into a GraphQL Connection as Edges with Cursors...
             if (source is IPreProcessedCursorSlice<TEntity> pagedResults)
             {
-                bool includeTotalCount = this.PagingOptions.IncludeTotalCount ?? false;
-                //TODO: Optimize this to only require only if the query actually requested it (for both Offset & Cursor Paging)!
-                if (includeTotalCount && pagedResults.TotalCount == null)
-                    throw new InvalidOperationException($"Total Count is required by configuration, but was not provided with the results [{this.GetType().GetTypeName()}] by resolvers pre-processing logic; TotalCount is null.");
+                bool includeTotalCountEnabled = this.PagingOptions.IncludeTotalCount ?? PagingDefaults.IncludeTotalCount;
+                var graphQLParamsContext = new GraphQLParamsContext(context);
+
+                //Optimized to only require TotalCount value if the query actually requested it!
+                if (includeTotalCountEnabled && graphQLParamsContext.IsTotalCountRequested && pagedResults.TotalCount == null)
+                    throw new InvalidOperationException($"Total Count is requested in the query, but was not provided with the results [{this.GetType().GetTypeName()}] from the resolvers pre-processing logic; TotalCount is null.");
 
                 int? totalCount = pagedResults.TotalCount;
 
