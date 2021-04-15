@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.RepoDb.SqlServer", "GraphQL.RepoDb\GraphQL.RepoDb.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.RepoDb.SqlServer", "GraphQL.RepoDb.SqlServer\GraphQL.RepoDb.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.PreProcessingExtensions", "GraphQL.PreProcessingExtensions\GraphQL.PreProcessingExtensions.csproj", "{747B95FC-FFA7-4966-A0F9-7FA315D7F823}"
 EndProject
@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepoDb", "Sample.StartWars-AzureFunctions-SqlServer\StarWars-AzureFunctions-RepoDb.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.PreProcessingExtensions.Tests", "GraphQL.PreProcessingExtensions.Tests\GraphQL.PreProcessingExtensions.Tests.csproj", "{2334C956-DC54-4A52-8277-0FA6A269C330}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.PreProcessingExtensions.Tests", "GraphQL.PreProcessingExtensions.Tests\GraphQL.PreProcessingExtensions.Tests.csproj", "{2334C956-DC54-4A52-8277-0FA6A269C330}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
