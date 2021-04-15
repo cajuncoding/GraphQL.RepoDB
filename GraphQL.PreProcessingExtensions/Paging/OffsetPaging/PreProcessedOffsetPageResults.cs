@@ -15,7 +15,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// As a real List<> the PureCode Schema inference works as expected!
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class PreProcessedOffsetPageResults<TEntity> : List<TEntity>, IEnumerable<TEntity>, IPreProcessedOffsetPageResults<TEntity> 
+    public class PreProcessedOffsetPageResults<TEntity> : List<TEntity>, IPreProcessedOffsetPageResults<TEntity>
         where TEntity : class
     {
         public PreProcessedOffsetPageResults(IOffsetPageResults<TEntity> pageResults)
@@ -23,11 +23,11 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
             if (pageResults == null)
                 throw new ArgumentNullException(nameof(pageResults));
 
-            this.TotalCount = pageResults?.TotalCount ?? 0;
+            this.TotalCount = pageResults?.TotalCount;
             this.HasNextPage = pageResults.HasNextPage;
             this.HasPreviousPage = pageResults.HasPreviousPage;
 
-            if (pageResults.Results.Any() == true)
+            if (pageResults.Results.Any())
                 this.AddRange(pageResults.Results);
         }
 

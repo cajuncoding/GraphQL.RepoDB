@@ -8,7 +8,6 @@ using HotChocolate.PreProcessingExtensions.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using OffsetPagingArguments = HotChocolate.PreProcessingExtensions.Pagination.OffsetPagingArguments;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
 {

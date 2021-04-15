@@ -15,23 +15,23 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// As a real List<> the PureCode Schema inference works as expected!
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class PreProcessedCursorSlice<TEntity> : List<TEntity>, IEnumerable<TEntity>, IPreProcessedCursorSlice<TEntity>
+    public class PreProcessedCursorSlice<TEntity> : List<TEntity>, IPreProcessedCursorSlice<TEntity>
         where TEntity : class
     {
         public PreProcessedCursorSlice(ICursorPageSlice<TEntity> pageSlice)
         {
             this.CursorPage = pageSlice ?? throw new ArgumentNullException(nameof(pageSlice));
-            this.TotalCount = pageSlice?.TotalCount ?? 0;
+            this.TotalCount = pageSlice.TotalCount ?? 0;
 
-            var firstCursor = pageSlice?.CursorResults?.FirstOrDefault();
-            var lastCursor = pageSlice?.CursorResults?.LastOrDefault();
+            var firstCursor = pageSlice.CursorResults?.FirstOrDefault();
+            var lastCursor = pageSlice.CursorResults?.LastOrDefault();
 
             //Now we can deduce if there are results before or after this slice based on the total count
             //  and the ordinal index of the first and last cursors.
             this.HasNextPage = lastCursor?.CursorIndex < this.TotalCount; //Cursor Index is 1 Based; the Count will match the Last Item
             this.HasPreviousPage = firstCursor?.CursorIndex > 1; //Cursor Index is 1 Based; 0 would be the Cursor before the First
 
-            if(pageSlice?.Results != null)
+            if(pageSlice.Results != null)
                 this.AddRange(pageSlice.Results);
         }
 

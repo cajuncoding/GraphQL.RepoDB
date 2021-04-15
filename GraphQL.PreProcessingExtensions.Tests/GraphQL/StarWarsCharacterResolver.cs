@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.Types;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
@@ -17,6 +19,28 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         {
             var results = CreateCharacters();
             return Task.FromResult(results);
+        }
+
+        [UsePaging]
+        [UseSorting]
+        [GraphQLName("starWarsCharactersCursorPaginated")]
+        public Task<PreProcessedCursorSlice<IStarWarsCharacter>> GetStarWarsCharactersWithCursorPagingAsync(
+            [GraphQLParams] IParamsContext paramsContext
+        )
+        {
+            var results = CreateCharacters().SliceAsCursorPage(paramsContext.CursorPagingArgs);
+            return Task.FromResult(results.AsPreProcessedCursorSlice());
+        }
+
+        [UseOffsetPaging]
+        [UseSorting]
+        [GraphQLName("starWarsCharactersOffsetPaginated")]
+        public Task<PreProcessedOffsetPageResults<IStarWarsCharacter>> GetStarWarsCharactersWithOffsetPagingAsync(
+            [GraphQLParams] IParamsContext paramsContext
+        )
+        {
+            var results = CreateCharacters().SliceAsOffsetPage(paramsContext.OffsetPagingArgs);
+            return Task.FromResult(results.AsPreProcessedPageResults());
         }
 
         private static IEnumerable<IStarWarsCharacter> CreateCharacters()

@@ -1,6 +1,5 @@
 ﻿# nullable enable
 
-using HotChocolate.Types.Pagination;
 using System;
 
 namespace RepoDb.CursorPagination

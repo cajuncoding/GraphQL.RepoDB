@@ -46,7 +46,7 @@ namespace StarWars.Characters
             //Get the data and convert to List() to ensure it's an Enumerable
             //  and no longer using IQueryable to successfully simulate 
             //  pre-processed results.
-            var characters = repository.GetCharacters().ToList();
+            var characters = repository.GetCharacters().AsEnumerable();
             
             //Perform some pre-processed Sorting & Then Paging!
             //This could be done in a lower repository or pushed to the Database!
@@ -57,8 +57,41 @@ namespace StarWars.Characters
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering will be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return new PreProcessedCursorSlice<ICharacter>(slicedCharacters);
+            return slicedCharacters.AsPreProcessedCursorSlice();
             //********************************************************************************
+        }
+
+        /// <summary>
+        /// Gets all character.
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <returns>The character.</returns>
+        [UseOffsetPaging]
+        [UseFiltering]
+        [UseSorting]
+        public PreProcessedOffsetPageResults<ICharacter> GetCharactersWithOffsetPaging(
+            [Service] ICharacterRepository repository,
+            //THIS is now injected by Pre-Processed extensions middleware...
+            [GraphQLParams] IParamsContext graphQLParams
+        )
+        {
+            //********************************************************************************
+            //Get the data and convert to List() to ensure it's an Enumerable
+            //  and no longer using IQueryable to successfully simulate 
+            //  pre-processed results.
+            var characters = repository.GetCharacters().AsEnumerable();
+
+            //Perform some pre-processed Sorting & Then Paging!
+            //This could be done in a lower repository or pushed to the Database!
+            var sortedCharacters = characters.SortDynamically(graphQLParams.SortArgs);
+            var slicedCharacters = sortedCharacters.SliceAsOffsetPage(graphQLParams.OffsetPagingArgs);
+
+            //With a valid Page/Slice we can return a PreProcessed Offset Paging Result so that
+            //  it will not have additional post-processing in the HotChocolate pipeline!
+            //NOTE: Filtering will be applied but ONLY to the results we are now returning;
+            //       Because this would normally be pushed down to the Sql Database layer.
+            return slicedCharacters.AsPreProcessedPageResults();
+            ////********************************************************************************
         }
 
         /// <summary>

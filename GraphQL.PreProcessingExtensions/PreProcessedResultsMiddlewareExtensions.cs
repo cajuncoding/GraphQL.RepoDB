@@ -87,10 +87,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
 
             builder.Services
-                .AddSingleton<IEnumerable<CursorPagingProvider>>(r => new List<CursorPagingProvider>()
-                {
-                    new PreProcessedCursorPagingProvider()
-                });
+                .AddSingleton<IEnumerable<CursorPagingProvider>>(r => new List<CursorPagingProvider>() { new PreProcessedCursorPagingProvider() })
+                .AddSingleton<IEnumerable<OffsetPagingProvider>>(r => new List<OffsetPagingProvider>() { new PreProcessedOffsetPagingProvider() });
 
             return builder;
         }

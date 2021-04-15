@@ -29,7 +29,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 
         /// <summary>
         /// Convenience method to easily map/convert/project all types in the current page to a different object type
-        /// altogether, without affecting the cursor indexes, etc. Provide deffered execution via Linq Select().
+        /// altogether, without affecting the cursor indexes, etc. Provide deferred execution via Linq Select().
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc"></param>
@@ -38,7 +38,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 
         /// <summary>
         /// Convenience method to Wrap the current Page Slice as PreProcessedCursorSliceResults; to eliminate
-        /// cermenonial code for new'ing up the results.
+        /// ceremonial code for new-ing up the results.
         /// </summary>
         /// <returns></returns>
         PreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice();

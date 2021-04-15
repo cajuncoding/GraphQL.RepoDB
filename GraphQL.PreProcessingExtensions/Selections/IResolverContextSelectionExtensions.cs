@@ -7,18 +7,12 @@ using HotChocolate.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GraphQL.PreProcessingExtensions.Selections;
 
 namespace HotChocolate.PreProcessingExtensions.Selections
 {
     public static class IResolverContextSelectionExtensions
     {
-        public static class SelectionNodeName
-        {
-            public const string Nodes = "nodes";
-            public const string Edges = "edges";
-            public const string EdgeNode = "node";
-        }
-
         /// <summary>
         /// Similar to CollectFields in v10, this uses GetSelections but safely validates that the current context
         ///     has selections before returning them, it will safely return null if unable to do so.

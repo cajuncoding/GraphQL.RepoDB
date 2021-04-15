@@ -71,7 +71,7 @@ namespace HotChocolate.PreProcessingExtensions
         /// </summary>
         /// <param name="flags"></param>
         /// <returns></returns>
-        public IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All)
+        public virtual IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All)
         {
             var results = GatherSelectionNamesInternal(AllSelectionFields, flags);
             return results;
@@ -83,13 +83,13 @@ namespace HotChocolate.PreProcessingExtensions
         /// </summary>
         /// <param name="flags"></param>
         /// <returns></returns>
-        public IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All)
+        public virtual IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All)
         {
             var results = GatherSelectionNamesInternal(GetSelectionFieldsFor<TObjectType>(), flags);
             return results;
         }
 
-        protected CursorPagingArguments LoadCursorPagingArgsHelper()
+        protected virtual CursorPagingArguments LoadCursorPagingArgsHelper()
         {
             var cursorPagingArgs = _resolverContext.GetCursorPagingArgsSafely();
             return cursorPagingArgs.IsPagingArgumentsValid()
@@ -97,7 +97,7 @@ namespace HotChocolate.PreProcessingExtensions
                     : new CursorPagingArguments();
         }
 
-        protected OffsetPagingArguments LoadOffsetPagingArgsHelper()
+        protected virtual OffsetPagingArguments LoadOffsetPagingArgsHelper()
         {
             var offsetPagingArgs = _resolverContext.GetOffsetPagingArgsSafely();
             return offsetPagingArgs.IsPagingArgumentsValid()
@@ -105,7 +105,7 @@ namespace HotChocolate.PreProcessingExtensions
                     : new OffsetPagingArguments(-1, -1);
         }
 
-        protected IEnumerable<string> GatherSelectionNamesInternal(IEnumerable<IPreProcessingSelection> baseEnumerable, SelectionNameFlags flags)
+        protected virtual IEnumerable<string> GatherSelectionNamesInternal(IEnumerable<IPreProcessingSelection> baseEnumerable, SelectionNameFlags flags)
         {
             var results = new List<string>();
 
@@ -127,7 +127,7 @@ namespace HotChocolate.PreProcessingExtensions
             return results.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         }
 
-        protected IReadOnlyList<PreProcessingDependencyLink> GatherDependencyLinks()
+        protected virtual IReadOnlyList<PreProcessingDependencyLink> GatherDependencyLinks()
         {
             if (AllSelectionFields == null)
                 return null;

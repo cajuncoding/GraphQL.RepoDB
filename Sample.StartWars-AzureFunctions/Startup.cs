@@ -5,6 +5,7 @@ using StarWars.Repositories;
 using StarWars.Reviews;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using HotChocolate.AzureFunctionsProxy;
+using HotChocolate.Types.Pagination;
 
 //CRITICAL: Here we self-wire up the Startup into the Azure Functions framework!
 [assembly: FunctionsStartup(typeof(StarWars.Startup))]
@@ -52,6 +53,12 @@ namespace StarWars
                 //  of results for sorting, paging, etc. and do not want redundant post-processing to occur
                 //  by HotChocolate internals...
                 //NOTE: This Adds Sorting & Paging providers/conventions by default!
+                .SetPagingOptions(new PagingOptions()
+                {
+                    DefaultPageSize = 10,
+                    IncludeTotalCount = true,
+                    MaxPageSize = 100
+                })
                 .AddPreProcessedResultsExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************

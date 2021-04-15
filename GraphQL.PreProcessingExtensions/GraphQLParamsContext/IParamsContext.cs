@@ -61,7 +61,6 @@ namespace HotChocolate.PreProcessingExtensions
         /// <summary>
         /// GatherSelectionNames based on provided parameters to simplify getting the specifid
         /// </summary>
-        /// <param name="includeDependencyNames"></param>
         /// <param name="flags"></param>
         /// <returns></returns>
         IEnumerable<string> GetSelectionMappedNames(SelectionNameFlags flags = SelectionNameFlags.All);
@@ -69,7 +68,6 @@ namespace HotChocolate.PreProcessingExtensions
         /// <summary>
         /// GatherSelectionNames based on provided parameters to simplify getting the specifid
         /// </summary>
-        /// <param name="includeDependencyNames"></param>
         /// <param name="flags"></param>
         /// <returns></returns>
         IEnumerable<string> GetSelectionMappedNamesFor<TObjectType>(SelectionNameFlags flags = SelectionNameFlags.All);

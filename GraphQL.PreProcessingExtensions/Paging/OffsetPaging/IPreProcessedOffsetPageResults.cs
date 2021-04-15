@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
+using HotChocolate.Types.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
-    public interface IPreProcessedOffsetPageResults<TEntity> : IEnumerable<TEntity>
+    public interface IPreProcessedOffsetPageResults<TEntity> : IList<TEntity>, IHavePreProcessedPagingInfo, IAmPreProcessedResult
     {
-        bool HasNextPage { get; }
-        bool HasPreviousPage { get; }
-        int? TotalCount { get; }
     }
 }

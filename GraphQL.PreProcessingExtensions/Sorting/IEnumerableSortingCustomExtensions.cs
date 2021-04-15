@@ -13,6 +13,9 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
             if (items == null || !items.Any())
                 return new List<T>();
 
+            if (!sortArgs.Any())
+                return items;
+
             //Map the Sort by property string names to actual Property Descriptors
             //for dynamic processign...
             var propCollection = TypeDescriptor.GetProperties(typeof(T));
@@ -20,6 +23,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
                 SortArg = s,
                 Getter = propCollection.Find(s.FieldName, true)
             });
+
 
             IOrderedEnumerable<T> orderedItems = null;
             foreach (var sort in sortGetters)

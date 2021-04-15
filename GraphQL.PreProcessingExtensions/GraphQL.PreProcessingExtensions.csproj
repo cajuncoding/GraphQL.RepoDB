@@ -33,6 +33,7 @@ Prior Releases Notes:
 
   <ItemGroup>
     <PackageReference Include="HotChocolate.Data" Version="11.0.4" />
+    <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="11.0.4" />
   </ItemGroup>
 
 </Project>

@@ -25,11 +25,11 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
 
     }
 
-    public static class PreprocessedSortedResultsExtnsions
+    public static class PreprocessedSortedResultsExtensions
     {
         /// <summary>
-        /// Conveniene method to Wrap the current Enumeable Result Items as a PreProcessedSortResults; to eliminate
-        /// cermenonial code for new'ing up the results.
+        /// Convenience method to Wrap the current Enumerable Result Items as a PreProcessedSortResults; to eliminate
+        /// ceremonial code for new-ing up the results.
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="enumerableItems"></param>
