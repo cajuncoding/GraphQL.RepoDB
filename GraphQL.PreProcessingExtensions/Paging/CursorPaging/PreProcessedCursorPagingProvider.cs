@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Reflection;
+using GraphQL.PreProcessingExtensions;
+using GraphQL.PreProcessingExtensions.Paging;
 using HotChocolate.Internal;
 using HotChocolate.Types.Pagination;
 
@@ -16,6 +18,13 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// </summary>
     public class PreProcessedCursorPagingProvider : CursorPagingProvider
     {
+        public PreProcessingPagingProviderConfig PagingProviderConfig { get; }
+
+        public PreProcessedCursorPagingProvider(PreProcessingPagingProviderConfig pagingProviderConfig)
+        {
+            PagingProviderConfig = pagingProviderConfig;
+        }
+
         //BBernard
         //This allows one single instance to be used for Generic types that are not known a compile time,
         //  because of the dynamic Schema & Classes gen processes provided by HotChocolate OOTB Sorting/Paging
@@ -41,7 +50,9 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
-            bool isPreProcessedResult = source.Type.IsDerivedFromGenericParent(typeof(IPreProcessedCursorSlice<>));
+            bool isPreProcessedResult = source.Type.IsDerivedFromGenericParent(StaticTypes.IPreProcessedCursorSlice)
+                                        || (PagingProviderConfig.DisableDefaultHotChocolatePagingProviders && source.Type.IsDerivedFromGenericParent(StaticTypes.IEnumerableGeneric));
+
             return source.IsArrayOrList && isPreProcessedResult;
         }
 

@@ -12,17 +12,15 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// This class generally to be used by libraries and/or lower level code that executes queries and renders page results.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class OffsetPageResults<TEntity> : IOffsetPageResults<TEntity> where TEntity : class
+    public class OffsetPageResults<TEntity> : List<TEntity>, IOffsetPageResults<TEntity>
     {
         public OffsetPageResults(IEnumerable<TEntity> results, bool hasNextPage, bool hasPreviousPage, int? totalCount)
         {
-            this.Results = results ?? throw new ArgumentException(nameof(results));
+            this.AddRange(results ?? throw new ArgumentException(nameof(results)));
             this.HasNextPage = hasNextPage;
             this.HasPreviousPage = hasPreviousPage;
             this.TotalCount = totalCount;
         }
-
-        public IEnumerable<TEntity> Results { get; protected set; }
 
         public int? TotalCount { get; protected set; }
 
@@ -31,15 +29,15 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         public bool HasPreviousPage { get; protected set; }
 
 
-        public OffsetPageResults<TTargetType> OfType<TTargetType>() where TTargetType : class
+        public OffsetPageResults<TTargetType> OfType<TTargetType>()
         {
-            var results = this.Results?.OfType<TTargetType>();
+            var results = this.OfType<TTargetType>();
             return new OffsetPageResults<TTargetType>(results, this.HasNextPage, this.HasPreviousPage, this.TotalCount);
         }
 
-        public OffsetPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class
+        public OffsetPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
         {
-            var results = this.Results?.Select(r => mappingFunc(r));
+            var results = this.Select(r => mappingFunc(r));
             return new OffsetPageResults<TTargetType>(results, this.HasNextPage, this.HasPreviousPage, this.TotalCount);
         }
 
@@ -62,7 +60,6 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <param name="totalCount"></param>
         /// <returns></returns>
         public static PreProcessedOffsetPageResults<TEntity> AsPreProcessedOffsetPageResults<TEntity>(this IEnumerable<TEntity> enumerableItems, bool hasNextPage, bool hasPreviousPage, int? totalCount = null)
-            where TEntity : class
         {
             if (enumerableItems == null)
                 return null;

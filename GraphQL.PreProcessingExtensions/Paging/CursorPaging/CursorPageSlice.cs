@@ -11,17 +11,17 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// This class generally to be used by libraries and/or lower level code that executes queries and renders page results.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class CursorPageSlice<TEntity> : ICursorPageSlice<TEntity> where TEntity : class
+    public class CursorPageSlice<TEntity> : List<ICursorResult<TEntity>>, ICursorPageSlice<TEntity>
     {
-        private int _totalCount;
+        private readonly int _totalCount;
         
         public CursorPageSlice(IEnumerable<ICursorResult<TEntity>> results, int totalCount)
         {
-            this.CursorResults = (results ?? throw new ArgumentException(nameof(results))).ToList();
+            this.AddRange(results ?? throw new ArgumentException(nameof(results)));
             _totalCount = totalCount;
 
-            var firstCursor = this.CursorResults.FirstOrDefault();
-            var lastCursor = this.CursorResults.LastOrDefault();
+            var firstCursor = this.FirstOrDefault();
+            var lastCursor = this.LastOrDefault();
 
             //Now we can deduce if there are results before or after this slice based on the total count
             //  and the ordinal index of the first and last cursors.
@@ -29,9 +29,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
             this.HasPreviousPage = firstCursor?.CursorIndex > 1; //Cursor Index is 1 Based; 0 would be the Cursor before the First
         }
 
-        public IEnumerable<ICursorResult<TEntity>> CursorResults { get; protected set; }
-
-        public IEnumerable<TEntity> Results => CursorResults?.Select(cr => cr?.Entity);
+        public IEnumerable<TEntity> Results => this.Select(cr => cr.Entity);
 
         public int? TotalCount => _totalCount;
 
@@ -39,17 +37,17 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 
         public bool HasPreviousPage { get; protected set; }
         /// <summary>
-        /// Convenience method to easily cast all types in the current page to a garget compatible type
+        /// Convenience method to easily cast all types in the current page to a compatible type
         /// without affecting the cursor indexes, etc. Provide deferred execution via Linq Select(). Type mismatches
         /// will be ignored and not returned for behaviour matching Linq OfType().
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
-        public CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class
+        public CursorPageSlice<TTargetType> OfType<TTargetType>()
         {
-            var results = this.CursorResults?.Select(r => {
+            var results = this.Select(r => {
                     // ReSharper disable once ConvertToLambdaExpression
-                    return r?.Entity is TTargetType targetType
+                    return r.Entity is TTargetType targetType
                     ? new CursorResult<TTargetType>(targetType, r.CursorIndex)
                     : null;
             })
@@ -65,9 +63,9 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc">Specify the Func that takes the current type in and returns the target type.</param>
         /// <returns></returns>
-        public CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class
+        public CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
         {
-            var results = this.CursorResults?.Select(r =>
+            var results = this.Select(r =>
             {
                 var mappedEntity = mappingFunc(r.Entity);
                 return new CursorResult<TTargetType>(mappedEntity, r.CursorIndex);

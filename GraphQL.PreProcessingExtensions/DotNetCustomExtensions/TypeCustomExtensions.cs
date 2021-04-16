@@ -7,6 +7,8 @@ namespace HotChocolate.PreProcessingExtensions
 {
     public static class SystemTypeCustomExtensions
     {
+        public static readonly Type ObjectType = typeof(object);
+
         /// <summary>
         /// A wonderful little utility for robust Generic Type comparisons 
         /// more info see: https://stackoverflow.com/a/37184228/7293142
@@ -18,9 +20,9 @@ namespace HotChocolate.PreProcessingExtensions
         {
             if (!parentType.IsGenericType)
             {
-                throw new ArgumentException("type must be generic", nameof(parentType));
+                throw new ArgumentException("Type must be generic.", nameof(parentType));
             }
-            else if (type == null || type == typeof(object))
+            else if (type == null || type == ObjectType)
             {
                 return false;
             }

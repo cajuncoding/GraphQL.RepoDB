@@ -12,6 +12,8 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 {
     public class PreProcessedOffsetPagingHandler<TEntity> : OffsetPagingHandler
     {
+        public static OffsetPagingArguments NoOpOffsetrPagingArguments = new OffsetPagingArguments(skip: 0, take: int.MaxValue);
+
         public PagingOptions PagingOptions { get; protected set; }
 
         public PreProcessedOffsetPagingHandler(PagingOptions pagingOptions)
@@ -31,19 +33,40 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <returns></returns>
         #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         protected override async ValueTask<CollectionSegment> SliceAsync(IResolverContext context, object source, OffsetPagingArguments arguments)
-        #pragma warning restore CS1998 
+        #pragma warning restore CS1998
         {
+            IPreProcessedOffsetPageResults<TEntity>? pagedResults = null;
+
             //If Appropriate we handle the values here to ensure that no post-processing is done other than
             //  correctly mapping the results into a GraphQL Collection Segment with appropriate Paging Details...
-            if (source is IPreProcessedOffsetPageResults<TEntity> pagedResults)
+            if (source is IPreProcessedOffsetPageResults<TEntity> offsetPageResults)
             {
                 bool includeTotalCountEnabled = this.PagingOptions.IncludeTotalCount ?? PagingDefaults.IncludeTotalCount;
                 var graphQLParamsContext = new GraphQLParamsContext(context);
 
                 //Optimized to only require TotalCount value if the query actually requested it!
-                if (includeTotalCountEnabled && graphQLParamsContext.IsTotalCountRequested && pagedResults.TotalCount == null)
+                if (includeTotalCountEnabled && graphQLParamsContext.IsTotalCountRequested && offsetPageResults.TotalCount == null)
                     throw new InvalidOperationException($"Total Count is requested in the query, but was not provided with the results [{this.GetType().GetTypeName()}] from the resolvers pre-processing logic; TotalCount is null.");
 
+                pagedResults = offsetPageResults;
+            }
+            //IF provided (and enabled in the Paging Provider via CanHandle() checks), we attempt to gracefully handle IEnumerable even though TotalCount details are likely incorrect.
+            else if (source is IEnumerable<TEntity> enumerableResults)
+            {
+                if (source is IHavePreProcessedPagingInfo pagingInfo)
+                {
+                    var offsetPageItems = new OffsetPageResults<TEntity>(enumerableResults, pagingInfo.HasNextPage, pagingInfo.HasPreviousPage, pagingInfo.TotalCount);
+                    pagedResults = offsetPageItems.AsPreProcessedPageResults();
+                }
+                else
+                {
+                    var offsetPageItems = new OffsetPageResults<TEntity>(enumerableResults, false, false, 0);
+                    pagedResults = offsetPageItems.AsPreProcessedPageResults();
+                }
+            }
+
+            if (pagedResults != null)
+            {
                 int? totalCount = pagedResults.TotalCount;
 
                 //Ensure we are null safe and return a valid empty list by default.

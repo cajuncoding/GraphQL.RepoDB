@@ -19,7 +19,6 @@ namespace HotChocolate.PreProcessingExtensions
         /// <param name="pagingArgs"></param>
         /// <returns></returns>
         public static ICursorPageSlice<T> SliceAsCursorPage<T>(this IEnumerable<T> items, CursorPagingArguments graphQLPagingArgs)
-            where T : class
         {
             return items.SliceAsCursorPage(
                 after: graphQLPagingArgs.After,
@@ -36,13 +35,16 @@ namespace HotChocolate.PreProcessingExtensions
         /// <typeparam name="T"></typeparam>
         /// <param name="items"></param>
         /// <param name="pagingArgs"></param>
+        /// <param name="after"></param>
+        /// <param name="first"></param>
+        /// <param name="before"></param>
+        /// <param name="last"></param>
         /// <returns></returns>
         public static ICursorPageSlice<T> SliceAsCursorPage<T>(this IEnumerable<T> items, string? after, int? first, string? before, int? last)
-        where T : class
         {
             //Do nothing if there are no results...
             if (!items.Any())
-                return new CursorPageSlice<T>(null, 0);
+                return new CursorPageSlice<T>(new List<ICursorResult<T>>(), 0);
 
             var afterIndex = after != null
                 ? IndexEdge<string>.DeserializeCursor(after)
@@ -57,12 +59,11 @@ namespace HotChocolate.PreProcessingExtensions
             //  around the Entity Models.
 
             //NOTE: We MUST materialize this after applying index values to prevent ongoing increments...
-            int index = 0;
-            IEnumerable<ICursorResult<T>> slice = items
-                .Select(c => new CursorResult<T>(c, ++index))
-                .ToList();
+            var itemsList = items.ToList();
 
-            int totalCount = slice.Count();
+            int index = 0;
+            IEnumerable<ICursorResult<T>> slice = itemsList
+                .Select(c => new CursorResult<T>(c, ++index));
 
             //If After specified, remove all before After (or skip past After)
             if (afterIndex > 0 && slice.Last().CursorIndex > afterIndex)
@@ -88,9 +89,12 @@ namespace HotChocolate.PreProcessingExtensions
                 slice = slice.TakeLast(last.Value);
             }
 
+            var finalizedSlice = slice.ToList();
+            int totalCount = itemsList.Count;
+
             //Wrap all results into a PagedCursor Slice result wit Total Count...
             //NOTE: to ensure our pagination is complete, we materialize the Results!
-            var cursorPageSlice = new CursorPageSlice<T>(slice.ToList(), totalCount);
+            var cursorPageSlice = new CursorPageSlice<T>(finalizedSlice, totalCount);
             return cursorPageSlice;
         }
     }

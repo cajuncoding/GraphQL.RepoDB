@@ -2,16 +2,14 @@
 
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.PreProcessingExtensions;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.PreProcessingExtensions.Sorting;
 using HotChocolate.Types.Pagination;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using GraphQL.PreProcessingExtensions.Paging;
 
 //Use the Same namespace as HotChocolate...
 namespace Microsoft.Extensions.DependencyInjection
@@ -26,24 +24,25 @@ namespace Microsoft.Extensions.DependencyInjection
     /// </summary>
     public static class PreProcessedResultsMiddlewareExtensions
     {
-
         /// <summary>
         /// This is the Primary method to wire up all extensions for working with
         /// Pre-Processed results in the Resolver or lower layer (e.g. Services/Repositories).
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="name"></param>
+        /// <param name="pagingConfigAction"></param>
         /// <returns></returns>
         public static IRequestExecutorBuilder AddPreProcessedResultsExtensions(
             this IRequestExecutorBuilder builder,
-            string? name = null
+            string? name = null,
+            Action<PreProcessingPagingProviderConfig> pagingConfigAction = null!
         )
         {
             return builder
                 //Add DI Middleware for Parameter
                 .AddMiddlewareForPreProcessedResults()
                 //Add Paging extensions
-                .AddPagingForPreProcessedResults()
+                .AddPagingForPreProcessedResults(pagingConfigAction)
                 //Add Sorting Extensions
                 .AddSortingForPreProcessedResults(name);
         }
@@ -78,17 +77,22 @@ namespace Microsoft.Extensions.DependencyInjection
         /// recommended to use AddPreProcessedResultsExtensions() to enable all support instead.
         /// </summary>
         /// <param name="builder"></param>
+        /// <param name="pagingConfig"></param>
         /// <returns></returns>
         public static IRequestExecutorBuilder AddPagingForPreProcessedResults(
-            this IRequestExecutorBuilder builder
+            this IRequestExecutorBuilder builder,
+            Action<PreProcessingPagingProviderConfig> pagingConfigAction = null!
         )
         {
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
+            var pagingConfig = new PreProcessingPagingProviderConfig();
+            pagingConfigAction?.Invoke(pagingConfig);
+
             builder.Services
-                .AddSingleton<IEnumerable<CursorPagingProvider>>(r => new List<CursorPagingProvider>() { new PreProcessedCursorPagingProvider() })
-                .AddSingleton<IEnumerable<OffsetPagingProvider>>(r => new List<OffsetPagingProvider>() { new PreProcessedOffsetPagingProvider() });
+                .AddSingleton<IEnumerable<CursorPagingProvider>>(r => new List<CursorPagingProvider>() { new PreProcessedCursorPagingProvider(pagingConfig) })
+                .AddSingleton<IEnumerable<OffsetPagingProvider>>(r => new List<OffsetPagingProvider>() { new PreProcessedOffsetPagingProvider(pagingConfig) });
 
             return builder;
         }

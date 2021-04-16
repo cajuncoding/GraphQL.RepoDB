@@ -16,7 +16,6 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class PreProcessedOffsetPageResults<TEntity> : List<TEntity>, IPreProcessedOffsetPageResults<TEntity>
-        where TEntity : class
     {
         public PreProcessedOffsetPageResults(IOffsetPageResults<TEntity> pageResults)
         {
@@ -27,8 +26,8 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
             this.HasNextPage = pageResults.HasNextPage;
             this.HasPreviousPage = pageResults.HasPreviousPage;
 
-            if (pageResults.Results.Any())
-                this.AddRange(pageResults.Results);
+            if (pageResults.Any())
+                this.AddRange(pageResults);
         }
 
         public int? TotalCount { get; protected set; }

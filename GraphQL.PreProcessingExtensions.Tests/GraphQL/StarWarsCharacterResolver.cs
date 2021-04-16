@@ -43,6 +43,29 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             return Task.FromResult(results.AsPreProcessedPageResults());
         }
 
+        //[UsePaging]
+        //[UseSorting]
+        //[GraphQLName("starWarsCharactersCursorPaginatedIEnumerableCursors")]
+        //public Task<CursorPageSlice<IStarWarsCharacter>> GetStarWarsCharactersWithCursorPagingIEnumerableAsync(
+        //    [GraphQLParams] IParamsContext paramsContext
+        //)
+        //{
+        //    var results = (CursorPageSlice<IStarWarsCharacter>)CreateCharacters().SliceAsCursorPage(paramsContext.CursorPagingArgs);
+        //    return Task.FromResult(results);
+        //}
+
+        //[UseOffsetPaging]
+        //[UseSorting]
+        //[GraphQLName("starWarsCharactersOffsetPaginatedIEnumerable")]
+        //public Task<OffsetPageResults<IStarWarsCharacter>> GetStarWarsCharactersWithOffsetPagingIEnumerableAsync(
+        //    [GraphQLParams] IParamsContext paramsContext
+        //)
+        //{
+        //    var results = (OffsetPageResults<IStarWarsCharacter>)CreateCharacters().SliceAsOffsetPage(paramsContext.OffsetPagingArgs);
+        //    return Task.FromResult(results);
+        //}
+
+
         private static IEnumerable<IStarWarsCharacter> CreateCharacters()
         {
             yield return new StarWarsHuman

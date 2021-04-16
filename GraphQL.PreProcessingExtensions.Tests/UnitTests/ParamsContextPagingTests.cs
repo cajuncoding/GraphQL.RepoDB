@@ -117,5 +117,41 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             Assert.AreEqual("Han Solo", results.FirstOrDefault()?["name"]);
             Assert.AreEqual("Leia Organa", results.LastOrDefault()?["name"]);
         }
+
+        [TestMethod]
+        public async Task TestParamsContextOffsetPagingForIEnumerable()
+        {
+            // arrange
+            var server = CreateStarWarsTestServer();
+
+            // act
+            var result = await server.PostQueryAsync(@"{
+                starWarsCharactersOffsetPaginatedIEnumerable(skip:2, take:2) {
+                    items {
+                        id
+                        name
+                    }
+                }
+            }");
+
+            // assert
+            Assert.IsNotNull(result?.Data, "Query Execution Failed");
+
+            var queryKey = "starWarsCharactersOffsetPaginatedIEnumerable";
+            var paramsContext = server.GetParamsContext(queryKey);
+            var offsetPagingParams = paramsContext.OffsetPagingArgs;
+
+            Assert.IsNotNull(offsetPagingParams);
+            Assert.AreEqual(2, offsetPagingParams.Skip);
+            Assert.AreEqual(2, offsetPagingParams.Take);
+
+            var resultsJson = (JObject)result.Data[queryKey];
+            var results = resultsJson[SelectionNodeName.Items];
+
+            Assert.IsNotNull(results);
+            Assert.AreEqual(2, results.Count());
+            Assert.AreEqual("Han Solo", results.FirstOrDefault()?["name"]);
+            Assert.AreEqual("Leia Organa", results.LastOrDefault()?["name"]);
+        }
     }
 }

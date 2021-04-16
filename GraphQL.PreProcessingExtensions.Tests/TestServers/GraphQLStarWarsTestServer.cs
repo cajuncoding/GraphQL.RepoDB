@@ -38,7 +38,10 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                             IncludeTotalCount = true,
                             MaxPageSize = 10
                         })
-                        .AddPreProcessedResultsExtensions();
+                        .AddPreProcessedResultsExtensions(pagingConfigAction: c =>
+                        {
+                            c.DisableDefaultHotChocolatePagingProviders = true;
+                        });
 
                     return graphQLBuilder;
                 }

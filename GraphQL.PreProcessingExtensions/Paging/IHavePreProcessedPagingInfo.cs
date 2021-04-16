@@ -2,7 +2,7 @@
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
-    public interface IHavePreProcessedPagingInfo
+    public interface IHavePreProcessedPagingInfo : IAmPreProcessedResult
     {
         public int? TotalCount { get; }
         public bool HasNextPage { get; }

@@ -48,7 +48,6 @@ namespace RepoDb.CursorPagination
             ITrace trace = null,
             CancellationToken cancellationToken = default
         )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection
         {
@@ -99,7 +98,6 @@ namespace RepoDb.CursorPagination
             ITrace trace = null,
             CancellationToken cancellationToken = default
         )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection
         {
@@ -166,7 +164,6 @@ namespace RepoDb.CursorPagination
             ITrace trace = null,
             CancellationToken cancellationToken = default
         )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
             return await dbConnection.GraphQLBatchOffsetPagingQueryAsync<TEntity>(
@@ -214,7 +211,6 @@ namespace RepoDb.CursorPagination
             ITrace trace = null,
             CancellationToken cancellationToken = default
         )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
             if (orderBy == null)
