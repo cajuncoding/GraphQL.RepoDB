@@ -13,11 +13,11 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
             if (items == null || !items.Any())
                 return new List<T>();
 
-            if (!sortArgs.Any())
+            if (sortArgs?.Any() == false)
                 return items;
 
             //Map the Sort by property string names to actual Property Descriptors
-            //for dynamic processign...
+            //for dynamic processing...
             var propCollection = TypeDescriptor.GetProperties(typeof(T));
             var sortGetters = sortArgs?.Select(s => new {
                 SortArg = s,
@@ -43,7 +43,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
             }
 
             //NOTE: To Finish the sorting, we materialize the Results!
-            return orderedItems.ToList();
+            return orderedItems?.ToList() ?? items;
         }
     }
 }
