@@ -1,20 +1,33 @@
-## Overview 
+﻿## Overview 
 *HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
 This library greatly simplifies working with HotChocolate to **_pre-processes_** data for
-selecting/projecting, sorting, filtering, etc. before returning the data to HotChocolate from the resolver; 
+selecting/projecting, sorting, paging, etc. before returning the data to HotChocolate from the resolver; 
 this is in contrast to the often documented deferred execution via IQueryable whereby control over the execution
 is delegated to the HotChocolate (& EntityFramework) internals.
 
-*Note: Updated Repo & Package names to eliminate conflicts with the core HotChocolate packages.*
+By providing a facade that enables easier selections, projections, and paging inside the resolver this library greatly simplifies working 
+with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements 
+such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged 
+in the Resolvers (and lower level Serivces/Repositories that encapsulate all data access) without dependency on IQueryable deferred 
+execution (e.g. EntityFramework).
+
+### [Buy me a Coffee ☕](https://www.buymeacoffee.com/cajuncoding)
+*I'm happy to share with the community, but if you find this useful (e.g for professional use), and are so inclinded,
+then I do love-me-some-coffee!*
+
+<a href="https://www.buymeacoffee.com/cajuncoding" target="_blank">
+<img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174">
+</a>
+
 
 ### *GraphQL.PreprocessingExtensions*
 A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as 
 RepoDb (or Dapper).  Micro ORMs normally require (and encourage) encapsulated data access that **_pre-processes_** 
 the results prior to returning results from the resolvers to HotChocolate.
 
-This is in contrast to how many existing tutorials illustrate deferred execution of database queries via IQueryable
-. Because IQueryable is pretty much only supported by Entity Framework, it may be incongruent with existing tech-stacks
+This is in contrast to how many existing tutorials illustrate deferred execution of database queries via IQueryable. 
+Because IQueryable is pretty much only supported by Entity Framework, it may be incongruent with existing tech-stacks
 and/or be much to large (bloated) of a dependency -- in addition to removing control over the SQL queries.  
 
 In these cases, and in other cases where existing repository/service layer code already exists, the data is
@@ -26,34 +39,39 @@ arguments in a significantly simplified facade so this logic can be leveraged in
 encapsulate all data access (without dependency on IQueryable and execution outside 
 of the devs control).
 
-### Usage for IParamsContext only:
+### Usage for GraphQLParamsContext (_IParamsContext_) only:
 If all you want to use is the greatly simplified facade for accessing Selections, etc., then you may leverage this package only as a lightweight facade
-that can be injected into Resolvers very easily as outlined in Steps [#1](https://github.com/cajuncoding/GraphQL.RepoDb#startup-configuration---hotchocolatepreprocessingextensions) & [#2](https://github.com/cajuncoding/GraphQL.RepoDb#simplified-facade-for-key-elements-of-the-request-graphqlparams) below for easy access to **IParamsContext**.
+that can be injected into Resolvers very easily as outlined in Steps [#1](https://github.com/cajuncoding/GraphQL.RepoDb#startup-configuration---hotchocolatepreprocessingextensions) & [#2](https://github.com/cajuncoding/GraphQL.RepoDb#simplified-facade-for-key-elements-of-the-request-graphqlparams) 
+below for easy access to the injected simplified facade **GraphQLParamsContext** (_IParamsContext_).
 
-#### Nuget Package (>=.netcoreapp3.0)
+#### Nuget Package (>=netstandard2.1)
 To use this in your project, add the [GraphQL.PreprocessingExtensions](https://www.nuget.org/packages/GraphQL.PreProcessingExtensions/) 
 NuGet package to your project and wire up your Starup  middleware and inject / instantiate params in your resolvers as outlined below...
 
-## Work in Progress...
 ### Pending:
-1. Improved support for field selections with Mutations.
-2. Support for Default Paging options use in IParamsContext... 
-3. Offset Paging support in the Facade is pending....
-4. Update Implementation summary detais below in README...
-
-### Planned:
-1. Support for enhanced ability to work with Dynamic Filtering (WHERE clause) arguments; support will be added as time permits.
+1. TODO: Finish implementation of OffsetPaging support with RepoDB for Sql Server...
+1. TODO: Update Implementation summary detais below in README...
 
 ### Completed:
+1. Added full support for Offset Paging as well as CursorPaging with matching capabilities - including models, extension methods to convert from IEnumerable, etc.
+   - Added examples in the StarWars Azure Functions project using in-memory processing (RepoDb implementation is not complete).
+   - `graphQLParamsContext.IsTotalCountRequested` 
+1. Added support to easily determine if TotalCount is selected (as it's a special case selection) to support potential performance optimizations within Resolver logic.
+1. Added more Unit test coverage for Selections, and Paging implmentations
 1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
-2. Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
-3. Provides abstraction facade with *GraphQL.PreProcessingExtensions* package that can be used for any micro-orm.
-5. Supports abstracted facade for: 
+1. Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
+1. Provides abstraction facade with *GraphQL.PreProcessingExtensions* package that can be used for any micro-orm.
+1. Implemented RepoDb on top of GraphQL.PreProcessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
+1. Supports abstracted facade for: 
    - Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!  And supports correct GraphQL Schema to Class property mapping.
    - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
    - Support for Cursor based Pagination arguments down to the the Repository/Service layer & into Sql queries via RepoDb -- Relay spec cursors are fully implemented via Sql Server api extensions to RepoDb.
-6. Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
-7. Fixed/Changed repo & package names to fix conflicts with HotChocolate core packages.
+1. Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
+1. Fixed/Changed repo & package names to address conflicts with HotChocolate core packages.
+
+### Planned:
+1. Support for enhanced ability to work with Dynamic Filtering (WHERE clause) arguments; support will be added as time permits.
+2. TODO: Improved support for field selections with Mutations.
 
 
 ## Demo Site (Star Wars)
@@ -131,6 +149,12 @@ implementations.*
         builder.Services
             .AddGraphQLServer()
             .AddQueryType<YourQueryResolverClass>()
+            .SetPagingOptions(new PagingOptions()
+            {
+                DefaultPageSize = 10,
+                IncludeTotalCount = true,
+                MaxPageSize = 100
+            })
             //This Below is the initializer to be added...
             //NOTE: This Adds Sorting & Paging providers/conventions by default!  Do not AddPaging() & 
             //      AddSorting() in addition to '.AddPreProcessedResultsExtensions()', or the HotChocolate 
@@ -215,7 +239,7 @@ namespace StarWars.Characters
  instantiated anytime you have a valid IResolverContext from HotChocolate:
    * NOTE: This sample uses dynamic injection for elegant/easy consuming of the IParamsContext, but it can also be instantiated (see below).
 
-##### Direct Instantiation of IParamsContext 
+##### Direct Instantiation of GraphQLParamsContext (_IParamsContext_)_ 
 ```csharp
     public class QueryResolverHelpers
     {
