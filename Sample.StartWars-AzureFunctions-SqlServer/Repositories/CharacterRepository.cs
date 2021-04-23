@@ -33,7 +33,7 @@ namespace StarWars.Repositories
             IEnumerable<OrderField> sortFields
         )
         {
-            var sqlConn = CreateConnection();
+            await using var sqlConn = CreateConnection();
 
             var results = await sqlConn.QueryAsync<CharacterDbModel>(
                 where: c => c.Id >= 1000 && c.Id <=2999,
@@ -52,7 +52,7 @@ namespace StarWars.Repositories
             IRepoDbCursorPagingParams pagingParams
         )
         {
-            var sqlConn = CreateConnection();
+            await using var sqlConn = CreateConnection();
 
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
                 fields: selectFields,
@@ -75,7 +75,7 @@ namespace StarWars.Repositories
             IRepoDbOffsetPagingParams pagingParams
         )
         {
-            var sqlConn = CreateConnection();
+            await using var sqlConn = CreateConnection();
 
             var offsetPageResults = await sqlConn.GraphQLBatchOffsetPagingQueryAsync<CharacterDbModel>(
                 page: pagingParams.Page,
@@ -94,7 +94,7 @@ namespace StarWars.Repositories
             IRepoDbCursorPagingParams pagingParams
         )
         {
-            var sqlConn = CreateConnection();
+            await using var sqlConn = CreateConnection();
 
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
                 orderBy: sortFields,
@@ -113,7 +113,7 @@ namespace StarWars.Repositories
 
         public async Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(int[] ids)
         {
-            var sqlConn = CreateConnection();
+            await using var sqlConn = CreateConnection();
             var results = await sqlConn.QueryAsync<CharacterDbModel>(c => ids.Contains(c.Id));
             
             var mappedResults = MapDbModelsToCharacterModels(results);
@@ -122,7 +122,7 @@ namespace StarWars.Repositories
 
         public async Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(int characterId)
         {
-            var sqlConn = CreateConnection();
+            await using var sqlConn = CreateConnection();
             var results = await sqlConn.QueryAsync<CharacterFriendDbModel>(
                 where: f => f.FriendOfId == characterId,
                 //Always include a Default Sort Order (for paging)
@@ -135,7 +135,7 @@ namespace StarWars.Repositories
 
         public async Task<ICursorPageSlice<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams)
         {
-            var sqlConn = CreateConnection();
+            await using var sqlConn = CreateConnection();
             var results = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterFriendDbModel>(
                 where: f => f.FriendOfId == characterId,
                 //Always include a Default Sort Order (for paging)

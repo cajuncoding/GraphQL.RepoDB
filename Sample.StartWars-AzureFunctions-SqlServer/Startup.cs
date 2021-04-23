@@ -7,6 +7,7 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using HotChocolate.AzureFunctionsProxy;
 using Microsoft.Data.SqlClient;
 using System;
+using HotChocolate.Types.Pagination;
 
 //CRITICAL: Here we self-wire up the Startup into the Azure Functions framework!
 [assembly: FunctionsStartup(typeof(StarWars.Startup))]
@@ -59,9 +60,13 @@ namespace StarWars
                 //NOTE This allows all OOTB behaviors except for when we want to control the processing
                 //  of results for sorting, paging, etc. and do not want redundant post-processing to occur
                 //  by HotChocolate internals...
-                //NOTE: This Adds Sorting & Paging providers/conventions by default!  Do not AddPaging() & 
-                //      AddSorting() in addition to '.AddPreProcessedResultsExtensions()', or the HotChocolate 
-                //       Pipeline will not work as expected!
+                //NOTE: This Adds Sorting & Paging providers/conventions by default!
+                .SetPagingOptions(new PagingOptions()
+                {
+                    DefaultPageSize = 10,
+                    IncludeTotalCount = true,
+                    MaxPageSize = 100
+                })
                 .AddPreProcessedResultsExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************

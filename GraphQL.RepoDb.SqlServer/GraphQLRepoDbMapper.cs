@@ -194,7 +194,7 @@ namespace HotChocolate.RepoDb
                 return null;
             }
 
-            return RepoDbOffsetPagingParams.FromSkipTake(graphQLPagingArgs.Take, graphQLPagingArgs.Skip ?? 0);
+            return RepoDbOffsetPagingParams.FromSkipTake(graphQLPagingArgs.Skip, graphQLPagingArgs.Take);
         }
     }
 }
