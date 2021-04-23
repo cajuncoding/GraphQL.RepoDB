@@ -4,5 +4,6 @@
     {
         int Page { get; }
         int RowsPerBatch { get; }
+        bool IsTotalCountEnabled { get; }
     }
 }

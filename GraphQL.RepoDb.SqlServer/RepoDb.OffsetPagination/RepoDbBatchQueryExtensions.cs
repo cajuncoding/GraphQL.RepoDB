@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using RepoDb.Interfaces;
 
-namespace RepoDb.CursorPagination
+namespace RepoDb.OffsetPagination
 {
     public static class BaseRepositoryOffsetPaginationCustomExtensions
     {
@@ -25,6 +25,7 @@ namespace RepoDb.CursorPagination
         /// <param name="where"></param>
         /// <param name="page"></param>
         /// <param name="rowsPerBatch"></param>
+        /// <param name="fetchTotalCount"></param>
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
@@ -40,6 +41,7 @@ namespace RepoDb.CursorPagination
             Expression<Func<TEntity, bool>> where,
             int? page = null,
             int? rowsPerBatch = null,
+            bool fetchTotalCount = false,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -55,6 +57,7 @@ namespace RepoDb.CursorPagination
             return await baseRepo.GraphQLBatchOffsetPagingQueryAsync<TEntity, TDbConnection>(
                     page: page,
                     rowsPerBatch: rowsPerBatch,
+                    fetchTotalCount: fetchTotalCount,
                     orderBy: orderBy,
                     where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
                     hints: hints,
@@ -78,6 +81,7 @@ namespace RepoDb.CursorPagination
         /// <param name="page"></param>
         /// <param name="rowsPerBatch"></param>
         /// <param name="tableName"></param>
+        /// <param name="fetchTotalCount"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
@@ -91,6 +95,7 @@ namespace RepoDb.CursorPagination
             QueryGroup where = null,
             int? page = null,
             int? rowsPerBatch = null,
+            bool fetchTotalCount = false,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
@@ -111,6 +116,7 @@ namespace RepoDb.CursorPagination
                 var cursorPageResult = await connection.GraphQLBatchOffsetPagingQueryAsync<TEntity>(
                     page: page,
                     rowsPerBatch: rowsPerBatch,
+                    fetchTotalCount: fetchTotalCount,
                     orderBy: orderBy,
                     where: where,
                     hints: hints,
@@ -145,6 +151,7 @@ namespace RepoDb.CursorPagination
         /// <param name="where"></param>
         /// <param name="page"></param>
         /// <param name="rowsPerBatch"></param>
+        /// <param name="fetchTotalCount"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
@@ -159,6 +166,7 @@ namespace RepoDb.CursorPagination
             Expression<Func<TEntity, bool>> where,
             int? page = null,
             int? rowsPerBatch = null,
+            bool fetchTotalCount = false,
             string hints = null,
             IEnumerable<Field> fields = null,
             int? commandTimeout = null,
@@ -172,6 +180,7 @@ namespace RepoDb.CursorPagination
             return await dbConnection.GraphQLBatchOffsetPagingQueryAsync<TEntity>(
                 page: page,
                 rowsPerBatch: rowsPerBatch,
+                fetchTotalCount: fetchTotalCount,
                 orderBy: orderBy,
                 where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
                 hints: hints,
@@ -193,6 +202,7 @@ namespace RepoDb.CursorPagination
         /// <param name="page"></param>
         /// <param name="rowsPerBatch"></param>
         /// <param name="tableName"></param>
+        /// <param name="fetchTotalCount"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
@@ -206,6 +216,7 @@ namespace RepoDb.CursorPagination
             QueryGroup where = null, 
             int? page = null, 
             int? rowsPerBatch = null,
+            bool fetchTotalCount = false,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
@@ -242,10 +253,14 @@ namespace RepoDb.CursorPagination
                 ? RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(where)
                 : null;
 
-            var batchResults = await dbConnection.BatchQueryAsync<TEntity>(
-                tableName: tableName,
+            //We increment Rows count to actually be fetched by One to help determine if there is any data after the current page...
+            var rowsPerPage = rowsPerBatch ?? int.MaxValue;
+            var rowsToFetch = rowsPerPage < int.MaxValue ? rowsPerPage + 1 : rowsPerPage;
+
+            var batchResults = (await dbConnection.BatchQueryAsync<TEntity>(
+                tableName: dbTableName,
                 page: page ?? 0,
-                rowsPerBatch: rowsPerBatch ?? int.MaxValue,
+                rowsPerBatch: rowsToFetch,
                 fields: validSelectFields,
                 orderBy: orderBy,
                 where: whereParams,
@@ -254,10 +269,34 @@ namespace RepoDb.CursorPagination
                 transaction: transaction,
                 trace: trace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
+            ).ConfigureAwait(false))
+            ?.ToList() ?? new List<TEntity>();
+
+            //If specified we need to get the Total Count...
+            int totalCount = 0;
+            if (fetchTotalCount)
+            {
+                var repoDbTotalCount = await dbConnection.CountAsync(
+                    tableName: dbTableName,
+                    where: whereParams,
+                    hints: hints,
+                    commandTimeout: commandTimeout,
+                    transaction: transaction,
+                    trace: trace,
+                    cancellationToken: cancellationToken
+                ).ConfigureAwait(false);
+
+                totalCount = Convert.ToInt32(repoDbTotalCount);
+            }
 
             //TODO: Implement Logic to determine HasNextPage, HasPreviousPage, and get Total Count or Not!
-            var offsetPageResults = new OffsetPageResults<TEntity>(batchResults, true, true, 0);
+            var hasPreviousPage = page > 0;
+            var hasNextPage = batchResults.Count > rowsPerPage;
+
+            //Trim the results to the exact page size (removing potential additional item).
+            var pageResults = batchResults.Take(rowsPerPage);
+
+            var offsetPageResults = new OffsetPageResults<TEntity>(pageResults, hasNextPage, hasPreviousPage, totalCount);
             return offsetPageResults;
         }
 

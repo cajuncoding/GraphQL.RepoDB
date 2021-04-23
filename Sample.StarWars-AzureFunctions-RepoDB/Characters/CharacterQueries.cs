@@ -55,7 +55,7 @@ namespace StarWars.Characters
             //       down to the Repository (and underlying Database) layer.
             var charactersSlice = await repository.GetCursorPagedCharactersAsync(
                 repoDbParams.GetSelectFields(),
-                repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
+                repoDbParams.GetSortOrderFields(),
                 repoDbParams.GetCursorPagingParameters()
             );
 
@@ -91,7 +91,7 @@ namespace StarWars.Characters
             //       down to the Repository (and underlying Database) layer.
             var charactersPage = await repository.GetOffsetPagedCharactersAsync(
                 repoDbParams.GetSelectFields(),
-                repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
+                repoDbParams.GetSortOrderFields(),
                 repoDbParams.GetOffsetPagingParameters()
             );
 

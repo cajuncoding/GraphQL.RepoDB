@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using Microsoft.Data.SqlClient;
 using RepoDb;
-using RepoDb.CursorPagination;
 using RepoDb.Enumerations;
+using RepoDb.CursorPagination;
+using RepoDb.OffsetPagination;
 using StarWars.Characters;
 using StarWars.Characters.DbModels;
 
@@ -18,10 +19,10 @@ namespace StarWars.Repositories
 {
     public class CharacterRepository : BaseRepository<ICharacter, SqlConnection>, ICharacterRepository
     {
-        public static class TableNames
+        public static readonly IReadOnlyList<OrderField> DefaultCharacterSortFields = new List<OrderField>()
         {
-            public const string StarWarsCharacters = "StarWarsCharacters";
-        }
+            OrderField.Ascending<ICharacter>(c => c.Id)
+        }.AsReadOnly();
 
         public CharacterRepository(string connectionString)
             : base(connectionString)
@@ -38,7 +39,7 @@ namespace StarWars.Repositories
             var results = await sqlConn.QueryAsync<CharacterDbModel>(
                 where: c => c.Id >= 1000 && c.Id <=2999,
                 fields: selectFields,
-                orderBy: sortFields
+                orderBy: sortFields ?? DefaultCharacterSortFields
             );
 
             var mappedResults = MapDbModelsToCharacterModels(results);
@@ -56,7 +57,7 @@ namespace StarWars.Repositories
 
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
                 fields: selectFields,
-                orderBy: sortFields,
+                orderBy: sortFields ?? DefaultCharacterSortFields,
                 afterCursor: pagingParams.AfterIndex!,
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
@@ -80,7 +81,8 @@ namespace StarWars.Repositories
             var offsetPageResults = await sqlConn.GraphQLBatchOffsetPagingQueryAsync<CharacterDbModel>(
                 page: pagingParams.Page,
                 rowsPerBatch: pagingParams.RowsPerBatch,
-                orderBy: sortFields,
+                fetchTotalCount: pagingParams.IsTotalCountEnabled,
+                orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields
             );
 
@@ -97,7 +99,7 @@ namespace StarWars.Repositories
             await using var sqlConn = CreateConnection();
 
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
-                orderBy: sortFields,
+                orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields,
                 where: c => c.Id >=1000 && c.Id <= 1999,
                 afterCursor: pagingParams.AfterIndex!,
