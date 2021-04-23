@@ -2,7 +2,6 @@
 using HotChocolate.RepoDb.SqlServer.Reflection;
 using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;
-using RepoDb.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,11 +13,11 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.RepoDb;
-using RepoDb.Interfaces;
+using RepoDb.CursorPagination;
 
-namespace RepoDb.CursorPagination
+namespace RepoDb.OffsetPagination
 {
-    public static class BaseRepositoryCursorPaginationCustomExtensions
+    public static class RepoDbBatchSkipTakeQueryExtensions
     {
         /// <summary>
         /// Base Repository extension for Relay Cursor Paginated Batch Query capability.
@@ -50,7 +49,7 @@ namespace RepoDb.CursorPagination
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
@@ -69,7 +68,7 @@ namespace RepoDb.CursorPagination
         where TEntity : class
         where TDbConnection : DbConnection
         {
-            return await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+            return await baseRepo.GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
                     afterCursor: afterCursor,
                     firstTake: firstTake,
                     beforeCursor: beforeCursor,
@@ -116,7 +115,7 @@ namespace RepoDb.CursorPagination
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup where = null,
@@ -139,7 +138,7 @@ namespace RepoDb.CursorPagination
 
             try
             {
-                var cursorPageResult = await connection.GraphQLBatchSliceQueryAsync<TEntity>(
+                var cursorPageResult = await connection.GraphQLBatchSkipTakeQueryAsync<TEntity>(
                     afterCursor: afterCursor,
                     firstTake: firstTake,
                     beforeCursor: beforeCursor,
@@ -197,7 +196,7 @@ namespace RepoDb.CursorPagination
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
@@ -214,7 +213,7 @@ namespace RepoDb.CursorPagination
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
-            return await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
+            return await dbConnection.GraphQLBatchSkipTakeQueryAsync<TEntity>(
                 afterCursor: afterCursor,
                 firstTake: firstTake,
                 beforeCursor: beforeCursor,
@@ -259,7 +258,7 @@ namespace RepoDb.CursorPagination
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             QueryGroup where = null, 
@@ -301,7 +300,7 @@ namespace RepoDb.CursorPagination
                 : null;
 
             //Build the Cursor Paging query...
-            var query = RepoDbBatchSliceQueryBuilder.BuildSqlServerBatchSliceQuery<TEntity>(
+            var query = RepoDbBatchSkipTakePagingQueryBuilder.BuildSqlServerBatchSkipTakeQuery<TEntity>(
                 tableName: dbTableName,
                 fields: validSelectFields,
                 orderBy: orderBy,

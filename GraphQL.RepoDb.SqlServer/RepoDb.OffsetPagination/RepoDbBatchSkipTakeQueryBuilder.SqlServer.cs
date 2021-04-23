@@ -1,16 +1,15 @@
 ﻿using HotChocolate.PreProcessingExtensions.Pagination;
-using RepoDb;
 using RepoDb.CustomExtensions;
-using RepoDb.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using RepoDb.CursorPagination;
 
-namespace RepoDb.CursorPagination
+namespace RepoDb.OffsetPagination
 {
     //TODO: Abstract this out so that DBSettings is Injected and this can support all RepoDb database targets... etc.
-    public class RepoDbBatchSliceQueryBuilder
+    public class RepoDbBatchSkipTakePagingQueryBuilder
     {
         /// <summary>
         /// BBernard
@@ -30,7 +29,7 @@ namespace RepoDb.CursorPagination
         /// <param name="lastTake"></param>
         /// <param name="includeTotalCountQuery"></param>
         /// <returns></returns>
-        public static string BuildSqlServerBatchSliceQuery<TEntity>(
+        public static string BuildSqlServerBatchSkipTakeQuery<TEntity>(
             string tableName,
             IEnumerable<Field> fields,
             IEnumerable<OrderField> orderBy,
@@ -116,7 +115,7 @@ namespace RepoDb.CursorPagination
             return builder.GetString();
         }
 
-        public static void AssertCursorPagingArgsAreValid(
+        public static void AsserteCursorPagingArgsAreValid(
             int? after, int? before, int? first, int? last,
             IEnumerable<OrderField> orderBy = null
         )
@@ -159,7 +158,7 @@ namespace RepoDb.CursorPagination
         {
             //Implement Cursor pagination algorithm in alightment with industry accepted Relay Spec. for GraphQL
             //For more info. see: https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
-            AssertCursorPagingArgsAreValid(
+            AsserteCursorPagingArgsAreValid(
                 after: afterCursorIndex,
                 before: beforeCursorIndex,
                 first: firstTake,
