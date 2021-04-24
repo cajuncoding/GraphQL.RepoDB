@@ -118,17 +118,13 @@ namespace HotChocolate.PreProcessingExtensions
         protected virtual CursorPagingArguments LoadCursorPagingArgsHelper()
         {
             var cursorPagingArgs = _resolverContext.GetCursorPagingArgsSafely();
-            return cursorPagingArgs.IsPagingArgumentsValid()
-                    ? cursorPagingArgs
-                    : new CursorPagingArguments();
+            return cursorPagingArgs;
         }
 
         protected virtual OffsetPagingArguments LoadOffsetPagingArgsHelper()
         {
             var offsetPagingArgs = _resolverContext.GetOffsetPagingArgsSafely();
-            return offsetPagingArgs.IsPagingArgumentsValid()
-                    ? offsetPagingArgs
-                    : new OffsetPagingArguments(-1, -1);
+            return offsetPagingArgs;
         }
 
         protected virtual IEnumerable<string> GatherSelectionNamesInternal(IEnumerable<IPreProcessingSelection> baseEnumerable, SelectionNameFlags flags)

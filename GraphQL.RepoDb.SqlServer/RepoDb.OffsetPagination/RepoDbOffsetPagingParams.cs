@@ -23,8 +23,8 @@ namespace RepoDb.OffsetPagination
             //For RepoDb both Skip & Take may actually be optional so that would result in default behaviour to retrieve all results
             //  which is consistent with Cursor Paging as not specifying any filtering for Cursor Pagination would also get all results.
             //  Cursor based paging which retrieves all results if not specified.
-            if (skip.HasValue && skip <= 0)
-                throw new ArgumentException("If specified (e.g. not null) then a valid number of items to skip-over must be specified (e.g. greater than 0).", nameof(skip));
+            if (skip.HasValue && skip < 0)
+                throw new ArgumentException("If specified (e.g. not null) then a valid number of items to skip-over must be specified (e.g. greater than or equal to 0).", nameof(skip));
 
             if (take.HasValue && take <= 0)
                 throw new ArgumentException("If specified (e.g. not null) then A valid number of items to take (rows-per-page) must be specified (e.g. greater than 0).", nameof(take));

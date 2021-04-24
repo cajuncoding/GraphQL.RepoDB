@@ -56,7 +56,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
                 //If the result is a pre-processed result, we assume that Sorting was handled previously 
                 if (context.Result is IAmPreProcessedResult)
                 {
-                    //Since sorting is alreayd 'pre-processed' (e.g. by the Resolver) 
+                    //Since sorting is already 'pre-processed' (e.g. by the Resolver) 
                     //  we can immediately yield control back to the HotChocolate Pipeline
                     return;
                 }

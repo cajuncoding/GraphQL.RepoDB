@@ -160,14 +160,12 @@ namespace HotChocolate.RepoDb
         {
             var graphQLPagingArgs = this.GraphQLParamsContext.CursorPagingArgs;
 
-            return graphQLPagingArgs.IsPagingArgumentsValid()
-                ? new RepoDbCursorPagingParams(
-                    first: graphQLPagingArgs.First,
-                    after: graphQLPagingArgs.After,
-                    before: graphQLPagingArgs.Before,
-                    last: graphQLPagingArgs.Last
-                )
-                : null;
+            return new RepoDbCursorPagingParams(
+                first: graphQLPagingArgs.First,
+                after: graphQLPagingArgs.After,
+                before: graphQLPagingArgs.Before,
+                last: graphQLPagingArgs.Last
+            );
         }
 
         /// <summary>
@@ -180,9 +178,10 @@ namespace HotChocolate.RepoDb
         {
             var graphQLPagingArgs = this.GraphQLParamsContext.OffsetPagingArgs;
 
-            return graphQLPagingArgs.IsPagingArgumentsValid()
-                ? new RepoDbOffsetPagingParams(graphQLPagingArgs.Skip, graphQLPagingArgs.Take)
-                : null;
+            return new RepoDbOffsetPagingParams(
+                graphQLPagingArgs.Skip, 
+                graphQLPagingArgs.Take
+            );
         }
     }
 }
