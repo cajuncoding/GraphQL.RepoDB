@@ -47,7 +47,7 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
@@ -113,7 +113,7 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
@@ -194,7 +194,7 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
@@ -256,7 +256,7 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
@@ -373,7 +373,7 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         [SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
         private static async Task<CursorPageSlice<TEntity>> ExecuteBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConn,
