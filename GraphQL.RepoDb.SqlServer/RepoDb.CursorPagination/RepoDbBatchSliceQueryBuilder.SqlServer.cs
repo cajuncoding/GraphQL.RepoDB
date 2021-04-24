@@ -96,7 +96,7 @@ namespace RepoDb.CursorPagination
             if (includeTotalCountQuery)
             {
 
-                //Look for PKey Field to use as the Count Colunm... as this just makes sense...
+                //Look for PKey Field to use as the Count Column... as this just makes sense...
                 //NOTE: COUNT(1) may not work as expected when column permission are in use, so we use a real field.
                 var countField = PropertyCache.Get<TEntity>().FirstOrDefault(p => p.GetPrimaryAttribute() != null)?.AsField()
                                     ?? selectFields.FirstOrDefault();
@@ -109,7 +109,7 @@ namespace RepoDb.CursorPagination
                     .From().TableNameFrom(tableName, dbSetting)
                     .HintsFrom(hints)
                     .WhereFrom(where, dbSetting)
-                .End();
+                    .End();
             }
 
             // Return the query
@@ -157,7 +157,7 @@ namespace RepoDb.CursorPagination
         [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         private static string BuildRelaySpecWhereCondition(string cursorFieldName, int? afterCursorIndex, int? beforeCursorIndex, int? firstTake, int? lastTake)
         {
-            //Implement Cursor pagination algorithm in alightment with industry accepted Relay Spec. for GraphQL
+            //Implement Cursor pagination algorithm in alignment with industry accepted Relay Spec. for GraphQL
             //For more info. see: https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
             AssertCursorPagingArgsAreValid(
                 after: afterCursorIndex,
@@ -199,7 +199,7 @@ namespace RepoDb.CursorPagination
             }
 
             //SECOND we process first/last args which may apply combinatorially...
-            //  For example this may be the first time endIndex is intialized, based on FIRST process above.
+            //  For example this may be the first time endIndex is initialized, based on FIRST process above.
             if (firstTake.HasValue && count > firstTake && startIndex.HasValue)
             {
                 endIndex = (startIndex + (int)firstTake) - 1;
@@ -219,13 +219,13 @@ namespace RepoDb.CursorPagination
                     //This is the Case where We are requested to select from the End of all results
                     //  dynamically because no Before Cursor (ending cursor) was provided...
                     //Therefore this requires a special Query condition to Dynamically compute 
-                    //  the currently uknown StartIndex...
+                    //  the currently unknown StartIndex...
                     startIndex = null;
                     endIndex = null;
                 }
             }
 
-            //Finally we can conver the Mapped Start & End indexes to valid Where Clause...
+            //Finally we can convert the Mapped Start & End indexes to valid Where Clause...
             if (startIndex.HasValue && endIndex.HasValue)
             {
                 where = $"WHERE ([{cursorFieldName}] BETWEEN {startIndex} AND {endIndex})";

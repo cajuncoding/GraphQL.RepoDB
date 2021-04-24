@@ -1,15 +1,12 @@
-﻿using HotChocolate.PreProcessingExtensions;
-using HotChocolate.PreProcessingExtensions.Pagination;
-using HotChocolate.PreProcessingExtensions.Sorting;
-using HotChocolate.Types;
-using RepoDb;
-using RepoDb.CursorPagination;
-using RepoDb.CustomExtensions;
-using RepoDb.Enumerations;
-using RepoDb.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RepoDb;
+using RepoDb.CursorPagination;
+using RepoDb.Enumerations;
+using RepoDb.OffsetPagination;
+using HotChocolate.PreProcessingExtensions;
+using HotChocolate.PreProcessingExtensions.Pagination;
 
 namespace HotChocolate.RepoDb
 {
@@ -33,7 +30,6 @@ namespace HotChocolate.RepoDb
         /// All Fields are returned as a default if the value is undefined and/or invalid and cannot be mapped.
         /// NOTE: Property names and db fields names are not guaranteed to be the same.
         /// </summary>
-        /// <param name="fieldNamesFilter"></param>
         /// <returns>
         /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
         /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
@@ -54,7 +50,6 @@ namespace HotChocolate.RepoDb
         /// All Fields are returned as a default if the value is undefined and/or invalid and cannot be mapped.
         /// NOTE: Property names and db fields names are not guaranteed to be the same.
         /// </summary>
-        /// <param name="fieldNamesFilter"></param>
         /// <returns>
         /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
         /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
@@ -75,7 +70,7 @@ namespace HotChocolate.RepoDb
         /// All Fields are returned as a default if the value is undefined and/or invalid and cannot be mapped.
         /// NOTE: Property names and db fields names are not guaranteed to be the same.
         /// </summary>
-        /// <param name="fieldNamesFilter"></param>
+        /// <param name="selectionNamesFilter"></param>
         /// <returns>
         /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
         /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
@@ -111,7 +106,6 @@ namespace HotChocolate.RepoDb
         /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
         /// NOTE: Property names and db fields names are not guaranteed to be the same.
         /// </summary>
-        /// <param name="graphQLSortFields"></param>
         /// <returns></returns>
         public IEnumerable<OrderField> GetSortOrderFields()
         {
@@ -166,17 +160,14 @@ namespace HotChocolate.RepoDb
         {
             var graphQLPagingArgs = this.GraphQLParamsContext.CursorPagingArgs;
 
-            if (!graphQLPagingArgs.IsPagingArgumentsValid())
-            {
-                return null;
-            }
-
-            return new RepoDbCursorPagingParams(
-                first: graphQLPagingArgs.First,
-                after: graphQLPagingArgs.After,
-                before: graphQLPagingArgs.Before,
-                last: graphQLPagingArgs.Last
-            );
+            return graphQLPagingArgs.IsPagingArgumentsValid()
+                ? new RepoDbCursorPagingParams(
+                    first: graphQLPagingArgs.First,
+                    after: graphQLPagingArgs.After,
+                    before: graphQLPagingArgs.Before,
+                    last: graphQLPagingArgs.Last
+                )
+                : null;
         }
 
         /// <summary>
@@ -189,17 +180,9 @@ namespace HotChocolate.RepoDb
         {
             var graphQLPagingArgs = this.GraphQLParamsContext.OffsetPagingArgs;
 
-            if (!graphQLPagingArgs.IsPagingArgumentsValid())
-            {
-                return null;
-            }
-
-            
-            return RepoDbOffsetPagingParams.FromSkipTake(
-                graphQLPagingArgs.Skip, 
-                graphQLPagingArgs.Take,
-                this.GraphQLParamsContext.IsTotalCountRequested
-            );
+            return graphQLPagingArgs.IsPagingArgumentsValid()
+                ? new RepoDbOffsetPagingParams(graphQLPagingArgs.Skip, graphQLPagingArgs.Take)
+                : null;
         }
     }
 }

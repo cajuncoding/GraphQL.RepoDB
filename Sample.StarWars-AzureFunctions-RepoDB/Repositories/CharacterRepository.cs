@@ -79,9 +79,8 @@ namespace StarWars.Repositories
             await using var sqlConn = CreateConnection();
 
             var offsetPageResults = await sqlConn.GraphQLBatchSkipTakeQueryAsync<CharacterDbModel>(
-                page: pagingParams.Page,
-                rowsPerBatch: pagingParams.RowsPerBatch,
-                fetchTotalCount: pagingParams.IsTotalCountEnabled,
+                skip: pagingParams.Skip,
+                take: pagingParams.Take,
                 orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields
             );

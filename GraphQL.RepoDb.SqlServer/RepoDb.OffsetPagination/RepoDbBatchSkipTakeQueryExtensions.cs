@@ -1,18 +1,11 @@
 ﻿using HotChocolate.PreProcessingExtensions.Pagination;
-using HotChocolate.RepoDb.SqlServer.Reflection;
-using RepoDb.CustomExtensions;
-using RepoDb.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate.RepoDb;
 using RepoDb.CursorPagination;
 
 namespace RepoDb.OffsetPagination
@@ -20,27 +13,31 @@ namespace RepoDb.OffsetPagination
     public static class RepoDbBatchSkipTakeQueryExtensions
     {
         /// <summary>
-        /// Base Repository extension for Relay Cursor Paginated Batch Query capability.
+        /// Base Repository extension for Offset Paginated Batch Query capability.
         /// 
-        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
-        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// Public Facade method to provide dynamically paginated results using Offset based paging/slicing.
         /// 
-        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        /// NOTE: Since RepoDb supports only Batch querying using Page Number and Page Size -- it's less flexible
+        ///     than pure Offset based paging which uses Skip/Take.  Therefore, this logic provides an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
-        ///     
-        /// NOTE: For Relay Spec details and Cursor Algorithm see:
-        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        ///     this facade will remain as a proxy to the core feature.
+        /// 
+        /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
+        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
+        ///      it is still very effective for many common use-cases.
+        /// 
+        /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
+        ///      exactly as required; this should work well for many common use cases.
+        /// 
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDbConnection"></typeparam>
         /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
@@ -48,14 +45,14 @@ namespace RepoDb.OffsetPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+        /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
+        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> where,
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
+            int? skip = null, 
+            int? take = null,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -68,188 +65,197 @@ namespace RepoDb.OffsetPagination
         where TEntity : class
         where TDbConnection : DbConnection
         {
-            return await baseRepo.GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
-                    afterCursor: afterCursor,
-                    firstTake: firstTake,
-                    beforeCursor: beforeCursor,
-                    lastTake: lastTake,
-                    orderBy: orderBy,
-                    where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
-                    hints: hints,
-                    fields: fields,
-                    tableName: tableName,
-                    commandTimeout: commandTimeout,
-                    transaction: transaction,
-                    logTrace: logTrace,
-                    cancellationToken: cancellationToken
-                ).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Base Repository extension for Relay Cursor Paginated Batch Query capability.
-        /// 
-        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
-        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
-        /// 
-        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
-        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
-        ///     
-        /// NOTE: For Relay Spec details and Cursor Algorithm see:
-        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <typeparam name="TDbConnection"></typeparam>
-        /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="where"></param>
-        /// <param name="hints"></param>
-        /// <param name="fields"></param>
-        /// <param name="tableName"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="transaction"></param>
-        /// <param name="logTrace"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
-            this BaseRepository<TEntity, TDbConnection> baseRepo,
-            IEnumerable<OrderField> orderBy,
-            QueryGroup where = null,
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
-            string hints = null,
-            IEnumerable<Field> fields = null,
-            string tableName = null,
-            int? commandTimeout = null,
-            IDbTransaction transaction = null,
-            Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
-        )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-        where TEntity : class
-        where TDbConnection : DbConnection
-        {
-            //Below Logic mirrors that of RepoDb Source for managing the Connection (PerInstance or PerCall)!
-            var connection = (DbConnection)(transaction?.Connection ?? baseRepo.CreateConnection());
-
-            try
-            {
-                var cursorPageResult = await connection.GraphQLBatchSkipTakeQueryAsync<TEntity>(
-                    afterCursor: afterCursor,
-                    firstTake: firstTake,
-                    beforeCursor: beforeCursor,
-                    lastTake: lastTake,
-                    orderBy: orderBy,
-                    where: where,
-                    hints: hints,
-                    fields: fields,
-                    tableName: tableName,
-                    commandTimeout: commandTimeout,
-                    transaction: transaction,
-                    logTrace: logTrace,
-                    cancellationToken: cancellationToken
-                ).ConfigureAwait(false);
-
-                return cursorPageResult;
-            }
-            catch
-            {
-                // Throw back the error
-                throw;
-            }
-            finally
-            {
-                // Dispose the connection
-                baseRepo.DisposeConnectionForPerCallExtension(connection, transaction);
-            }
-        }
-
-        /// <summary>
-        /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
-        /// 
-        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
-        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
-        /// 
-        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
-        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
-        ///     
-        /// NOTE: For Relay Spec details and Cursor Algorithm see:
-        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="dbConnection">Extends DbConnection directly</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="where"></param>
-        /// <param name="hints"></param>
-        /// <param name="fields"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="transaction"></param>
-        /// <param name="logTrace"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
-            this DbConnection dbConnection,
-            IEnumerable<OrderField> orderBy,
-            //NOTE: Expression is required to prevent Ambiguous Signatures
-            Expression<Func<TEntity, bool>> where,
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
-            string hints = null,
-            IEnumerable<Field> fields = null,
-            int? commandTimeout = null,
-            IDbTransaction transaction = null,
-            Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
-        )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-        where TEntity : class
-        {
-            return await dbConnection.GraphQLBatchSkipTakeQueryAsync<TEntity>(
-                afterCursor: afterCursor,
-                firstTake: firstTake,
-                beforeCursor: beforeCursor,
-                lastTake: lastTake,
+            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
+            //  need to maintain duplicated code for the less flexible paging approach since we can provide
+            //  the simplified Offset Paging facade on top of the existing Slice Queries!
+            var sliceResults = await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
                 orderBy: orderBy,
-                where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
+                //NOTE: Expression is required to prevent Ambiguous Signatures
+                where: where,
+                afterCursor: skip,
+                firstTake: take,
+                tableName: tableName,
                 hints: hints,
                 fields: fields,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
+            );
+
+            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
+            return sliceResults.ToOffsetPageResults();
         }
 
         /// <summary>
-        /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
+        /// Base Repository extension for Offset Paginated Batch Query capability.
         /// 
-        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
-        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// Public Facade method to provide dynamically paginated results using Offset based paging/slicing.
         /// 
-        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        /// NOTE: Since RepoDb supports only Batch querying using Page Number and Page Size -- it's less flexible
+        ///     than pure Offset based paging which uses Skip/Take.  Therefore, this logic provides an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
-        ///     
-        /// NOTE: For Relay Spec details and Cursor Algorithm see:
-        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        ///     this facade will remain as a proxy to the core feature.
+        /// 
+        /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
+        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
+        ///      it is still very effective for many common use-cases.
+        /// 
+        /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
+        ///      exactly as required; this should work well for many common use cases.
+        /// 
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
-        /// <param name="dbConnection">Extends DbConnection directly</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
+        /// <typeparam name="TDbConnection"></typeparam>
+        /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="tableName"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
+        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+            this BaseRepository<TEntity, TDbConnection> baseRepo,
+            IEnumerable<OrderField> orderBy,
+            QueryGroup where = null,
+            int? skip = null,
+            int? take = null,
+            string hints = null,
+            IEnumerable<Field> fields = null,
+            string tableName = null,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+        )
+        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+        where TEntity : class
+        where TDbConnection : DbConnection
+        {
+            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
+            //  need to maintain duplicated code for the less flexible paging approach since we can provide
+            //  the simplified Offset Paging facade on top of the existing Slice Queries!
+            var sliceResults = await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+                orderBy: orderBy,
+                //NOTE: Expression is required to prevent Ambiguous Signatures
+                where: where,
+                afterCursor: skip,
+                firstTake: take,
+                tableName: tableName,
+                hints: hints,
+                fields: fields,
+                commandTimeout: commandTimeout,
+                transaction: transaction,
+                logTrace: logTrace,
+                cancellationToken: cancellationToken
+            );
+
+            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
+            return sliceResults.ToOffsetPageResults();
+        }
+
+        /// <summary>
+        /// Base Repository extension for Offset Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Offset based paging/slicing.
+        /// 
+        /// NOTE: Since RepoDb supports only Batch querying using Page Number and Page Size -- it's less flexible
+        ///     than pure Offset based paging which uses Skip/Take.  Therefore, this logic provides an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to the core feature.
+        /// 
+        /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
+        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
+        ///      it is still very effective for many common use-cases.
+        /// 
+        /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
+        ///      exactly as required; this should work well for many common use cases.
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbConnection">Extends the RepoDb BaseRepository abstraction</param>
+        /// <param name="orderBy"></param>
+        /// <param name="where"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
+        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
+            this DbConnection dbConnection,
+            IEnumerable<OrderField> orderBy,
+            //NOTE: Expression is required to prevent Ambiguous Signatures
+            Expression<Func<TEntity, bool>> where,
+            int? skip = null,
+            int? take = null,
+            string hints = null,
+            IEnumerable<Field> fields = null,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+        )
+        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+        where TEntity : class
+        {
+            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
+            //  need to maintain duplicated code for the less flexible paging approach since we can provide
+            //  the simplified Offset Paging facade on top of the existing Slice Queries!
+            var sliceResults = await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
+                orderBy: orderBy,
+                //NOTE: Expression is required to prevent Ambiguous Signatures
+                where: where,
+                afterCursor: skip,
+                firstTake: take,
+                hints: hints,
+                fields: fields,
+                commandTimeout: commandTimeout,
+                transaction: transaction,
+                logTrace: logTrace,
+                cancellationToken: cancellationToken
+            );
+
+            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
+            return sliceResults.ToOffsetPageResults(); ;
+        }
+
+        /// <summary>
+        /// Base Repository extension for Offset Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Offset based paging/slicing.
+        /// 
+        /// NOTE: Since RepoDb supports only Batch querying using Page Number and Page Size -- it's less flexible
+        ///     than pure Offset based paging which uses Skip/Take.  Therefore, this logic provides an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to the core feature.
+        /// 
+        /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
+        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
+        ///      it is still very effective for many common use-cases.
+        /// 
+        /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
+        ///      exactly as required; this should work well for many common use cases.
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbConnection">Extends the RepoDb BaseRepository abstraction</param>
+        /// <param name="orderBy"></param>
+        /// <param name="where"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
@@ -257,13 +263,13 @@ namespace RepoDb.OffsetPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
+        /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
+        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
-            QueryGroup where = null, 
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
+            QueryGroup where = null,
+            int? skip = null,
+            int? take = null,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
@@ -275,191 +281,44 @@ namespace RepoDb.OffsetPagination
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
-            if (orderBy == null)
-                throw new ArgumentNullException(nameof(orderBy), "A sort order must be specified to provide valid cursor paging results.");
-
-            var dbTableName = string.IsNullOrWhiteSpace(tableName)
-                                ? ClassMappedNameCache.Get<TEntity>()
-                                : tableName;
-
-            //Ensure we have default fields; default is to include All Fields...
-            var fieldsList = fields?.ToList();
-            var selectFields = fieldsList?.Any() == true
-                ? fieldsList
-                : FieldCache.Get<TEntity>();
-
-            //Retrieve only the select fields that are valid for the Database query!
-            //NOTE: We guard against duplicate values as a convenience.
-            var validSelectFields = await dbConnection
-                .GetValidatedDbFields(dbTableName, selectFields.Distinct())
-                .ConfigureAwait(false);
-
-            //Dynamically handle RepoDb where filters (QueryGroup)...
-            object whereParams = where != null
-                ? RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(where)
-                : null;
-
-            //Build the Cursor Paging query...
-            var query = RepoDbBatchSkipTakePagingQueryBuilder.BuildSqlServerBatchSkipTakeQuery<TEntity>(
-                tableName: dbTableName,
-                fields: validSelectFields,
+            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
+            //  need to maintain duplicated code for the less flexible paging approach since we can provide
+            //  the simplified Offset Paging facade on top of the existing Slice Queries!
+            var sliceResults = await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
                 orderBy: orderBy,
+                //NOTE: Expression is required to prevent Ambiguous Signatures
                 where: where,
+                afterCursor: skip,
+                firstTake: take,
                 hints: hints,
-                afterCursorIndex: afterCursor,
-                firstTake: firstTake,
-                beforeCursorIndex: beforeCursor,
-                lastTake: lastTake,
-                //Currently we MUST include the Total Count because it's required to tell if there is a previous/next page
-                includeTotalCountQuery: true
+                fields: fields,
+                tableName: tableName,
+                commandTimeout: commandTimeout,
+                transaction: transaction,
+                logTrace: logTrace,
+                cancellationToken: cancellationToken
             );
 
-            var cursorPageResult = await dbConnection.ExecuteBatchSliceQueryAsync<TEntity>(
-                commandText: query,
-                queryParams: whereParams,
-                commandTimeout: commandTimeout,
-                logTrace: logTrace,
-                transaction: transaction,
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-
-            return cursorPageResult;
+            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
+            return sliceResults.ToOffsetPageResults(); ;
         }
 
         /// <summary>
-        /// CLONED from RepoDb source code that is marked as 'internal' but needed to handle in a consistent way!
-        /// Disposes an <see cref="IDbConnection"/> object if there is no <see cref="IDbTransaction"/> object connected
-        /// and if the current <see cref="ConnectionPersistency"/> value is <see cref="ConnectionPersistency.PerCall"/>.
-        /// </summary>
-        /// <param name="connection">The instance of <see cref="IDbConnection"/> object.</param>
-        /// <param name="transaction">The instance of <see cref="IDbTransaction"/> object.</param>
-        private static void DisposeConnectionForPerCallExtension<TEntity, TDbConnection>(
-            this BaseRepository<TEntity, TDbConnection> baseRepo,
-            IDbConnection connection,
-            IDbTransaction transaction = null
-        )
-        where TEntity : class
-        where TDbConnection : DbConnection
-        {
-            if (baseRepo.ConnectionPersistency == ConnectionPersistency.PerCall)
-            {
-                if (transaction == null)
-                {
-                    connection?.Dispose();
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Internal query execution method for Slice Queries based on TEntity model. We attempt to use as much as possible
-        ///     from RepoDb, with the caveat that some resources/utilities are internal and require brute force via reflection
-        ///     to access.
-        ///     
-        /// NOTE: We must manually construct our Reader as the Helpers from RepoDb are 'internal' scope
-        ///      and not readily accessible, though for this it's important that we have access to the reader
-        ///      so that we can manually extract the CursorIndex that was dynamically added via the Query!
-        /// NOTE: Since this doesn't have access to all RepoDb internals, there are some less optimal things such as:
-        ///          - RepoDb CreateDbCommandForExecution() method isn't accessible and it performs greater validation.
-        ///          - We use Reflection to get access to some internal elements via Brute Force, but cache the access
-        ///              via proxy class that mitigates performance issues.
-        ///
+        /// Helper method for converting Cursor Slice to OffsetPageResults for easier processing by calling code.
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
-        /// <param name="dbConn"></param>
-        /// <param name="commandText"></param>
-        /// <param name="queryParams"></param>
-        /// <param name="tableName"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="transaction"></param>
-        /// <param name="logTrace"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cursorPageSlice"></param>
         /// <returns></returns>
-        [SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
-        private static async Task<CursorPageSlice<TEntity>> ExecuteBatchSliceQueryAsync<TEntity>(
-            this DbConnection dbConn,
-            string commandText,
-            object queryParams = null,
-            string tableName = null,
-            int? commandTimeout = null,
-            IDbTransaction transaction = null,
-            Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
-        ) where TEntity : class
+        public static OffsetPageResults<TEntity> ToOffsetPageResults<TEntity>(this CursorPageSlice<TEntity> cursorPageSlice)
+            //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+            where TEntity : class
         {
-            logTrace?.Invoke($"Query: {commandText}");
-
-            var timer = Stopwatch.StartNew();
-
-            //Get the Fields from Cache first (as this can't be done after Reader is opened...
-            var tableNameForCache = tableName ?? ClassMappedNameCache.Get<TEntity>();
-            var dbSetting = dbConn.GetDbSetting();
-            var dbFieldsForCache = await DbFieldCache
-                .GetAsync(dbConn, tableNameForCache, transaction, false, cancellationToken)
-                .ConfigureAwait(false);
-
-            //Ensure that the DB Connection is open (RepoDb provided extension)...
-            await dbConn.EnsureOpenAsync(cancellationToken).ConfigureAwait(false);
-
-            logTrace?.Invoke($"DB Connection Established in: {timer.ToElapsedTimeDescriptiveFormat()}");
-
-            //Re-use the RepoDb Execute Reader method to get benefits of Command & Param caches, etc.
-            await using var reader = (DbDataReader)await dbConn.ExecuteReaderAsync(
-                commandText: commandText,
-                param: queryParams,
-                commandType: CommandType.Text,
-                transaction: transaction,
-                commandTimeout: commandTimeout,
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-
-            //BBernard
-            //We NEED to manually process the Reader externally here!
-            //Therefore, this had to be Code borrowed from RepoDb Source (DataReader.ToEnumerableAsync<TEntity>(...) 
-            // core code so that we clone minimal amount of logic outside of RepoDb due to 'internal' scope.
-            var results = new List<CursorResult<TEntity>>();
-            int totalCount = 0;
-            if (reader != null && !reader.IsClosed && reader.HasRows)
-            {
-                string cursorIndexName = nameof(IHaveCursor.CursorIndex);
-
-                //Initialize the RepoDb compiled entity mapping function (via Brute Force Proxy class; it's marked 'internal'.
-                var functionCacheProxy = new RepoDbFunctionCacheProxy<TEntity>();
-                var repoDbMappingFunc = functionCacheProxy.GetDataReaderToDataEntityFunctionCompatible(
-                    reader, dbConn, transaction, true, dbFieldsForCache, dbSetting
-                ) ?? throw new Exception($"Unable to retrieve the RepoDb entity mapping function for [{typeof(TEntity).Name}].");
-
-                while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-                {
-                    //Dynamically read the Entity from the Results...
-                    TEntity entity = repoDbMappingFunc(reader);
-
-                    //Manually Process the Cursor for each record...
-                    var cursorIndex = Convert.ToInt32(reader.GetValue(cursorIndexName));
-
-                    //This allows us to extract the CursorIndex field and return in a Decorator class 
-                    //  so there's NO REQUIREMENT that the Model (TEntity) have any special fields/interfaces added.
-                    var cursorResult = new CursorResult<TEntity>(entity, cursorIndex);
-                    results.Add(cursorResult);
-                }
-
-                //Now attempt to step to the Total Count query result...
-                //Note: We know to attempt getting the TotalCount if there is a second result set avaialble.
-                if (await reader.NextResultAsync(cancellationToken).ConfigureAwait(false) 
-                    && await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-                {
-                    //This is a Scalar query so the first ordinal value is the Total Count!
-                    totalCount = Convert.ToInt32(reader.GetValue(0));
-                }
-
-            }
-
-            timer.Stop();
-            logTrace?.Invoke($"Query Execution Time: {timer.ToElapsedTimeDescriptiveFormat()}");
-
-            //Return a CursorPagedResult decorator for the results along with the Total Count!
-            var cursorPage = new CursorPageSlice<TEntity>(results, totalCount);
-            return cursorPage;
+            return new OffsetPageResults<TEntity>(
+                cursorPageSlice.Results,
+                cursorPageSlice.HasNextPage,
+                cursorPageSlice.HasPreviousPage,
+                cursorPageSlice.TotalCount
+            );
         }
     }
 

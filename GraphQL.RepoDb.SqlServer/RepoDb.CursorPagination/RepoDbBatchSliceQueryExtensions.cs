@@ -2,7 +2,6 @@
 using HotChocolate.RepoDb.SqlServer.Reflection;
 using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;
-using RepoDb.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -14,11 +13,10 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using HotChocolate.RepoDb;
-using RepoDb.Interfaces;
 
 namespace RepoDb.CursorPagination
 {
-    public static class BaseRepositoryCursorPaginationCustomExtensions
+    public static class RepoDbBatchSliceQueryExtensions
     {
         /// <summary>
         /// Base Repository extension for Relay Cursor Paginated Batch Query capability.
@@ -311,7 +309,7 @@ namespace RepoDb.CursorPagination
                 firstTake: firstTake,
                 beforeCursorIndex: beforeCursor,
                 lastTake: lastTake,
-                //Currently we MUST include the Total Count because it's required to tell if there is a previous/next page
+                //Currently we MUST include the Total Count because it's required to efficiently/reliably tell if there is a previous/next page
                 includeTotalCountQuery: true
             );
 
@@ -445,7 +443,7 @@ namespace RepoDb.CursorPagination
                 }
 
                 //Now attempt to step to the Total Count query result...
-                //Note: We know to attempt getting the TotalCount if there is a second result set avaialble.
+                //Note: We know to attempt getting the TotalCount if there is a second result set availalble.
                 if (await reader.NextResultAsync(cancellationToken).ConfigureAwait(false) 
                     && await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {

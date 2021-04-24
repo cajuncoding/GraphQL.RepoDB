@@ -2,60 +2,38 @@
 
 using System;
 
-namespace RepoDb.CursorPagination
+namespace RepoDb.OffsetPagination
 {
     /// <summary>
-    /// RepoDb specific class representing Cursor Paging parameteres. This provides a specific class for RepoDb
+    /// RepoDb specific class representing Offset Paging parameters. This provides a specific class for RepoDb
     /// that is isolated from HotChocolate and other libraries, similar to Field, OrderField, QueryField provide
     /// RepoDb specific context for those elements of a query.
     /// </summary>
     public class RepoDbOffsetPagingParams : IRepoDbOffsetPagingParams
     {
         /// <summary>
-        /// Initialize Batch paging parameters safely; if null values are specified the default behaviour
-        ///     will be to retrieve all results by initializing Page to 0 and batch size to int.MaxValue.
+        /// Initialize Offset paging parameters safely; if null values are specified the default behaviour
+        ///     will be to retrieve all results which is consistent with behavior of Cursor paging when no
+        ///     paging filters are specified.
         /// </summary>
-        /// <param name="rowsPerBatch">Is Optional and may be null to get all results; will default to getting all data (int.MaxValue) if null or is not a valid positive value.</param>
-        /// <param name="page">Is Optional and will default to the first page (zero-based) if null or is not a valid positive value.</param>
-        /// <param name="fetchTotalCount">Enable the retrieval of the Total Count; for OffsetPaging this is optional and enabling it may impact performance.</param>
-        public RepoDbOffsetPagingParams(int? rowsPerBatch = null, int? page = null, bool fetchTotalCount = false)
+        /// <param name="skip">Is Optional and will default to the first page (or potentially all results based on Take) if null; but otherwise must be a valid positive value or an ArgumentException will occur.</param>
+        /// <param name="take">Is Optional and may be null to get all results; but otherwise must be a valid positive value or an ArgumentException will occur.</param>
+        public RepoDbOffsetPagingParams(int? skip = null, int? take = null)
         {
-            if (rowsPerBatch.HasValue && rowsPerBatch <= 0)
-                throw new ArgumentException("A valid number of rows per batch must be specified (>0).", nameof(rowsPerBatch));
-
-            this.RowsPerBatch = rowsPerBatch.HasValue && rowsPerBatch > 0 ? (int)rowsPerBatch : int.MaxValue;
-            this.Page = page.HasValue && page > 0 ? (int)page : 0;
-            this.IsTotalCountEnabled = fetchTotalCount;
-        }
-
-        /// <summary>
-        /// Initialize Batch paging parameters safely; if null values are specified the default behaviour
-        ///     will be to retrieve all results by initializing Page to 0 and batch size to int.MaxValue.
-        /// </summary>
-        /// <param name="skip">Is Optional and may be null to get all results; will default to skipping none (0) if null or is not a valid positive value.</param>
-        /// <param name="take">Is Optional and may be null to get all results; will default to getting all data (int.MaxValue) if null or is not a valid positive value.</param>
-        /// <param name="fetchTotalCount">Enable the retrieval of the Total Count; for OffsetPaging this is optional and enabling it may impact performance.</param>
-        /// <returns></returns>
-        public static RepoDbOffsetPagingParams FromSkipTake(int? skip = null, int? take = null, bool fetchTotalCount = false)
-        {
-            if (take.HasValue && take <= 0)
-                throw new ArgumentException("A valid number of items to take (rows-per-page) must be specified (e.g. greater than 0).", nameof(take));
-
-            //The RepoDb specific rows-per-batch is the same value as the Take value; but we allow null values which
-            //  default to retrieving all results by using int.MaxValue; this matches the default behavior of
+            //For RepoDb both Skip & Take may actually be optional so that would result in default behaviour to retrieve all results
+            //  which is consistent with Cursor Paging as not specifying any filtering for Cursor Pagination would also get all results.
             //  Cursor based paging which retrieves all results if not specified.
-            var rowsPerBatch = take.HasValue && take > 0 ? (int)take : int.MaxValue;
+            if (skip.HasValue && skip <= 0)
+                throw new ArgumentException("If specified (e.g. not null) then a valid number of items to skip-over must be specified (e.g. greater than 0).", nameof(skip));
 
-            //Dynamically derive a Page number from the Skip & Take values as RepoDb specific 
-            //  Page value (which is zero-based).
-            var skipOver = Math.Max((skip ?? 0), 0);
-            var page = (int)(skipOver / rowsPerBatch);
+            if (take.HasValue && take <= 0)
+                throw new ArgumentException("If specified (e.g. not null) then A valid number of items to take (rows-per-page) must be specified (e.g. greater than 0).", nameof(take));
 
-            return new RepoDbOffsetPagingParams(rowsPerBatch, page, fetchTotalCount);
+            this.Skip = skip;
+            this.Take = take;
         }
 
-        public int Page { get; }
-        public int RowsPerBatch { get; }
-        public bool IsTotalCountEnabled { get; }
+        public int? Skip { get; }
+        public int? Take { get; }
     }
 }
