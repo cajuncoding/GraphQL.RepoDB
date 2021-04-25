@@ -30,7 +30,7 @@ namespace RepoDb.CursorPagination
         /// <param name="lastTake"></param>
         /// <param name="includeTotalCountQuery"></param>
         /// <returns></returns>
-        public static string BuildSqlServerBatchSliceQuery<TEntity>(
+        public static SqlQuerySliceInfo BuildSqlServerBatchSliceQuery<TEntity>(
             string tableName,
             IEnumerable<Field> fields,
             IEnumerable<OrderField> orderBy,
@@ -74,6 +74,8 @@ namespace RepoDb.CursorPagination
             selectFields.AddRange(fieldsList);
             selectFields.Add(new Field(cursorIndexName));
 
+            var sqlWhereClauseSliceInfo = BuildRelaySpecQuerySliceInfo(cursorIndexName, afterCursorIndex, beforeCursorIndex, firstTake, lastTake);
+
             // Build the base Paginated Query
             builder.Clear()
                 .With()
@@ -89,13 +91,12 @@ namespace RepoDb.CursorPagination
                     .FieldsFrom(selectFields, dbSetting)
                 .From().WriteText("CTE")
                 //Implement Relay Spec Cursor Slicing Algorithm!
-                .WriteText(BuildRelaySpecWhereCondition(cursorIndexName, afterCursorIndex, beforeCursorIndex, firstTake, lastTake))
+                .WriteText(sqlWhereClauseSliceInfo.SQL)
                 .OrderByFrom(orderByList, dbSetting)
                 .End();
 
             if (includeTotalCountQuery)
             {
-
                 //Look for PKey Field to use as the Count Column... as this just makes sense...
                 //NOTE: COUNT(1) may not work as expected when column permission are in use, so we use a real field.
                 var countField = PropertyCache.Get<TEntity>().FirstOrDefault(p => p.GetPrimaryAttribute() != null)?.AsField()
@@ -112,8 +113,20 @@ namespace RepoDb.CursorPagination
                     .End();
             }
 
+            // Build the Query and other Slice Info metadata needed for optimal pagination...
+            var sqlQuery = builder.GetString();
+
+            var sqlQuerySliceInfo = new SqlQuerySliceInfo()
+            { 
+                SQL = sqlQuery, 
+                ExpectedCount = sqlWhereClauseSliceInfo.ExpectedCount, 
+                IsPreviousPagePossible = sqlWhereClauseSliceInfo.IsPreviousPagePossible,
+                IsNextPagePossible = sqlWhereClauseSliceInfo.IsNextPagePossible,
+                IsEndIndexOverFetchedForNextPageCheck = sqlWhereClauseSliceInfo.IsEndIndexOverFetchedForNextPageCheck
+            };
+
             // Return the query
-            return builder.GetString();
+            return sqlQuerySliceInfo;
         }
 
         public static void AssertCursorPagingArgsAreValid(
@@ -147,7 +160,7 @@ namespace RepoDb.CursorPagination
                 );
             }
 
-            if (orderBy?.Count() <= 0)
+            if (orderBy?.Any() == false)
                 throw new ArgumentException(
                     "A valid Order By field must be specified to ensure consistent ordering of data.",
                     nameof(orderBy)
@@ -155,7 +168,7 @@ namespace RepoDb.CursorPagination
         }
 
         [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        private static string BuildRelaySpecWhereCondition(string cursorFieldName, int? afterCursorIndex, int? beforeCursorIndex, int? firstTake, int? lastTake)
+        private static SqlQuerySliceInfo BuildRelaySpecQuerySliceInfo(string cursorFieldName, int? afterCursorIndex, int? beforeCursorIndex, int? firstTake, int? lastTake)
         {
             //Implement Cursor pagination algorithm in alignment with industry accepted Relay Spec. for GraphQL
             //For more info. see: https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -171,7 +184,11 @@ namespace RepoDb.CursorPagination
             int? endIndex = null;
             int count = 0;
 
+            //********************************************************************************
             //FIRST we process after/before args...
+            //********************************************************************************
+            //NOTE: SQL Server BETWEEN operation is INCLUSIVE therefore to compute ordinal indexes from teh After/Before Cursors
+            //      we increment/decrement by One (1) to always get the item actual after or actually before the cursor specified!
             if (afterCursorIndex.HasValue && beforeCursorIndex.HasValue)// Both 'after' & 'before' args
             {
                 //Both Before & After are specified; This scenario is discouraged by the Spec but not prohibited!
@@ -198,21 +215,25 @@ namespace RepoDb.CursorPagination
                 count = int.MaxValue;
             }
 
-            //SECOND we process first/last args which may apply combinatorially...
-            //  For example this may be the first time endIndex is initialized, based on FIRST process above.
-            if (firstTake.HasValue && count > firstTake && startIndex.HasValue)
+            //********************************************************************************
+            //SECOND we process first/last args which may applied in combination...
+            //********************************************************************************
+            //NOTE: This may be the first time endIndex is initialized, based on FIRST filter step above...
+            if (firstTake.HasValue && count > firstTake)
             {
                 endIndex = (startIndex + (int)firstTake) - 1;
                 count = (int)firstTake;
             }
 
             //Last can be combined in addition to First above (not exclusive)
+            //NOTE: We only allow the Last Filter Here if there are enough items expected (expected count)
+            //      to be available; meaning the expected count from the FIRST filter step above has to
+            //      be greater than the take from the end (as outlined in Relay Spec).
             if (lastTake.HasValue && count > lastTake)
             {
                 if (endIndex.HasValue)
                 {
                     startIndex = ((int)endIndex - (int)lastTake) + 1;
-                    //count = (int)lastTake;
                 }
                 else
                 {
@@ -223,31 +244,68 @@ namespace RepoDb.CursorPagination
                     startIndex = null;
                     endIndex = null;
                 }
+                
+                //In both of these cases teh total count expected will be the Last Take size
+                //  since it's smaller than the original count expected from the FIRST filter step above...
+                count = (int)lastTake;
             }
+
+            
+            var sqlSliceInfo = new SqlQuerySliceInfo() { ExpectedCount = count };
 
             //Finally we can convert the Mapped Start & End indexes to valid Where Clause...
             if (startIndex.HasValue && endIndex.HasValue)
             {
-                where = $"WHERE ([{cursorFieldName}] BETWEEN {startIndex} AND {endIndex})";
+                //NOTE: We INCREMENT End Index by one here to intentionally Over Fetch so that we can optimize
+                //      the computation of HasNextPage without knowing the Full table Count!
+                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] BETWEEN {startIndex} AND {endIndex + 1})";
+                sqlSliceInfo.IsPreviousPagePossible = true;
+                sqlSliceInfo.IsNextPagePossible = true;
+                sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = true;
             }
             else if (startIndex.HasValue)
             {
-                where = $"WHERE ([{cursorFieldName}] >= {startIndex})";
+                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] >= {startIndex})";
+                sqlSliceInfo.IsPreviousPagePossible = true;
+                sqlSliceInfo.IsNextPagePossible = false;
+                sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = false;
             }
+            //NOTE: Is Always False as note by Re-sharper; in all cases where EndIndex has a value so will StartIndex also have a value hitting the first case above!
+            //  But algorithmically it feels right to just leave this since we may optimize code above and risk changing this in the future
             else if (endIndex.HasValue)
             {
-                where = $"WHERE ([{cursorFieldName}] <= {endIndex})";
+                //NOTE: We INCREMENT End Index by one here to intentionally Over Fetch so that we can optimize
+                //      the computation of HasNextPage without knowing the Full table Count!
+                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] <= {endIndex + 1})";
+                sqlSliceInfo.IsPreviousPagePossible = false;
+                sqlSliceInfo.IsNextPagePossible = true;
+                sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = true;
             }
-            //Handle Unique Case of ONLY 'Last' was provided without any 'Before' cursor!
+            //Handle Unique Case for when 'Last' was provided without any 'Before' cursor!
+            //NOTE: Is Always True (if we get here) as note by Re-sharper; because we intentionally null out StartIndex for this case to hit
+            //      when LastTake is specified without an AFTER or BEFORE!
+            //      But algorithmically it feels right to just leave this since we may optimize code above and risk changing this in the future
             else if (lastTake.HasValue)
             {
-                //Computing from the End is the most complex so some performance hit is likely acceptable 
-                //  since it's a less used use-case.
+                //Computing from the End is the most complex so some performance hit is likely acceptable since it's a less used use-case.
                 //NOTE: This must use the Dynamic Count() to determine the End of the existing result set...
-                where = $"WHERE ([{cursorFieldName}] > (SELECT (COUNT([{cursorFieldName}]) - {(int)lastTake}) FROM CTE))";
+                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] > (SELECT (COUNT([{cursorFieldName}]) - {(int)lastTake}) FROM CTE))";
+                sqlSliceInfo.IsPreviousPagePossible = true;
+                sqlSliceInfo.IsNextPagePossible = false;
+                sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = false;
             }
 
-            return where;
+            return sqlSliceInfo;
         }
+    }
+
+    public class SqlQuerySliceInfo
+    {
+        // ReSharper disable once InconsistentNaming
+        public string SQL { get; set; }
+        public bool IsEndIndexOverFetchedForNextPageCheck { get; set; }
+        public int ExpectedCount { get; set; }
+        public bool IsPreviousPagePossible { get; set; }
+        public bool IsNextPagePossible { get; set; }
     }
 }

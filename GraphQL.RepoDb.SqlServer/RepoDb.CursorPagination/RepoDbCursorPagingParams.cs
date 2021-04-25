@@ -6,13 +6,13 @@ using System;
 namespace RepoDb.CursorPagination
 {
     /// <summary>
-    /// RepoDb specific class representing Cursor Paging parameteres. This provides a specific class for RepoDb
+    /// RepoDb specific class representing Cursor Paging parameters. This provides a specific class for RepoDb
     /// that is isolated from HotChocolate and other libraries, similar to Field, OrderField, QueryField provide
     /// RepoDb specific context for those elements of a query.
     /// </summary>
     public class RepoDbCursorPagingParams : IRepoDbCursorPagingParams
     {
-        public RepoDbCursorPagingParams(int? first = null, int? last = null, string? after = null, string? before = null)
+        public RepoDbCursorPagingParams(int? first = null, int? last = null, string? after = null, string? before = null, bool isTotalCountRequested = false)
         {
             this.First = first;
             this.Last = last;
@@ -20,6 +20,7 @@ namespace RepoDb.CursorPagination
             this.Before = before;
             this.AfterIndex = DeserializeCursor(after);
             this.BeforeIndex = DeserializeCursor(before);
+            this.IsTotalCountRequested = isTotalCountRequested;
         }
 
         public static string? SerializeCursor(int? index)
@@ -43,5 +44,6 @@ namespace RepoDb.CursorPagination
         public int? AfterIndex { get; }
         public string? Before { get; }
         public int? BeforeIndex { get; }
+        public bool IsTotalCountRequested { get; }
     }
 }

@@ -42,7 +42,7 @@ namespace HotChocolate.PreProcessingExtensions
         {
             //Do nothing if there are no results...
             if (!items.Any())
-                return new CursorPageSlice<T>(null, 0);
+                return new CursorPageSlice<T>(null, 0, false, false);
 
             var afterIndex = after != null
                 ? IndexEdge<string>.DeserializeCursor(after)
@@ -90,7 +90,16 @@ namespace HotChocolate.PreProcessingExtensions
 
             //Wrap all results into a PagedCursor Slice result wit Total Count...
             //NOTE: to ensure our pagination is complete, we materialize the Results!
-            var cursorPageSlice = new CursorPageSlice<T>(slice.ToList(), totalCount);
+            var results = slice.ToList();
+            var firstCursor = results.FirstOrDefault();
+            var lastCursor = results.LastOrDefault();
+
+            var cursorPageSlice = new CursorPageSlice<T>(
+                results, 
+                totalCount, 
+                hasPreviousPage: firstCursor?.CursorIndex > 1,
+                hasNextPage: lastCursor?.CursorIndex < totalCount
+            );
             return cursorPageSlice;
         }
     }

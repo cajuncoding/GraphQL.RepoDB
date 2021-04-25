@@ -62,6 +62,7 @@ namespace StarWars.Repositories
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
                 lastTake: pagingParams.Last,
+                computeTotalCount: pagingParams.IsTotalCountRequested,
                 logTrace: s => Debug.WriteLine(s),
                 commandTimeout: 15
             );
@@ -81,6 +82,7 @@ namespace StarWars.Repositories
             var offsetPageResults = await sqlConn.GraphQLBatchSkipTakeQueryAsync<CharacterDbModel>(
                 skip: pagingParams.Skip,
                 take: pagingParams.Take,
+                computeTotalCount: pagingParams.IsTotalCountRequested,
                 orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields
             );
@@ -105,6 +107,7 @@ namespace StarWars.Repositories
                 beforeCursor: pagingParams.BeforeIndex!,
                 firstTake: pagingParams.First,
                 lastTake: pagingParams.Last,
+                computeTotalCount: pagingParams.IsTotalCountRequested,
                 commandTimeout: 15
             );
 
@@ -145,6 +148,7 @@ namespace StarWars.Repositories
                 firstTake: pagingParams.First,
                 beforeCursor: pagingParams.BeforeIndex,
                 lastTake: pagingParams.Last,
+                computeTotalCount: pagingParams.IsTotalCountRequested,
                 commandTimeout: 15
             );
 

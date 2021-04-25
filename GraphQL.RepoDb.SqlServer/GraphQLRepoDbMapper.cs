@@ -164,7 +164,8 @@ namespace HotChocolate.RepoDb
                 first: graphQLPagingArgs.First,
                 after: graphQLPagingArgs.After,
                 before: graphQLPagingArgs.Before,
-                last: graphQLPagingArgs.Last
+                last: graphQLPagingArgs.Last,
+                isTotalCountRequested: this.GraphQLParamsContext.IsTotalCountRequested
             );
         }
 
@@ -180,7 +181,8 @@ namespace HotChocolate.RepoDb
 
             return new RepoDbOffsetPagingParams(
                 graphQLPagingArgs.Skip, 
-                graphQLPagingArgs.Take
+                graphQLPagingArgs.Take,
+                isTotalCountRequested: this.GraphQLParamsContext.IsTotalCountRequested
             );
         }
     }

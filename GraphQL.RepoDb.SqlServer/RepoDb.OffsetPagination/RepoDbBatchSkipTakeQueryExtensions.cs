@@ -23,9 +23,7 @@ namespace RepoDb.OffsetPagination
         ///     this facade will remain as a proxy to the core feature.
         /// 
         /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
-        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
-        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
-        ///      it is still very effective for many common use-cases.
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and Cursor paging paradigm.
         /// 
         /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
         ///      exactly as required; this should work well for many common use cases.
@@ -45,6 +43,7 @@ namespace RepoDb.OffsetPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="computeTotalCount"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
@@ -59,8 +58,9 @@ namespace RepoDb.OffsetPagination
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
-        )
+            CancellationToken cancellationToken = default,
+            bool computeTotalCount = false
+            )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection
@@ -80,7 +80,8 @@ namespace RepoDb.OffsetPagination
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken
+                cancellationToken: cancellationToken,
+                computeTotalCount: computeTotalCount
             );
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
@@ -98,9 +99,7 @@ namespace RepoDb.OffsetPagination
         ///     this facade will remain as a proxy to the core feature.
         /// 
         /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
-        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
-        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
-        ///      it is still very effective for many common use-cases.
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and Cursor paging paradigm.
         /// 
         /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
         ///      exactly as required; this should work well for many common use cases.
@@ -120,6 +119,7 @@ namespace RepoDb.OffsetPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="computeTotalCount"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
@@ -133,8 +133,9 @@ namespace RepoDb.OffsetPagination
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
-        )
+            CancellationToken cancellationToken = default,
+            bool computeTotalCount = false
+            )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection
@@ -154,7 +155,8 @@ namespace RepoDb.OffsetPagination
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken
+                cancellationToken: cancellationToken,
+                computeTotalCount: computeTotalCount
             );
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
@@ -172,9 +174,7 @@ namespace RepoDb.OffsetPagination
         ///     this facade will remain as a proxy to the core feature.
         /// 
         /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
-        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
-        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
-        ///      it is still very effective for many common use-cases.
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and Cursor paging paradigm.
         /// 
         /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
         ///      exactly as required; this should work well for many common use cases.
@@ -192,6 +192,7 @@ namespace RepoDb.OffsetPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="computeTotalCount"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
@@ -205,8 +206,9 @@ namespace RepoDb.OffsetPagination
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
-        )
+            CancellationToken cancellationToken = default,
+            bool computeTotalCount = false
+            )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
@@ -224,7 +226,8 @@ namespace RepoDb.OffsetPagination
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken
+                cancellationToken: cancellationToken,
+                computeTotalCount: computeTotalCount
             );
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
@@ -242,9 +245,7 @@ namespace RepoDb.OffsetPagination
         ///     this facade will remain as a proxy to the core feature.
         /// 
         /// NOTE: Cursor Slice Querying is more flexible and works perfectly for Offset Based processing also so this
-        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and true Cursor paging
-        ///      paradigm; therefore it may not be 100% as efficient as an Skip/Take query (due to TotalCount computations),
-        ///      it is still very effective for many common use-cases.
+        ///      represents a facade around the Cursor Page slicing that maps between Skip/Take and Cursor paging paradigm.
         /// 
         /// NOTE: If the implementor needs further optimization then it's recommended to implement the optimized query
         ///      exactly as required; this should work well for many common use cases.
@@ -263,6 +264,7 @@ namespace RepoDb.OffsetPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="computeTotalCount"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
@@ -276,7 +278,8 @@ namespace RepoDb.OffsetPagination
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
+            CancellationToken cancellationToken = default,
+            bool computeTotalCount = false
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
@@ -296,7 +299,8 @@ namespace RepoDb.OffsetPagination
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken
+                cancellationToken: cancellationToken, 
+                computeTotalCount: computeTotalCount
             );
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...

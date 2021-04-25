@@ -23,7 +23,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
             if (pageResults == null)
                 throw new ArgumentNullException(nameof(pageResults));
 
-            this.TotalCount = pageResults?.TotalCount;
+            this.TotalCount = pageResults.TotalCount;
             this.HasNextPage = pageResults.HasNextPage;
             this.HasPreviousPage = pageResults.HasPreviousPage;
 
