@@ -1,8 +1,9 @@
-﻿namespace RepoDb.CursorPagination
+﻿namespace RepoDb.OffsetPagination
 {
     public interface IRepoDbOffsetPagingParams
     {
-        int Page { get; }
-        int RowsPerBatch { get; }
+        int? Skip { get; }
+        int? Take { get; }
+        bool IsTotalCountRequested { get; }
     }
 }

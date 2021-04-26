@@ -8,7 +8,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// This class represents a set of results/nodes of offset pagination.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public interface IOffsetPageResults<TEntity> : IHavePreProcessedPagingInfo where TEntity : class
+    public interface IOffsetPageResults<TEntity> : IHavePreProcessedPagingInfo
     {
         /// <summary>
         /// An enumerable list of the base non-decorated TEntity values.
@@ -20,7 +20,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
-        OffsetPageResults<TTargetType> OfType<TTargetType>() where TTargetType : class;
+        OffsetPageResults<TTargetType> OfType<TTargetType>();
 
         /// <summary>
         /// Convenience method to easily map/convert/project all types in the current page to a different object type
@@ -29,7 +29,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc"></param>
         /// <returns></returns>
-        OffsetPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class;
+        OffsetPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc);
 
         /// <summary>
         /// Convenience method to Wrap the current Page results as PreProcessedOffsetPageResults; to eliminate

@@ -5,6 +5,11 @@
     <RootNamespace>StarWars_AzureFunctions</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="RepoDb\**" />
+    <EmbeddedResource Remove="RepoDb\**" />
+    <None Remove="RepoDb\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\README.md" Link="README.md" />
   </ItemGroup>
   <ItemGroup>
@@ -27,8 +32,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="RepoDb\" />
   </ItemGroup>
 </Project>

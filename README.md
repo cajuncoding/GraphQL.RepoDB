@@ -64,10 +64,13 @@ NuGet package to your project, wire up your Starup middleware, and inject / inst
 
 
 ### Pending:
-1. TODO: Finish implementation of OffsetPaging support with RepoDB for Sql Server...
+1. TODO: Enforce HotChocolate configuration defaults for DefaultPageSize & MaxPageSize in RepoDB...
 1. TODO: Update Implementation summary detais below in README...
 
 ### Completed:
+1. Added full support for Offset Paging with RepoDB.
+1. Optimized the RepoDB extensions Cursor paging algorithm to no longer require the TotalCount to safely determine HasNextPage & HasPreviousPage paging metadata; this helps optimize both Cursor Paging and Offset paging queries.
+1. Added RepoDB support for of the new GraphQLParamsContext.IsTotalCountRequested property so that we now only compute the Count when actually requested.
 1. Added full support for Offset Paging as well as CursorPaging with matching capabilities - including models, extension methods to convert from IEnumerable, etc.
    - Added examples in the StarWars Azure Functions project using in-memory processing (RepoDb implementation is not complete).
 1. Added support to easily determine if TotalCount is selected (as it's a special case selection) to support potential performance optimizations within Resolver logic.

@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
 { 
     /// <summary>
     /// Custom Extensions to initialize the Sorting Middleware with compatibility for PreProcessed 
-    /// results, interfaces and IEnumerable decorator objects returend from Resolvers whereby Sorting
+    /// results, interfaces and IEnumerable decorator objects returned from Resolvers whereby Sorting
     /// was already implemented at the Resolver, or lower level, business logic.
     /// 
     /// This works in collaboration with OOTB Queryable functionality, intercepting only PreProcessed result

@@ -38,8 +38,8 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
             var queryableExecutor = base.CreateExecutor<TEntityType>(argumentName);
 
             //Construct the FieldMiddleware delegate dynamically:
-            //  - At runtime the HotChocolate middleware will all the delegate passing in 'next',
-            //  - Which in turn is a deleagate that will be called passing in 'context',
+            //  - At runtime the HotChocolate middleware will call the delegate passing in 'next',
+            //  - Which in turn is a delegate that will be called passing in 'context',
             //  - Which we then wire up to our handler 'ExecuteAsync' whereby we pass down both next & context
             //      for processing at request runtime.
             return next => (context) => ExecuteAsync(next, context);
@@ -56,7 +56,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
                 //If the result is a pre-processed result, we assume that Sorting was handled previously 
                 if (context.Result is IAmPreProcessedResult)
                 {
-                    //Since sorting is alreayd 'pre-processed' (e.g. by the Resolver) 
+                    //Since sorting is already 'pre-processed' (e.g. by the Resolver) 
                     //  we can immediately yield control back to the HotChocolate Pipeline
                     return;
                 }

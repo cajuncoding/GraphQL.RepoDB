@@ -12,7 +12,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// This class represents a single result/node of an edge/slice/page result set.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public interface ICursorResult<TEntity>
+    public interface ICursorResult<out TEntity>
     {
         //As a general cover-all solution, the Cursor should be an Index value (e.g. Sql ROW_NUMBER()) 
         // so that it can be efficiently queried with Between X & Y or greater than X and less than Y syntax!

@@ -10,5 +10,6 @@ namespace RepoDb.CursorPagination
         int? BeforeIndex { get; }
         int? First { get; }
         int? Last { get; }
+        bool IsTotalCountRequested { get; }
     }
 }

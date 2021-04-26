@@ -9,7 +9,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// This class represents a set of results/nodes of an edge/slice/page.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public interface ICursorPageSlice<TEntity> : IHavePreProcessedPagingInfo where TEntity : class
+    public interface ICursorPageSlice<TEntity> : IHavePreProcessedPagingInfo
     {
         /// <summary>
         /// The set of all CursorResults decorator classes for TEntity model with Cursor Index values.
@@ -25,7 +25,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
-        CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class;
+        CursorPageSlice<TTargetType> OfType<TTargetType>();
 
         /// <summary>
         /// Convenience method to easily map/convert/project all types in the current page to a different object type
@@ -34,7 +34,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc"></param>
         /// <returns></returns>
-        CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class;
+        CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc);
 
         /// <summary>
         /// Convenience method to Wrap the current Page Slice as PreProcessedCursorSliceResults; to eliminate

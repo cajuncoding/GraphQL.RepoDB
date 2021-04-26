@@ -16,20 +16,13 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class PreProcessedCursorSlice<TEntity> : List<TEntity>, IPreProcessedCursorSlice<TEntity>
-        where TEntity : class
     {
         public PreProcessedCursorSlice(ICursorPageSlice<TEntity> pageSlice)
         {
             this.CursorPage = pageSlice ?? throw new ArgumentNullException(nameof(pageSlice));
-            this.TotalCount = pageSlice.TotalCount ?? 0;
-
-            var firstCursor = pageSlice.CursorResults?.FirstOrDefault();
-            var lastCursor = pageSlice.CursorResults?.LastOrDefault();
-
-            //Now we can deduce if there are results before or after this slice based on the total count
-            //  and the ordinal index of the first and last cursors.
-            this.HasNextPage = lastCursor?.CursorIndex < this.TotalCount; //Cursor Index is 1 Based; the Count will match the Last Item
-            this.HasPreviousPage = firstCursor?.CursorIndex > 1; //Cursor Index is 1 Based; 0 would be the Cursor before the First
+            this.TotalCount = pageSlice.TotalCount;
+            this.HasNextPage = pageSlice.HasNextPage;
+            this.HasPreviousPage = pageSlice.HasPreviousPage;
 
             if(pageSlice.Results != null)
                 this.AddRange(pageSlice.Results);
@@ -46,7 +39,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         public IEnumerable<IndexEdge<TEntity>> ToEdgeResults()
         {
             //The Linq Selection provides IEnumerable for us...
-            //Note: thats why we do NOT call ToList() here so that consuming classes may provide additional filtering...
+            //Note: that's why we do NOT call ToList() here so that consuming classes may provide additional filtering...
             var results = this.CursorPage?.CursorResults
                 .Where(cr => cr != null)
                 .Select(cr => IndexEdge<TEntity>.Create(cr.Entity, cr.CursorIndex));

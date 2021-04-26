@@ -15,7 +15,6 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class PreProcessedSortedResults<TEntity> : List<TEntity>, IEnumerable<TEntity>, IAmPreProcessedResult
-        where TEntity : class
     {
         public PreProcessedSortedResults(IEnumerable<TEntity> results)
         {
@@ -35,7 +34,6 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
         /// <param name="enumerableItems"></param>
         /// <returns></returns>
         public static PreProcessedSortedResults<TEntity> AsPreProcessedSortResults<TEntity>(this IEnumerable<TEntity> enumerableItems)
-            where TEntity : class
         {
             if (enumerableItems == null) 
                 return null;

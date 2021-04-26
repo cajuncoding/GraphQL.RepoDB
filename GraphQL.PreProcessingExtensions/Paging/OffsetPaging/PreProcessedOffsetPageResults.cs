@@ -16,14 +16,13 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class PreProcessedOffsetPageResults<TEntity> : List<TEntity>, IPreProcessedOffsetPageResults<TEntity>
-        where TEntity : class
     {
         public PreProcessedOffsetPageResults(IOffsetPageResults<TEntity> pageResults)
         {
             if (pageResults == null)
                 throw new ArgumentNullException(nameof(pageResults));
 
-            this.TotalCount = pageResults?.TotalCount;
+            this.TotalCount = pageResults.TotalCount;
             this.HasNextPage = pageResults.HasNextPage;
             this.HasPreviousPage = pageResults.HasPreviousPage;
 
