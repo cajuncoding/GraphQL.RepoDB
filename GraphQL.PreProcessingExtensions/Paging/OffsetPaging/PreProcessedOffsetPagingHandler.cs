@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.PreProcessingExtensions.Paging;
 using HotChocolate.Utilities;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
@@ -17,7 +18,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         public PreProcessedOffsetPagingHandler(PagingOptions pagingOptions)
             : base(pagingOptions)
         {
-            this.PagingOptions = pagingOptions;
+            this.PagingOptions = pagingOptions.ClonePagingOptions();
         }
 
         /// <summary>
@@ -29,9 +30,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <param name="source"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        protected override async ValueTask<CollectionSegment> SliceAsync(IResolverContext context, object source, OffsetPagingArguments arguments)
-        #pragma warning restore CS1998 
+        protected override ValueTask<CollectionSegment> SliceAsync(IResolverContext context, object source, OffsetPagingArguments arguments)
         {
             //If Appropriate we handle the values here to ensure that no post-processing is done other than
             //  correctly mapping the results into a GraphQL Collection Segment with appropriate Paging Details...
@@ -60,7 +59,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
                     ct => new ValueTask<int>(totalCount ?? throw new InvalidOperationException())
                 );
 
-                return graphQLConnection;
+                return new ValueTask<CollectionSegment>(graphQLConnection);
             }
 
             throw new GraphQLException($"[{nameof(PreProcessedOffsetPagingHandler<TEntity>)}] cannot handle the specified data source of type [{source.GetType().Name}].");

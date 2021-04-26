@@ -65,7 +65,7 @@ namespace StarWars
                 {
                     DefaultPageSize = 10,
                     IncludeTotalCount = true,
-                    MaxPageSize = 100
+                    MaxPageSize = 5
                 })
                 .AddPreProcessedResultsExtensions()
                 //*******************************************************************************************

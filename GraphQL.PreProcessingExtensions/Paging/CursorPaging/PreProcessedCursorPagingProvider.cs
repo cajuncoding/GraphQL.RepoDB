@@ -6,13 +6,14 @@ using HotChocolate.Types.Pagination;
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
     /// <summary>
+    /// A Paging Provider for HotChocolate that provides No Operation during the execution
+    ///     of the Pipeline; because all processing was already completed within the Resolver method!
     /// 
-    /// Paging Provider for HotChocolate that provides No Operation during the execution
-    /// of the Pipeline!  This enables Pagination handling, dynamic Schema creation, dynamic
-    /// Connection class creation, etc. while allowing the actual pagination logic to be implemented
-    /// at a lower layer in the Resolvers or below (e.g. in Service or Repository classes that may 
-    /// already exist) so that the results are unaffected by the HotChocolate pipeline; because they
-    /// have already been pre-processed.
+    /// This enables Pagination handling, dynamic Schema creation, dynamic
+    ///     Connection class creation, etc. while allowing the actual pagination logic to be implemented
+    ///     at a lower layer in the Resolvers or below (e.g. in Service or Repository classes that may 
+    ///     already exist) so that the results are unaffected by the HotChocolate pipeline; because they
+    ///     have already been pre-processed.
     /// </summary>
     public class PreProcessedCursorPagingProvider : CursorPagingProvider
     {
@@ -34,7 +35,6 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// NOTE: Borrowed from QueryableCursorPagingProvider implementation of HotChocolate.
         /// </summary>
         /// <param name="source"></param>
-        /// <param name="options"></param>
         /// <returns></returns>
         public override bool CanHandle(IExtendedType source)
         {

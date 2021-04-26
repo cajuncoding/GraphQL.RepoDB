@@ -38,8 +38,8 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
             var queryableExecutor = base.CreateExecutor<TEntityType>(argumentName);
 
             //Construct the FieldMiddleware delegate dynamically:
-            //  - At runtime the HotChocolate middleware will all the delegate passing in 'next',
-            //  - Which in turn is a deleagate that will be called passing in 'context',
+            //  - At runtime the HotChocolate middleware will call the delegate passing in 'next',
+            //  - Which in turn is a delegate that will be called passing in 'context',
             //  - Which we then wire up to our handler 'ExecuteAsync' whereby we pass down both next & context
             //      for processing at request runtime.
             return next => (context) => ExecuteAsync(next, context);
