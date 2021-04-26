@@ -97,16 +97,22 @@ namespace RepoDb.CursorPagination
 
             if (includeTotalCountQuery)
             {
-                //Look for PKey Field to use as the Count Column... as this just makes sense...
-                //NOTE: COUNT(1) may not work as expected when column permission are in use, so we use a real field.
-                var countField = PropertyCache.Get<TEntity>().FirstOrDefault(p => p.GetPrimaryAttribute() != null)?.AsField()
-                                    ?? selectFields.FirstOrDefault();
+                //////Look for PKey Field to use as the Count Column... as this just makes sense...
+                //////NOTE: COUNT(1) may not work as expected when column permission are in use, so we use a real field.
+                //////NOTE: 
+                ////var countField = PropertyCache.Get<TEntity>().FirstOrDefault(p => p.GetPrimaryAttribute() != null)?.AsField()
+                ////                    ?? selectFields.FirstOrDefault();
 
                 //Add SECOND Count Query into the Query so it can be executed as an efficient MultipleQuery!
                 //NOTE: For optimization we do not need to Sort or, select more than one field to get the Total Count,
                 //      the only thing that changes this result is the Where filter fields!
+                //NOTE: TO FIX RISK of Null values being skipped by the Count aggregation, this is changed to use the standard COUNT(*),
+                //      which is RepoDb's default behavior if field is null, to ensure that we get the true row count and nothing is
+                //      eliminated due to Null values.
+                //NOTE We also rely on SqlServer to optimize this query instead of trying to do too much ourselves (with other unknown risks
+                //      such as column permissions, etc.
                 builder.Select()
-                    .Count(countField, dbSetting)
+                    .Count(null, dbSetting)
                     .From().TableNameFrom(tableName, dbSetting)
                     .HintsFrom(hints)
                     .WhereFrom(where, dbSetting)
