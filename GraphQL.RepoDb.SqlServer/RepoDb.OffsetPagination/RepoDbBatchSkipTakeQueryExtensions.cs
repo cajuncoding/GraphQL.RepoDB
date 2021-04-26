@@ -82,7 +82,7 @@ namespace RepoDb.OffsetPagination
                 logTrace: logTrace,
                 cancellationToken: cancellationToken,
                 computeTotalCount: computeTotalCount
-            );
+            ).ConfigureAwait(false);
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
             return sliceResults.ToOffsetPageResults();
@@ -157,7 +157,7 @@ namespace RepoDb.OffsetPagination
                 logTrace: logTrace,
                 cancellationToken: cancellationToken,
                 computeTotalCount: computeTotalCount
-            );
+            ).ConfigureAwait(false);
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
             return sliceResults.ToOffsetPageResults();
@@ -228,7 +228,7 @@ namespace RepoDb.OffsetPagination
                 logTrace: logTrace,
                 cancellationToken: cancellationToken,
                 computeTotalCount: computeTotalCount
-            );
+            ).ConfigureAwait(false); 
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
             return sliceResults.ToOffsetPageResults(); ;
@@ -301,7 +301,7 @@ namespace RepoDb.OffsetPagination
                 logTrace: logTrace,
                 cancellationToken: cancellationToken, 
                 computeTotalCount: computeTotalCount
-            );
+            ).ConfigureAwait(false);
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
             return sliceResults.ToOffsetPageResults(); ;

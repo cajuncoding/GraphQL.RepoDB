@@ -13,6 +13,7 @@
     <PackageReleaseNotes>
       - Minor code cleanup and optimizations and removed duplicated validation.
       - Eliminated dependency on Total Count to compute HasNextPage; this enalbed optimizing the paging algorthims in RepoDB (and other consuming libraries).
+      - Eliminate dependency on Generic Class type constraint for Paging as this is not a restriction of the HC Core, now primitive return types are supported.
       - Enabled OffsetPaging parameters to be completely optional and default to retrieving all results, unless manually enforced by the Resolver or PagingMiddleware via PagingHandler (which is where HC core implements existing validation).
 
 

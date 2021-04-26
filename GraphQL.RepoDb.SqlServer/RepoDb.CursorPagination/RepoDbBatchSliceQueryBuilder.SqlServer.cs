@@ -138,16 +138,16 @@ namespace RepoDb.CursorPagination
             //  unexpected set of results (e.g. none).
             if (after.HasValue && before.HasValue && after > before)
             {
-                throw new ArgumentException($"The cursor values are invalid; the '{CursorPagingArgNames.AfterDescription}' cursor " +
-                    $"must occur before the '{CursorPagingArgNames.BeforeDescription}' cursor argument.");
+                throw new ArgumentException($"The cursor values are invalid; the '{CursorPagingArgNames.After}' cursor " +
+                    $"must occur before the '{CursorPagingArgNames.Before}' cursor argument.");
             }
 
             //Implement Exception as defined by Relay Spec.
             if (first.HasValue && first < 0)
             {
                 throw new ArgumentException(
-                    $"The value for '{CursorPagingArgNames.FirstDescription}' must be greater than zero.",
-                    CursorPagingArgNames.FirstDescription
+                    $"The value for '{CursorPagingArgNames.First}' must be greater than zero.",
+                    CursorPagingArgNames.First
                 );
             }
 
@@ -155,8 +155,8 @@ namespace RepoDb.CursorPagination
             if (last.HasValue && last < 0)
             {
                 throw new ArgumentException(
-                    $"The value for '{CursorPagingArgNames.LastDescription}' must be greater than zero.",
-                    CursorPagingArgNames.LastDescription
+                    $"The value for '{CursorPagingArgNames.Last}' must be greater than zero.",
+                    CursorPagingArgNames.Last
                 );
             }
 

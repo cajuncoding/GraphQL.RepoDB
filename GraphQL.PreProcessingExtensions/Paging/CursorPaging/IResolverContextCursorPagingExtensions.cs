@@ -20,10 +20,10 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         public static CursorPagingArguments GetCursorPagingArgsSafely(this IResolverContext context)
         {
             var pagingArgs = new CursorPagingArguments(
-                first: context?.ArgumentValueSafely<int?>(CursorPagingArgNames.FirstDescription),
-                after: context?.ArgumentValueSafely<string>(CursorPagingArgNames.AfterDescription),
-                last: context?.ArgumentValueSafely<int?>(CursorPagingArgNames.LastDescription),
-                before: context?.ArgumentValueSafely<string>(CursorPagingArgNames.BeforeDescription)
+                first: context?.ArgumentValueSafely<int?>(CursorPagingArgNames.First),
+                after: context?.ArgumentValueSafely<string>(CursorPagingArgNames.After),
+                last: context?.ArgumentValueSafely<int?>(CursorPagingArgNames.Last),
+                before: context?.ArgumentValueSafely<string>(CursorPagingArgNames.Before)
             );
 
             return pagingArgs;

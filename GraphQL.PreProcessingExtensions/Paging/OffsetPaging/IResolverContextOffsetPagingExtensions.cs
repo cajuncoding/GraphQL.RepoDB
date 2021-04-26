@@ -19,8 +19,8 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <returns></returns>
         public static OffsetPagingArguments GetOffsetPagingArgsSafely(this IResolverContext context)
         {
-            int? skip = context?.ArgumentValueSafely<int?>(OffsetPagingArgNames.SkipDescription);
-            int? take = context?.ArgumentValueSafely<int?>(OffsetPagingArgNames.TakeDescription);
+            int? skip = context?.ArgumentValueSafely<int?>(OffsetPagingArgNames.Skip);
+            int? take = context?.ArgumentValueSafely<int?>(OffsetPagingArgNames.Take);
 
             //Initialize with default values that enable default behaviour to retrieve all results anytime
             //  the values are not specified; consistent with Cursor based paging where all params are optional.

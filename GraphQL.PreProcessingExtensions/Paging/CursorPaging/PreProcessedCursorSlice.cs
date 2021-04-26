@@ -16,7 +16,6 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class PreProcessedCursorSlice<TEntity> : List<TEntity>, IPreProcessedCursorSlice<TEntity>
-        where TEntity : class
     {
         public PreProcessedCursorSlice(ICursorPageSlice<TEntity> pageSlice)
         {

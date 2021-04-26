@@ -11,7 +11,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// This class generally to be used by libraries and/or lower level code that executes queries and renders page results.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class CursorPageSlice<TEntity> : ICursorPageSlice<TEntity> where TEntity : class
+    public class CursorPageSlice<TEntity> : ICursorPageSlice<TEntity>
     {
         public CursorPageSlice(IEnumerable<ICursorResult<TEntity>> results, int? totalCount, bool hasPreviousPage, bool hasNextPage)
         {
@@ -23,7 +23,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 
         public IEnumerable<ICursorResult<TEntity>> CursorResults { get; protected set; }
 
-        public IEnumerable<TEntity> Results => CursorResults?.Select(cr => cr?.Entity);
+        public IEnumerable<TEntity> Results => CursorResults?.Select(cr => cr.Entity);
 
         public int? TotalCount { get; }
 
@@ -37,17 +37,19 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
-        public CursorPageSlice<TTargetType> OfType<TTargetType>() where TTargetType : class
+        public CursorPageSlice<TTargetType> OfType<TTargetType>()
         {
-            var results = this.CursorResults?.Select(r => {
+            var enumerableResults = this.CursorResults
+                .Select(r =>
+                {
                     // ReSharper disable once ConvertToLambdaExpression
-                    return r?.Entity is TTargetType targetType
-                    ? new CursorResult<TTargetType>(targetType, r.CursorIndex)
-                    : null;
-            })
-            .Where(cr => cr != null);
-            
-            return new CursorPageSlice<TTargetType>(results, this.TotalCount, this.HasPreviousPage, this.HasNextPage);
+                    return r.Entity is TTargetType entityAsTargetType
+                        ? new CursorResult<TTargetType>(entityAsTargetType, r.CursorIndex)
+                        : null;
+                })
+                .Where(c => c != null);
+
+            return new CursorPageSlice<TTargetType>(enumerableResults, this.TotalCount, this.HasPreviousPage, this.HasNextPage);
         }
 
         /// <summary>
@@ -57,8 +59,9 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc">Specify the Func that takes the current type in and returns the target type.</param>
         /// <returns></returns>
-        public CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc) where TTargetType : class
+        public CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
         {
+            if (mappingFunc == null) throw new ArgumentException(nameof(mappingFunc));
             var results = this.CursorResults?.Select(r =>
             {
                 var mappedEntity = mappingFunc(r.Entity);

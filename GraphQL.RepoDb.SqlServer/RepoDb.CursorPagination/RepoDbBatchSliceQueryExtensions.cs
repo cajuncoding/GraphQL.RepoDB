@@ -507,13 +507,6 @@ namespace RepoDb.CursorPagination
             int? totalCount
         ) where TEntity : class
         {
-            ////Determine the paging metadata from the results...
-
-            //Now we can deduce if there are results before or after this slice based on the total count
-            //  and the ordinal index of the first and last cursors.
-            //var hasPreviousPage = firstCursor?.CursorIndex > 1; //Cursor Index is 1 Based; 0 would be the Cursor before the First
-            //var hasNextPage = lastCursor?.CursorIndex < totalCount; //Cursor Index is 1 Based; the Count will match the Last Item
-
             bool hasPreviousPage = false;
             bool hasNextPage = false;
 
@@ -530,8 +523,6 @@ namespace RepoDb.CursorPagination
                 //  (e.g. ExpectedCount might be int.MaxValue which would ensure our Take is always successful to get ALL Results).
                 if (sqlQuerySliceInfo.IsEndIndexOverFetchedForNextPageCheck && sqlQuerySliceInfo.ExpectedCount < int.MaxValue)
                 {
-                    //var lastCursor = results.LastOrDefault();
-                    //hasNextPage = lastCursor?.CursorIndex > sqlQuerySliceInfo.ExpectedCount; //Cursor Index is 1 Based; the Count will match the Last Item
                     hasNextPage = results.Count > sqlQuerySliceInfo.ExpectedCount;
                     if (hasNextPage)
                     {
