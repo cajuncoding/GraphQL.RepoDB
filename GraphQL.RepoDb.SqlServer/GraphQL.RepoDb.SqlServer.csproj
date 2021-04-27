@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>11.2.2.1</Version>
+    <Version>11.2.2.2</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
     <Description>A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, &amp; Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.</Description>
@@ -12,9 +12,14 @@
     <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
     <PackageReleaseNotes>
-      -Bugfix where Count could be incorrect due to potential null values skipped by Sql Server Count() aggregation over specific field vs '*'.
+      - Breaking change but simplified the RepoDB Custom extension methods for CursorPaging and OffsetPaging to take in IRepoDbCursorPagingParams and IRepoDbOffsetPagingParams respectively instead of discrete values.
+      - This helps minimizes the risk of the issue arising from the Optimization to not rely on TotalCount; it introduced a non-intuitive breaking change in the ReboDB Custom extensions whereby the new 'IsTotalCountRequested' param from the GraphQLParamsContext must be explicitly provided.
+      - This also makes future enhancements easier and the method signatures more maintainable going forward.
+      - Also need to highlight another potential issue from the code optimization: Now the Cursor and Offset paging arguments are fully optional and both will default with consistent behavior to retrieve all data.  
+      - Therefore Any enforcement to require paging args or limit the data if they are not provided must now be done by the consuming code; this helps the library be less opinionated and flexible but may now open prior uses to selecting more data than intended; this may be improved with configuration value in a future release.
 
       Prior Releases Notes:
+      - Bugfix where Count could be incorrect due to potential null values skipped by Sql Server Count() aggregation over specific field vs '*'.
       - Bump HotChocolate version to v11.2.2 stable and sync Nuget version.
       - Bump RepoDB (Sql Server) version to v1.1.3 stable
       - Optimized paging algorithm to eliminate the dependency on TotalCount for computing HasPreviousPage/HasNextPage paging metadata.
@@ -29,8 +34,8 @@
       - Bump to HotChocolate v11.0.1 which now resolves a bug that we helped identify with interfaces in the initial release of v11.0.0.
       - Fix issue with Sort/OrderBy field not working if not also part of Selection. OffsetPaging is not working, it's still work in progress. But this release provides ability to trace log out some details for the query, execution time, etc. Also improves support for cancellation token throughout DB calls and minor optimizations and cleanup.
     </PackageReleaseNotes>
-    <AssemblyVersion>11.2.2.1</AssemblyVersion>
-    <FileVersion>11.2.2.1</FileVersion>
+    <AssemblyVersion>11.2.2.2</AssemblyVersion>
+    <FileVersion>11.2.2.2</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -161,9 +161,9 @@ namespace HotChocolate.RepoDb
             var graphQLPagingArgs = this.GraphQLParamsContext.CursorPagingArgs;
 
             return new RepoDbCursorPagingParams(
+                afterCursor: graphQLPagingArgs.After,
                 first: graphQLPagingArgs.First,
-                after: graphQLPagingArgs.After,
-                before: graphQLPagingArgs.Before,
+                beforeCursor: graphQLPagingArgs.Before,
                 last: graphQLPagingArgs.Last,
                 isTotalCountRequested: this.GraphQLParamsContext.IsTotalCountRequested
             );

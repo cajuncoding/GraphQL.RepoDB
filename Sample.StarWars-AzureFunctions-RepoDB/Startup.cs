@@ -7,6 +7,10 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using HotChocolate.AzureFunctionsProxy;
 using Microsoft.Data.SqlClient;
 using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using HotChocolate.Types.Pagination;
 
 //CRITICAL: Here we self-wire up the Startup into the Azure Functions framework!
@@ -63,7 +67,7 @@ namespace StarWars
                 //NOTE: This Adds Sorting & Paging providers/conventions by default!
                 .SetPagingOptions(new PagingOptions()
                 {
-                    DefaultPageSize = 10,
+                    DefaultPageSize = 2,
                     IncludeTotalCount = true,
                     MaxPageSize = 5
                 })

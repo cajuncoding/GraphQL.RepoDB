@@ -34,8 +34,7 @@ namespace RepoDb.OffsetPagination
         /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
@@ -50,8 +49,7 @@ namespace RepoDb.OffsetPagination
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> where,
-            int? skip = null, 
-            int? take = null,
+            IRepoDbOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -72,16 +70,14 @@ namespace RepoDb.OffsetPagination
                 orderBy: orderBy,
                 //NOTE: Expression is required to prevent Ambiguous Signatures
                 where: where,
-                afterCursor: skip,
-                firstTake: take,
+                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
                 tableName: tableName,
                 hints: hints,
                 fields: fields,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken,
-                computeTotalCount: computeTotalCount
+                cancellationToken: cancellationToken
             ).ConfigureAwait(false);
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
@@ -110,31 +106,27 @@ namespace RepoDb.OffsetPagination
         /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
         /// <param name="tableName"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="computeTotalCount"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup where = null,
-            int? skip = null,
-            int? take = null,
+            IRepoDbOffsetPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default,
-            bool computeTotalCount = false
+            CancellationToken cancellationToken = default
             )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
@@ -147,16 +139,14 @@ namespace RepoDb.OffsetPagination
                 orderBy: orderBy,
                 //NOTE: Expression is required to prevent Ambiguous Signatures
                 where: where,
-                afterCursor: skip,
-                firstTake: take,
+                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
                 tableName: tableName,
                 hints: hints,
                 fields: fields,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken,
-                computeTotalCount: computeTotalCount
+                cancellationToken: cancellationToken
             ).ConfigureAwait(false);
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
@@ -184,23 +174,20 @@ namespace RepoDb.OffsetPagination
         /// <param name="dbConnection">Extends the RepoDb BaseRepository abstraction</param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="computeTotalCount"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> where,
-            int? skip = null,
-            int? take = null,
+            IRepoDbOffsetPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             int? commandTimeout = null,
@@ -219,15 +206,13 @@ namespace RepoDb.OffsetPagination
                 orderBy: orderBy,
                 //NOTE: Expression is required to prevent Ambiguous Signatures
                 where: where,
-                afterCursor: skip,
-                firstTake: take,
+                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
                 hints: hints,
                 fields: fields,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken,
-                computeTotalCount: computeTotalCount
+                cancellationToken: cancellationToken
             ).ConfigureAwait(false); 
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
@@ -255,8 +240,7 @@ namespace RepoDb.OffsetPagination
         /// <param name="dbConnection">Extends the RepoDb BaseRepository abstraction</param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
@@ -264,22 +248,19 @@ namespace RepoDb.OffsetPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="computeTotalCount"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             QueryGroup where = null,
-            int? skip = null,
-            int? take = null,
+            IRepoDbOffsetPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default,
-            bool computeTotalCount = false
+            CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
@@ -291,16 +272,14 @@ namespace RepoDb.OffsetPagination
                 orderBy: orderBy,
                 //NOTE: Expression is required to prevent Ambiguous Signatures
                 where: where,
-                afterCursor: skip,
-                firstTake: take,
+                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
                 hints: hints,
                 fields: fields,
                 tableName: tableName,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken, 
-                computeTotalCount: computeTotalCount
+                cancellationToken: cancellationToken
             ).ConfigureAwait(false);
 
             //Map the Slice into the OffsetPageResults for simplified processing by calling code...
@@ -322,6 +301,15 @@ namespace RepoDb.OffsetPagination
                 cursorPageSlice.HasNextPage,
                 cursorPageSlice.HasPreviousPage,
                 cursorPageSlice.TotalCount
+            );
+        }
+
+        private static IRepoDbCursorPagingParams ConvertOffsetParamsToCursorParams(IRepoDbOffsetPagingParams offsetParams)
+        {
+            return new RepoDbCursorPagingParams(
+                after: offsetParams?.Skip,
+                first: offsetParams?.Take,
+                isTotalCountRequested: offsetParams?.IsTotalCountRequested ?? false
             );
         }
     }

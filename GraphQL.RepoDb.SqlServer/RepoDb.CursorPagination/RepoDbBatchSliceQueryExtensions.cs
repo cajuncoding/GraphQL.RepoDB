@@ -34,12 +34,9 @@ namespace RepoDb.CursorPagination
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDbConnection"></typeparam>
         /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
@@ -47,43 +44,36 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="computeTotalCount"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> where,
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
+            IRepoDbCursorPagingParams pagingParams,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default,
-            bool computeTotalCount = false
+            CancellationToken cancellationToken = default
             )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection
         {
             return await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
-                    afterCursor: afterCursor,
-                    firstTake: firstTake,
-                    beforeCursor: beforeCursor,
-                    lastTake: lastTake,
                     orderBy: orderBy,
                     where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
+                    pagingParams: pagingParams,
                     hints: hints,
                     fields: fields,
                     tableName: tableName,
                     commandTimeout: commandTimeout,
                     transaction: transaction,
                     logTrace: logTrace,
-                    cancellationToken: cancellationToken,
-                    computeTotalCount: computeTotalCount
+                    cancellationToken: cancellationToken
             ).ConfigureAwait(false);
         }
 
@@ -103,12 +93,9 @@ namespace RepoDb.CursorPagination
         /// <typeparam name="TEntity"></typeparam>
         /// <typeparam name="TDbConnection"></typeparam>
         /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
@@ -116,23 +103,20 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="computeTotalCount"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup where = null,
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
+            IRepoDbCursorPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default,
-            bool computeTotalCount = false
-            )
+            CancellationToken cancellationToken = default
+        )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection
@@ -143,20 +127,16 @@ namespace RepoDb.CursorPagination
             try
             {
                 var cursorPageResult = await connection.GraphQLBatchSliceQueryAsync<TEntity>(
-                    afterCursor: afterCursor,
-                    firstTake: firstTake,
-                    beforeCursor: beforeCursor,
-                    lastTake: lastTake,
                     orderBy: orderBy,
                     where: where,
+                    pagingParams: pagingParams,
                     hints: hints,
                     fields: fields,
                     tableName: tableName,
                     commandTimeout: commandTimeout,
                     transaction: transaction,
                     logTrace: logTrace,
-                    cancellationToken: cancellationToken,
-                    computeTotalCount: computeTotalCount
+                    cancellationToken: cancellationToken
                 ).ConfigureAwait(false);
 
                 return cursorPageResult;
@@ -188,52 +168,42 @@ namespace RepoDb.CursorPagination
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends DbConnection directly</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="computeTotalCount"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> where,
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
+            IRepoDbCursorPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default,
-            bool computeTotalCount = false
-            )
+            CancellationToken cancellationToken = default
+        )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
             return await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
-                afterCursor: afterCursor,
-                firstTake: firstTake,
-                beforeCursor: beforeCursor,
-                lastTake: lastTake,
                 orderBy: orderBy,
                 where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
+                pagingParams: pagingParams,
                 hints: hints,
                 fields: fields,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
-                cancellationToken: cancellationToken,
-                computeTotalCount: computeTotalCount
+                cancellationToken: cancellationToken
             ).ConfigureAwait(false);
         }
 
@@ -252,12 +222,9 @@ namespace RepoDb.CursorPagination
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends DbConnection directly</param>
-        /// <param name="afterCursor"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursor"></param>
-        /// <param name="lastTake"></param>
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
+        /// <param name="pagingParams"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
@@ -265,22 +232,19 @@ namespace RepoDb.CursorPagination
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="computeTotalCount"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
-            QueryGroup where = null, 
-            int? afterCursor = null, int? firstTake = null,
-            int? beforeCursor = null, int? lastTake = null,
+            QueryGroup where = null,
+            IRepoDbCursorPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
-            CancellationToken cancellationToken = default,
-            bool computeTotalCount = false
+            CancellationToken cancellationToken = default
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
@@ -317,12 +281,12 @@ namespace RepoDb.CursorPagination
                 orderBy: orderBy,
                 where: where,
                 hints: hints,
-                afterCursorIndex: afterCursor,
-                firstTake: firstTake,
-                beforeCursorIndex: beforeCursor,
-                lastTake: lastTake,
+                afterCursorIndex: pagingParams?.AfterIndex,
+                firstTake: pagingParams?.First,
+                beforeCursorIndex: pagingParams?.BeforeIndex,
+                lastTake: pagingParams?.Last,
                 //Optionally we compute the Total Count only when requested!
-                includeTotalCountQuery: computeTotalCount
+                includeTotalCountQuery: pagingParams?.IsTotalCountRequested ?? false
             );
 
             //Now we can execute the process and get the results!

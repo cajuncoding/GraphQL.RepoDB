@@ -58,11 +58,7 @@ namespace StarWars.Repositories
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
                 fields: selectFields,
                 orderBy: sortFields ?? DefaultCharacterSortFields,
-                afterCursor: pagingParams.AfterIndex!,
-                beforeCursor: pagingParams.BeforeIndex!,
-                firstTake: pagingParams.First,
-                lastTake: pagingParams.Last,
-                computeTotalCount: pagingParams.IsTotalCountRequested,
+                pagingParams: pagingParams,
                 logTrace: s => Debug.WriteLine(s),
                 commandTimeout: 15
             );
@@ -80,9 +76,7 @@ namespace StarWars.Repositories
             await using var sqlConn = CreateConnection();
 
             var offsetPageResults = await sqlConn.GraphQLBatchSkipTakeQueryAsync<CharacterDbModel>(
-                skip: pagingParams.Skip,
-                take: pagingParams.Take,
-                computeTotalCount: pagingParams.IsTotalCountRequested,
+                pagingParams: pagingParams,
                 orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields
             );
@@ -103,11 +97,7 @@ namespace StarWars.Repositories
                 orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields,
                 where: c => c.Id >=1000 && c.Id <= 1999,
-                afterCursor: pagingParams.AfterIndex!,
-                beforeCursor: pagingParams.BeforeIndex!,
-                firstTake: pagingParams.First,
-                lastTake: pagingParams.Last,
-                computeTotalCount: pagingParams.IsTotalCountRequested,
+                pagingParams: pagingParams,
                 commandTimeout: 15
             );
 
@@ -144,11 +134,7 @@ namespace StarWars.Repositories
                 where: f => f.FriendOfId == characterId,
                 //Always include a Default Sort Order (for paging)
                 orderBy: OrderField.Parse(new { Name = Order.Ascending }),
-                afterCursor: pagingParams.AfterIndex,
-                firstTake: pagingParams.First,
-                beforeCursor: pagingParams.BeforeIndex,
-                lastTake: pagingParams.Last,
-                computeTotalCount: pagingParams.IsTotalCountRequested,
+                pagingParams: pagingParams,
                 commandTimeout: 15
             );
 

@@ -12,14 +12,25 @@ namespace RepoDb.CursorPagination
     /// </summary>
     public class RepoDbCursorPagingParams : IRepoDbCursorPagingParams
     {
-        public RepoDbCursorPagingParams(int? first = null, int? last = null, string? after = null, string? before = null, bool isTotalCountRequested = false)
+        public RepoDbCursorPagingParams(int? first = null, int? last = null, string? afterCursor = null, string? beforeCursor = null, bool isTotalCountRequested = false)
         {
             this.First = first;
             this.Last = last;
-            this.After = after;
-            this.Before = before;
-            this.AfterIndex = DeserializeCursor(after);
-            this.BeforeIndex = DeserializeCursor(before);
+            this.After = afterCursor;
+            this.Before = beforeCursor;
+            this.AfterIndex = DeserializeCursor(afterCursor);
+            this.BeforeIndex = DeserializeCursor(beforeCursor);
+            this.IsTotalCountRequested = isTotalCountRequested;
+        }
+
+        public RepoDbCursorPagingParams(int? after = null, int? first = null, int? before = null, int ? last = null, bool isTotalCountRequested = false)
+        {
+            this.First = first;
+            this.Last = last;
+            this.AfterIndex = after;
+            this.BeforeIndex = before;
+            this.After = SerializeCursor(after);
+            this.Before = SerializeCursor(before);
             this.IsTotalCountRequested = isTotalCountRequested;
         }
 

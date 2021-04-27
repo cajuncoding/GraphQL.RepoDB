@@ -64,7 +64,6 @@ NuGet package to your project, wire up your Starup middleware, and inject / inst
 
 
 ### Pending:
-1. TODO: Enforce HotChocolate configuration defaults for DefaultPageSize & MaxPageSize in RepoDB...
 1. TODO: Update Implementation summary detais below in README...
 
 ### Completed:
@@ -124,7 +123,7 @@ is only availalbe in a lighter weight (bare-metal) ORM like Dapper or RepoDb.
    - Architecturally, you need to maintain a greater decoupling of your processing logic from
 being depending on HotChocolate post-processing of IQueryable yet still have Sorting/Paging, etc.
 middleware as part of v11. :-)
-3. **DISCLAIMER: Limited Testing has been done on this but I am actively using it on projects, 
+3. **DISCLAIMER: Testing has been done on my use-cases and I am actively using it on projects, 
 and will update with any findings. And features are being added as this project evolves.**
 
 ## Goals
@@ -151,11 +150,11 @@ helpers for Dapper could be similarly created).
 this by using Decorator classes/interfaces only as needed.
 
 
-## Implementation:
+## Implementation Notes:
 *TODO... add implementation summary*
 
 *NOTE: The HotChocolate default behaviour will occur anytime a normal IEnumerable or IQueryable result
-is returned. This ia accomplished by ensuring that the new Sorring/Paging Providers have 
+is returned. This is accomplished by ensuring that the new Sorting/Paging Providers have 
 "right of first refusal" for handling, but will always default back to the existing HotChocolate Queryable 
 implementations.*
 
@@ -265,7 +264,7 @@ namespace StarWars.Characters
         {
                 var paramsContext = new GraphQLParamsContext(resolverContext);
                 
-                ...... now you can work with selections, sort args, etc. easily.....
+                ...... now you can work with selections, sort args, paging arguments (including IsTotalCountRequested) etc. easily.....
         {
 ```
 
@@ -281,9 +280,9 @@ namespace StarWars.Characters
    * You can also configure a dependency for any Field via the IObjectFieldDescriptor.ConfigureContextData() method
         and the custom extension provided by this project as shown below.
 
-##### PreProcessingDependencies - Pure Code First
+##### PreProcessing Field Dependencies from optimized Selection/Projections - Annotation Based (aka Pure Code First)
 ```csharp
-    //Here we define an extension to the Human Query and expose a 'droids' field via our virtual resolver.
+    //Here we define an extension to the Human GraphQL type and expose a 'droids' field via our virtual resolver.
     [ExtendObjectType(nameof(Human))]
     public class HumanFieldResolvers
     {

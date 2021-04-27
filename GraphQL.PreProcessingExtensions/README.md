@@ -49,14 +49,15 @@ To use this in your project, add the [GraphQL.PreprocessingExtensions](https://w
 NuGet package to your project and wire up your Starup  middleware and inject / instantiate params in your resolvers as outlined below...
 
 ### Pending:
-1. TODO: Finish implementation of OffsetPaging support with RepoDB for Sql Server...
+1. TODO: Enforce HotChocolate configuration defaults for DefaultPageSize in RepoDB... (MaxPageSize is already enforced by HC core default Paging Handlers).
+   - This requires a change in HC Core to allow methods to be customized that are currently *not virtual* on the default Paging Handlers. 
 1. TODO: Update Implementation summary detais below in README...
 
 ### Completed:
 1. Added full support for Offset Paging as well as CursorPaging with matching capabilities - including models, extension methods to convert from IEnumerable, etc.
-   - Added examples in the StarWars Azure Functions project using in-memory processing (RepoDb implementation is not complete).
-   - `graphQLParamsContext.IsTotalCountRequested` 
+   - Added examples in the StarWars Azure Functions project using in-memory processing (RepoDB Sql Server implementation is also complete).
 1. Added support to easily determine if TotalCount is selected (as it's a special case selection) to support potential performance optimizations within Resolver logic.
+   - `graphQLParamsContext.IsTotalCountRequested` 
 1. Added more Unit test coverage for Selections, and Paging implmentations
 1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
 1. Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
@@ -106,7 +107,7 @@ is only availalbe in a lighter weight (bare-metal) ORM like Dapper or RepoDb.
    - Architecturally, you need to maintain a greater decoupling of your processing logic from
 being depending on HotChocolate post-processing of IQueryable yet still have Sorting/Paging, etc.
 middleware as part of v11. :-)
-3. **DISCLAIMER: Limited Testing has been done on this but I am actively using it on projects, 
+3. **DISCLAIMER: Testing has been done on my use-cases and I am actively using it on projects, 
 and will update with any findings. And features are being added as this project evolves.**
 
 ## Goals
@@ -137,7 +138,7 @@ this by using Decorator classes/interfaces only as needed.
 *TODO... add implementation summary*
 
 *NOTE: The HotChocolate default behaviour will occur anytime a normal IEnumerable or IQueryable result
-is returned. This ia accomplished by ensuring that the new Sorring/Paging Providers have 
+is returned. This is accomplished by ensuring that the new Sorting/Paging Providers have 
 "right of first refusal" for handling, but will always default back to the existing HotChocolate Queryable 
 implementations.*
 
@@ -263,9 +264,9 @@ namespace StarWars.Characters
    * You can also configure a dependency for any Field via the IObjectFieldDescriptor.ConfigureContextData() method
         and the custom extension provided by this project as shown below.
 
-##### PreProcessingDependencies - Pure Code First
+##### PreProcessing Field Dependencies from optimized Selection/Projections - Annotation Based (aka Pure Code First)
 ```csharp
-    //Here we define an extension to the Human Query and expose a 'droids' field via our virtual resolver.
+    //Here we define an extension to the Human GraphQL type and expose a 'droids' field via our virtual resolver.
     [ExtendObjectType(nameof(Human))]
     public class HumanFieldResolvers
     {
@@ -295,7 +296,7 @@ namespace StarWars.Characters
     }
 ```
 
-##### PreProcessingDependencies - Code First (Manually wire-up via HotChocolate Configuration)
+##### PreProcessing Field Dependencies from optimized Selection/Projections - Code First (Manually wire-up via HotChocolate Configuration)
 ```csharp
 public class HumanType : ObjectType<Human>
 {
