@@ -58,7 +58,7 @@ namespace RepoDb.OffsetPagination
             Action<string> logTrace = null,
             CancellationToken cancellationToken = default,
             bool computeTotalCount = false
-            )
+        )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection

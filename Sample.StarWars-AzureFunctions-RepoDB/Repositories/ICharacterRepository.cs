@@ -37,7 +37,7 @@ namespace StarWars.Repositories
 
         Task<ICursorPageSlice<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams);
 
-        Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(params int[] ids);
+        Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(IEnumerable<Field> selectFields, int[] ids);
         
         Task<ICharacter> GetHeroAsync(Episode episode);
         

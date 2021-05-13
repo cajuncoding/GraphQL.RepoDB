@@ -10,17 +10,17 @@ namespace RepoDb
 {
     public static class RepoDbHelperConnectionExtensions
     {
-        public static async Task<IEnumerable<Field>> GetValidatedDbFields<TEntity>(
+        public static async Task<IEnumerable<Field>> GetValidatedDbFieldsAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<Field> selectFields
         )
         {
             var tableName = ClassMappedNameCache.Get<TEntity>();
-            var safeSelectFields = await dbConnection.GetValidatedDbFields(tableName, selectFields).ConfigureAwait(false);
+            var safeSelectFields = await dbConnection.GetValidatedDbFieldsAsync(tableName, selectFields).ConfigureAwait(false);
             return safeSelectFields;
         }
 
-        public static async Task<IEnumerable<Field>> GetValidatedDbFields(
+        public static async Task<IEnumerable<Field>> GetValidatedDbFieldsAsync(
             this DbConnection dbConnection,
             string tableName,
             IEnumerable<Field> selectFields
@@ -29,7 +29,7 @@ namespace RepoDb
             if (dbConnection == null || selectFields == null || string.IsNullOrWhiteSpace(tableName))
                 return null;
 
-            //FILTER for only VALID fields from the seleciton by safely comparing to the valid fields from the DB Schema!
+            //FILTER for only VALID fields from the selection by safely comparing to the valid fields from the DB Schema!
             //NOTE: Per RepoDb source we need to compare unquoted names to get pure matches...
             var dbSetting = dbConnection.GetDbSetting();
             var dbFields = await DbFieldCache
@@ -37,22 +37,22 @@ namespace RepoDb
                 .ConfigureAwait(false);
             
             var dbFieldLookup = dbFields.ToLookup(f => f.Name.AsUnquoted(dbSetting).ToLower());
-            var safeSelectFields = selectFields.Where(s => dbFieldLookup[s.Name.AsUnquoted(dbSetting).ToLower()].Any());
+            var safeSelectFields = selectFields.Where(s => dbFieldLookup.Contains(s.Name.AsUnquoted(dbSetting).ToLower()));
             
             return safeSelectFields;
         }
 
-        public static async Task<IEnumerable<OrderField>> GetValidatedDbFields<TEntity>(
+        public static async Task<IEnumerable<OrderField>> GetValidatedDbFieldsAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> sortFields
         )
         {
             var tableName = ClassMappedNameCache.Get<TEntity>();
-            var safeSortFields = await dbConnection.GetValidatedDbFields(tableName, sortFields).ConfigureAwait(false);
+            var safeSortFields = await dbConnection.GetValidatedDbFieldsAsync(tableName, sortFields).ConfigureAwait(false);
             return safeSortFields;
         }
 
-        public static async Task<IEnumerable<OrderField>> GetValidatedDbFields(
+        public static async Task<IEnumerable<OrderField>> GetValidatedDbFieldsAsync(
             this DbConnection dbConnection,
             string tableName,
             IEnumerable<OrderField> sortFields
@@ -69,22 +69,22 @@ namespace RepoDb
                 .ConfigureAwait(false);
 
             var dbFieldLookup = dbFields.ToLookup(f => f.Name.AsUnquoted(dbSetting).ToLower());
-            var safeSortFields = sortFields.Where(s => dbFieldLookup[s.Name.AsUnquoted(dbSetting).ToLower()].Any());
+            var safeSortFields = sortFields.Where(s => dbFieldLookup.Contains(s.Name.AsUnquoted(dbSetting).ToLower()));
 
             return safeSortFields;
         }
 
-        public static async Task<string> GetValidatedSelectClause<TEntity>(
+        public static async Task<string> GetValidatedSelectClauseAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<Field> selectFields
         )
         {
             var tableName = ClassMappedNameCache.Get<TEntity>();
-            var safeSelectClause = await dbConnection.GetValidatedSelectClause(tableName, selectFields).ConfigureAwait(false);
+            var safeSelectClause = await dbConnection.GetValidatedSelectClauseAsync(tableName, selectFields).ConfigureAwait(false);
             return safeSelectClause;
         }
 
-        public static async Task<string> GetValidatedSelectClause(
+        public static async Task<string> GetValidatedSelectClauseAsync(
             this DbConnection dbConnection,
             string tableName,
             IEnumerable<Field> selectFields
@@ -93,24 +93,24 @@ namespace RepoDb
             if (dbConnection == null || selectFields == null || string.IsNullOrWhiteSpace(tableName))
                 return null;
 
-            var validSelectFields = await dbConnection.GetValidatedDbFields(tableName, selectFields).ConfigureAwait(false);
+            var validSelectFields = await dbConnection.GetValidatedDbFieldsAsync(tableName, selectFields).ConfigureAwait(false);
             
             var dbSetting = dbConnection.GetDbSetting();
             var safeSelectClause = new QueryBuilder().FieldsFrom(validSelectFields, dbSetting).GetString();
             return safeSelectClause;
         }
 
-        public static async Task<string> GetValidatedOrderByClause<TEntity>(
+        public static async Task<string> GetValidatedOrderByClauseAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> sortFields
         )
         {
             var tableName = ClassMappedNameCache.Get<TEntity>();
-            var safeSortClause = await dbConnection.GetValidatedOrderByClause(tableName, sortFields).ConfigureAwait(false);
+            var safeSortClause = await dbConnection.GetValidatedOrderByClauseAsync(tableName, sortFields).ConfigureAwait(false);
             return safeSortClause;
         }
 
-        public static async Task<string> GetValidatedOrderByClause(
+        public static async Task<string> GetValidatedOrderByClauseAsync(
             this DbConnection dbConnection,
             string tableName,
             IEnumerable<OrderField> sortFields
@@ -119,7 +119,7 @@ namespace RepoDb
             if (dbConnection == null || sortFields == null || string.IsNullOrWhiteSpace(tableName))
                 return null;
 
-            var safeSortFields = await dbConnection.GetValidatedDbFields(tableName, sortFields).ConfigureAwait(false);
+            var safeSortFields = await dbConnection.GetValidatedDbFieldsAsync(tableName, sortFields).ConfigureAwait(false);
 
             var dbSetting = dbConnection.GetDbSetting();
             var safeSortClause = new QueryBuilder().OrderByFrom(safeSortFields, dbSetting).GetString();

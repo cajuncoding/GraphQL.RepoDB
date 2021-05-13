@@ -105,11 +105,12 @@ namespace StarWars.Repositories
             return convertedSlice;
         }
 
-        public async Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(int[] ids)
+        public async Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(IEnumerable<Field> selectFields, int[] ids)
         {
             await using var sqlConn = CreateConnection();
-            var results = await sqlConn.QueryAsync<CharacterDbModel>(c => ids.Contains(c.Id));
-            
+            //var results = await sqlConn.QueryAsync<CharacterDbModel>(c => ids.Contains(c.Id));
+            var results = await sqlConn.QueryBulkResultsByIdAsync<CharacterDbModel>(ids, fields: selectFields, logTrace: l => Debug.WriteLine(l));
+
             var mappedResults = MapDbModelsToCharacterModels(results);
             return mappedResults;
         }

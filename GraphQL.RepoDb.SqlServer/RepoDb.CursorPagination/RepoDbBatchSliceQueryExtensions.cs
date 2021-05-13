@@ -266,7 +266,7 @@ namespace RepoDb.CursorPagination
             //Retrieve only the select fields that are valid for the Database query!
             //NOTE: We guard against duplicate values as a convenience.
             var validSelectFields = await dbConnection
-                .GetValidatedDbFields(dbTableName, selectFields.Distinct())
+                .GetValidatedDbFieldsAsync(dbTableName, selectFields.Distinct())
                 .ConfigureAwait(false);
 
             //Dynamically handle RepoDb where filters (QueryGroup)...

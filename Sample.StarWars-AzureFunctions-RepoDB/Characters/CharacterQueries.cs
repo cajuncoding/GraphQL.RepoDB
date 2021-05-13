@@ -158,12 +158,14 @@ namespace StarWars.Characters
         /// <param name="ids">The ids of the human to retrieve.</param>
         /// <param name="repository"></param>
         /// <returns>The character.</returns>
-        public async Task<IEnumerable<ICharacter>> GetCharacterAsync(
+        public async Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(
             [Service] ICharacterRepository repository,
+            [GraphQLParams] IParamsContext graphQLParams,
             int[] ids
         )
         {
-            var characters = await repository.GetCharactersByIdAsync(ids);
+            var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
+            var characters = await repository.GetCharactersByIdAsync(repoDbParams.GetSelectFields(), ids);
             return characters;
         }
 
