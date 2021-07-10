@@ -15,8 +15,6 @@ execution (e.g. EntityFramework).
 In addition, for RepoDb specifically, a full implementation is provided along with additional RepoDb extension 
 methods for efficient/easy Cursor Pagination and is built completely on top of the _GraphQL.PreProcessingExtensions_.
 
-_**NOTE: RepoDB implementation for OffsetPaging is still in-progress/pending...**__
-
 ### [Buy me a Coffee ☕](https://www.buymeacoffee.com/cajuncoding)
 *I'm happy to share with the community, but if you find this useful (e.g for professional use), and are so inclinded,
 then I do love-me-some-coffee!*
