@@ -33,6 +33,12 @@ namespace StarWars.Repositories
             IRepoDbCursorPagingParams pagingParams
         );
 
+        Task<ICursorPageSlice<Droid>> GetPagedDroidCharactersAsync(
+            IEnumerable<Field> selectFields,
+            IEnumerable<OrderField> sortFields,
+            IRepoDbCursorPagingParams pagingParams
+        );
+
         Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(int characterId);
 
         Task<ICursorPageSlice<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams);

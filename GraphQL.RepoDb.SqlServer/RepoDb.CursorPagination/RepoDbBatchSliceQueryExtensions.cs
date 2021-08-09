@@ -12,6 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using GraphQL.RepoDB.Sql;
 using HotChocolate.RepoDb;
 
 namespace RepoDb.CursorPagination
@@ -35,7 +36,7 @@ namespace RepoDb.CursorPagination
         /// <typeparam name="TDbConnection"></typeparam>
         /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
         /// <param name="orderBy"></param>
-        /// <param name="where"></param>
+        /// <param name="whereExpression"></param>
         /// <param name="pagingParams"></param>
         /// <param name="tableName"></param>
         /// <param name="hints"></param>
@@ -48,9 +49,8 @@ namespace RepoDb.CursorPagination
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
-            //NOTE: Expression is required to prevent Ambiguous Signatures
-            Expression<Func<TEntity, bool>> where,
-            IRepoDbCursorPagingParams pagingParams,
+            Expression<Func<TEntity, bool>> whereExpression,
+            IRepoDbCursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -63,13 +63,129 @@ namespace RepoDb.CursorPagination
         where TEntity : class
         where TDbConnection : DbConnection
         {
-            return await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+            return await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
                     orderBy: orderBy,
-                    where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
+                    where: whereExpression != null ? QueryGroup.Parse<TEntity>(whereExpression) : (QueryGroup)null,
                     pagingParams: pagingParams,
+                    tableName: tableName,
                     hints: hints,
                     fields: fields,
+                    commandTimeout: commandTimeout,
+                    transaction: transaction,
+                    logTrace: logTrace,
+                    cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Base Repository extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to core feature.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDbConnection"></typeparam>
+        /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
+        /// <param name="orderBy"></param>
+        /// <param name="whereQueryGroup"></param>
+        /// <param name="pagingParams"></param>
+        /// <param name="tableName"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+            this BaseRepository<TEntity, TDbConnection> baseRepo,
+            IEnumerable<OrderField> orderBy,
+            QueryGroup whereQueryGroup,
+            IRepoDbCursorPagingParams pagingParams = default,
+            string tableName = null,
+            string hints = null,
+            IEnumerable<Field> fields = null,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+            )
+        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+        where TEntity : class
+        where TDbConnection : DbConnection
+        {
+            return await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
+                    orderBy: orderBy,
+                    where: whereQueryGroup,
+                    pagingParams: pagingParams,
                     tableName: tableName,
+                    hints: hints,
+                    fields: fields,
+                    commandTimeout: commandTimeout,
+                    transaction: transaction,
+                    logTrace: logTrace,
+                    cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Base Repository extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to core feature.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TDbConnection"></typeparam>
+        /// <param name="baseRepo">Extends the RepoDb BaseRepository abstraction</param>
+        /// <param name="orderBy"></param>
+        /// <param name="whereRawSql"></param>
+        /// <param name="pagingParams"></param>
+        /// <param name="tableName"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+            this BaseRepository<TEntity, TDbConnection> baseRepo,
+            IEnumerable<OrderField> orderBy,
+            RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            IRepoDbCursorPagingParams pagingParams = default,
+            string tableName = null,
+            string hints = null,
+            IEnumerable<Field> fields = null,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+            )
+        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+        where TEntity : class
+        where TDbConnection : DbConnection
+        {
+            return await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
+                    orderBy: orderBy,
+                    where: whereRawSql,
+                    pagingParams: pagingParams,
+                    tableName: tableName,
+                    hints: hints,
+                    fields: fields,
                     commandTimeout: commandTimeout,
                     transaction: transaction,
                     logTrace: logTrace,
@@ -96,22 +212,22 @@ namespace RepoDb.CursorPagination
         /// <param name="orderBy"></param>
         /// <param name="where"></param>
         /// <param name="pagingParams"></param>
+        /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
-        /// <param name="tableName"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        private static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
-            QueryGroup where = null,
+            object where = null,
             IRepoDbCursorPagingParams pagingParams = default,
+            string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
-            string tableName = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
@@ -126,13 +242,13 @@ namespace RepoDb.CursorPagination
 
             try
             {
-                var cursorPageResult = await connection.GraphQLBatchSliceQueryAsync<TEntity>(
+                var cursorPageResult = await connection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
                     orderBy: orderBy,
                     where: where,
                     pagingParams: pagingParams,
+                    tableName: tableName,
                     hints: hints,
                     fields: fields,
-                    tableName: tableName,
                     commandTimeout: commandTimeout,
                     transaction: transaction,
                     logTrace: logTrace,
@@ -169,8 +285,9 @@ namespace RepoDb.CursorPagination
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends DbConnection directly</param>
         /// <param name="orderBy"></param>
-        /// <param name="where"></param>
+        /// <param name="whereExpression"></param>
         /// <param name="pagingParams"></param>
+        /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
@@ -182,8 +299,9 @@ namespace RepoDb.CursorPagination
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
-            Expression<Func<TEntity, bool>> where,
+            Expression<Func<TEntity, bool>> whereExpression,
             IRepoDbCursorPagingParams pagingParams = default,
+            string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
             int? commandTimeout = null,
@@ -194,10 +312,11 @@ namespace RepoDb.CursorPagination
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
-            return await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
+            return await dbConnection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
                 orderBy: orderBy,
-                where: where != null ? QueryGroup.Parse<TEntity>(where) : (QueryGroup)null,
+                where: whereExpression != null ? QueryGroup.Parse<TEntity>(whereExpression) : (QueryGroup)null,
                 pagingParams: pagingParams,
+                tableName: tableName,
                 hints: hints,
                 fields: fields,
                 commandTimeout: commandTimeout,
@@ -223,11 +342,11 @@ namespace RepoDb.CursorPagination
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends DbConnection directly</param>
         /// <param name="orderBy"></param>
-        /// <param name="where"></param>
+        /// <param name="whereQueryGroup"></param>
         /// <param name="pagingParams"></param>
+        /// <param name="tableName"></param>
         /// <param name="hints"></param>
         /// <param name="fields"></param>
-        /// <param name="tableName"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
@@ -236,11 +355,126 @@ namespace RepoDb.CursorPagination
         public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
-            QueryGroup where = null,
+            //NOTE: RawSql Where is required to prevent Ambiguous Signatures
+            QueryGroup whereQueryGroup,
             IRepoDbCursorPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+        )
+        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+        where TEntity : class
+        {
+            return await dbConnection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
+                orderBy: orderBy,
+                //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
+                where: whereQueryGroup,
+                pagingParams: pagingParams,
+                tableName: tableName,
+                hints: hints,
+                fields: fields,
+                commandTimeout: commandTimeout,
+                transaction: transaction,
+                logTrace: logTrace,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to core feature.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbConnection">Extends DbConnection directly</param>
+        /// <param name="orderBy"></param>
+        /// <param name="whereRawSql"></param>
+        /// <param name="pagingParams"></param>
+        /// <param name="tableName"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+            this DbConnection dbConnection,
+            IEnumerable<OrderField> orderBy,
+            RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            IRepoDbCursorPagingParams pagingParams = default,
+            string tableName = null,
+            string hints = null,
+            IEnumerable<Field> fields = null,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+        )
+        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+        where TEntity : class
+        {
+            return await dbConnection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
+                orderBy: orderBy,
+                //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
+                where: whereRawSql,
+                pagingParams: pagingParams,
+                tableName: tableName,
+                hints: hints,
+                fields: fields,
+                commandTimeout: commandTimeout,
+                transaction: transaction,
+                logTrace: logTrace,
+                cancellationToken: cancellationToken
+            ).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy to core feature.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbConnection">Extends DbConnection directly</param>
+        /// <param name="orderBy"></param>
+        /// <param name="where">May be either a QueryGroup or RawSqlWhere object</param>
+        /// <param name="pagingParams"></param>
+        /// <param name="tableName"></param>
+        /// <param name="hints"></param>
+        /// <param name="fields"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        internal static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryInternalAsync<TEntity>(
+            this DbConnection dbConnection,
+            IEnumerable<OrderField> orderBy,
+            object where = null, //NOTE: May be either a QueryGroup or RawSqlWhere object
+            IRepoDbCursorPagingParams pagingParams = default,
+            string tableName = null,
+            string hints = null,
+            IEnumerable<Field> fields = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
@@ -269,10 +503,13 @@ namespace RepoDb.CursorPagination
                 .GetValidatedDbFieldsAsync(dbTableName, selectFields.Distinct())
                 .ConfigureAwait(false);
 
-            //Dynamically handle RepoDb where filters (QueryGroup)...
-            var whereParams = where != null
-                ? RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(where)
-                : null;
+            //Dynamically handle RepoDb where filters (QueryGroup or now supporting Raw Sql and Params object)...
+            var validatedWhereParams = where switch
+            {
+                QueryGroup whereQueryGroup => RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(whereQueryGroup),
+                RawSqlWhere whereRawSql => whereRawSql.WhereParams,
+                _ => null
+            };
 
             //Build the Cursor Paging query...
             var querySliceInfo = RepoDbBatchSliceQueryBuilder.BuildSqlServerBatchSliceQuery<TEntity>(
@@ -292,7 +529,7 @@ namespace RepoDb.CursorPagination
             //Now we can execute the process and get the results!
             var cursorPageResult = await dbConnection.ExecuteBatchSliceQueryAsync<TEntity>(
                 sqlQuerySliceInfo: querySliceInfo,
-                queryParams: whereParams,
+                queryParams: validatedWhereParams,
                 tableName: dbTableName,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
@@ -392,28 +629,33 @@ namespace RepoDb.CursorPagination
             // core code so that we clone minimal amount of logic outside of RepoDb due to 'internal' scope.
             var results = new List<CursorResult<TEntity>>();
             int? totalCount = null;
-            if (reader != null && !reader.IsClosed && reader.HasRows)
+            if (reader != null && !reader.IsClosed)
             {
-                const string cursorIndexPropName = nameof(IHaveCursor.CursorIndex);
-
-                //It's exposed for easy use by extensions so we use Brute Force Reflection to get the Model Mapping Function
-                //  because RepoDb does this very well already!
-                //NOTE: The complied Mapping Func (delegate) that is retrieved is lazy loaded into a static cache reference
-                //      by Generic Type <TEntity> for extremely high performance once initialized!
-                var repoDbModelMappingFunc = await GetRepoDbModelMappingFuncByBruteForce<TEntity>(dbConn, reader, tableName, transaction, cancellationToken);
-
-                while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                //BBernard - 08/09/2021
+                //BUGFIX: Fix issue where when there are no results we still need to check and see if TotalCount has any results...
+                if (reader.HasRows)
                 {
-                    //Dynamically read the Entity from the Results...
-                    TEntity entity = repoDbModelMappingFunc(reader);
+                    const string cursorIndexPropName = nameof(IHaveCursor.CursorIndex);
 
-                    //Manually Process the Cursor for each record...
-                    var cursorIndex = Convert.ToInt32(reader.GetValue(cursorIndexPropName));
+                    //It's exposed for easy use by extensions so we use Brute Force Reflection to get the Model Mapping Function
+                    //  because RepoDb does this very well already!
+                    //NOTE: The complied Mapping Func (delegate) that is retrieved is lazy loaded into a static cache reference
+                    //      by Generic Type <TEntity> for extremely high performance once initialized!
+                    var repoDbModelMappingFunc = await GetRepoDbModelMappingFuncByBruteForce<TEntity>(dbConn, reader, tableName, transaction, cancellationToken);
 
-                    //This allows us to extract the CursorIndex field and return in a Decorator class 
-                    //  so there's NO REQUIREMENT that the Model (TEntity) have any special fields/interfaces added.
-                    var cursorResult = new CursorResult<TEntity>(entity, cursorIndex);
-                    results.Add(cursorResult);
+                    while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                    {
+                        //Dynamically read the Entity from the Results...
+                        TEntity entity = repoDbModelMappingFunc(reader);
+
+                        //Manually Process the Cursor for each record...
+                        var cursorIndex = Convert.ToInt32(reader.GetValue(cursorIndexPropName));
+
+                        //This allows us to extract the CursorIndex field and return in a Decorator class 
+                        //  so there's NO REQUIREMENT that the Model (TEntity) have any special fields/interfaces added.
+                        var cursorResult = new CursorResult<TEntity>(entity, cursorIndex);
+                        results.Add(cursorResult);
+                    }
                 }
 
                 //Now attempt to step to the Total Count query result...
@@ -424,7 +666,6 @@ namespace RepoDb.CursorPagination
                     //This is a Scalar query so the first ordinal value is the Total Count!
                     totalCount = Convert.ToInt32(reader.GetValue(0));
                 }
-
             }
 
             timer.Stop();
@@ -502,6 +743,4 @@ namespace RepoDb.CursorPagination
         }
 
     }
-
-
 }

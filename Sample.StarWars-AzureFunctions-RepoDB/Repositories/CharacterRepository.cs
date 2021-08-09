@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using GraphQL.RepoDB.Sql;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using Microsoft.Data.SqlClient;
 using RepoDb;
@@ -96,12 +97,38 @@ namespace StarWars.Repositories
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
                 orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields,
-                where: c => c.Id >=1000 && c.Id <= 1999,
+                whereExpression: c => c.Id >=1000 && c.Id <= 1999,
                 pagingParams: pagingParams,
                 commandTimeout: 15
             );
 
             var convertedSlice = pageSlice.AsMappedType(r => (Human)MapDbModelToCharacterModel(r));
+            return convertedSlice;
+        }
+
+        public async Task<ICursorPageSlice<Droid>> GetPagedDroidCharactersAsync(
+            IEnumerable<Field> selectFields,
+            IEnumerable<OrderField> sortFields,
+            IRepoDbCursorPagingParams pagingParams
+        )
+        {
+            await using var sqlConn = CreateConnection();
+
+            //BBernard - 08/09/2021
+            //NOTE: This Examples shows the use of RepoDb mapping and Raw SQL with Batch Slice Query capabilities;
+            //      which enables powerful field processing and features not supported by QueryField/QueryGroup objects
+            //      (e.g. LOWER(), TRIM(), or Full Text Search via CONTAINS() and FREETEXT()).
+            var idFieldName = PropertyMappedNameCache.Get<CharacterDbModel>(c => c.Id);
+
+            var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
+                orderBy: sortFields ?? DefaultCharacterSortFields,
+                fields: selectFields,
+                whereRawSql: new RawSqlWhere(@$"{idFieldName} >= @StartId AND {idFieldName} < @EndId", new {StartId = 2000, EndId = 3000}),
+                pagingParams: pagingParams,
+                commandTimeout: 15
+            );
+
+            var convertedSlice = pageSlice.AsMappedType(r => (Droid)MapDbModelToCharacterModel(r));
             return convertedSlice;
         }
 
@@ -132,7 +159,7 @@ namespace StarWars.Repositories
         {
             await using var sqlConn = CreateConnection();
             var results = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterFriendDbModel>(
-                where: f => f.FriendOfId == characterId,
+                whereExpression: f => f.FriendOfId == characterId,
                 //Always include a Default Sort Order (for paging)
                 orderBy: OrderField.Parse(new { Name = Order.Ascending }),
                 pagingParams: pagingParams,

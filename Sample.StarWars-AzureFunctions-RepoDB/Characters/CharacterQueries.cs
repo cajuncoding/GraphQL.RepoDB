@@ -135,6 +135,38 @@ namespace StarWars.Characters
             //********************************************************************************
         }
 
+        [UsePaging]
+        //[UseFiltering]
+        [UseSorting]
+        [GraphQLName("droids")]
+        public async Task<PreProcessedCursorSlice<Droid>> GetDroidsPaginatedAsync(
+            [Service] ICharacterRepository repository,
+            //THIS is now injected by Pre-Processed extensions middleware...
+            [GraphQLParams] IParamsContext graphQLParams
+        )
+        {
+            var repoDbParams = new GraphQLRepoDbMapper<CharacterDbModel>(graphQLParams);
+
+            //********************************************************************************
+            //Get the data and convert to List() to ensure it's an Enumerable
+            //  and no longer using IQueryable to successfully simulate 
+            //  pre-processed results.
+            //NOTE: Selections (e.g. Projections), SortFields, PagingArgs are all pushed
+            //       down to the Repository (and underlying Database) layer.
+            var charactersSlice = await repository.GetPagedDroidCharactersAsync(
+                repoDbParams.GetSelectFields(),
+                repoDbParams.GetSortOrderFields() ?? OrderField.Parse(new { Name = Order.Ascending }),
+                repoDbParams.GetCursorPagingParameters()
+            );
+
+            //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
+            //  it will not have additional post-processing in the HotChocolate pipeline!
+            //NOTE: Filtering can be applied but ONLY to the results we are now returning;
+            //       Because this would normally be pushed down to the Sql Database layer.
+            return charactersSlice.AsPreProcessedCursorSlice();
+            //********************************************************************************
+        }
+
         [UseSorting]
         [GraphQLName("allCharacters")]
         public async Task<IEnumerable<ICharacter>> GetAllCharactersAsync(

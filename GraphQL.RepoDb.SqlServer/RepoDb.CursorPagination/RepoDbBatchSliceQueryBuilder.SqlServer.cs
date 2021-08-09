@@ -4,8 +4,10 @@ using RepoDb.CustomExtensions;
 using RepoDb.Enumerations;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using GraphQL.RepoDB.Sql;
 
 namespace RepoDb.CursorPagination
 {
@@ -22,7 +24,7 @@ namespace RepoDb.CursorPagination
         /// <param name="tableName"></param>
         /// <param name="fields"></param>
         /// <param name="orderBy"></param>
-        /// <param name="where"></param>
+        /// <param name="where">May be either a QueryGroup or RawSqlWhere object</param>
         /// <param name="hints"></param>
         /// <param name="afterCursorIndex"></param>
         /// <param name="firstTake"></param>
@@ -34,7 +36,7 @@ namespace RepoDb.CursorPagination
             string tableName,
             IEnumerable<Field> fields,
             IEnumerable<OrderField> orderBy,
-            QueryGroup where = null,
+            object where = null,
             string hints = null,
             int? afterCursorIndex = null,
             int? firstTake = null,
@@ -47,9 +49,6 @@ namespace RepoDb.CursorPagination
             var dbSetting = RepoDbSettings.SqlServerSettings;
             string cursorIndexName = nameof(IHaveCursor.CursorIndex);
             
-            // Initialize the builder
-            var builder = new QueryBuilder();
-
             var fieldsList = fields.ToList();
             var orderByList = orderBy.ToList();
             var orderByLookup = orderByList.ToLookup(o => o.Name.ToLower());
@@ -74,18 +73,47 @@ namespace RepoDb.CursorPagination
             selectFields.AddRange(fieldsList);
             selectFields.Add(new Field(cursorIndexName));
 
+            // Initialize the builder
+            var cteBuilder = new QueryBuilder();
+
+            //Support either QueryGroup object model or Raw SQL; which enables support for complex Field processing & filtering not supported
+            //  by QueryField/QueryGroup objects (e.g. LOWER(), TRIM()), use of Sql Server Full Text Searching on Fields (e.g. CONTAINS(), FREETEXT()), etc.
+            //var sqlWhereDataFilter = whereQueryGroup?.GetString(0, dbSetting) ?? whereRawSql;
+            var sqlWhereDataFilter = where switch
+            {
+                QueryGroup whereQueryGroup => whereQueryGroup?.GetString(0, dbSetting),
+                RawSqlWhere whereRawSql => whereRawSql.RawSqlWhereClause,
+                string whereRawSql => whereRawSql,
+                _ => null
+            };
+
+            bool isWhereFilterSpecified = !string.IsNullOrWhiteSpace(sqlWhereDataFilter);
+
+            //Dynamically build/optimize the core data SQL that will be used as a CTE wrapped by the Pagination logic!
+            cteBuilder.Clear()
+                .Select()
+                .RowNumber().Over().OpenParen().OrderByFrom(orderByList, dbSetting).CloseParen().As($"[{cursorIndexName}],")
+                .FieldsFrom(cteFields, dbSetting)
+                .From().TableNameFrom(tableName, dbSetting)
+                .HintsFrom(hints);
+
+            if (isWhereFilterSpecified)
+            {
+                cteBuilder
+                    .Where()
+                    .WriteText(sqlWhereDataFilter);
+            }
+
+            var sqlCte = cteBuilder.GetString();
             var sqlWhereClauseSliceInfo = BuildRelaySpecQuerySliceInfo(cursorIndexName, afterCursorIndex, beforeCursorIndex, firstTake, lastTake);
 
             // Build the base Paginated Query
-            builder.Clear()
+            var sqlBuilder = new QueryBuilder();
+            sqlBuilder.Clear()
                 .With()
                 .WriteText("CTE").As().OpenParen()
-                    .Select()
-                        .RowNumber().Over().OpenParen().OrderByFrom(orderByList, dbSetting).CloseParen().As($"[{cursorIndexName}],")
-                        .FieldsFrom(cteFields, dbSetting)
-                    .From().TableNameFrom(tableName, dbSetting)
-                    .HintsFrom(hints)
-                .WhereFrom(where, dbSetting)
+                    //Dynamically insert the CTE that is built separately...
+                    .WriteText(sqlCte)
                 .CloseParen()
                 .Select()
                     .FieldsFrom(selectFields, dbSetting)
@@ -111,16 +139,23 @@ namespace RepoDb.CursorPagination
                 //      eliminated due to Null values.
                 //NOTE We also rely on SqlServer to optimize this query instead of trying to do too much ourselves (with other unknown risks
                 //      such as column permissions, etc.
-                builder.Select()
+                sqlBuilder.Select()
                     .Count(null, dbSetting)
                     .From().TableNameFrom(tableName, dbSetting)
-                    .HintsFrom(hints)
-                    .WhereFrom(where, dbSetting)
-                    .End();
+                    .HintsFrom(hints);
+
+                if (isWhereFilterSpecified)
+                {
+                    cteBuilder
+                        .Where()
+                        .WriteText(sqlWhereDataFilter);
+                }
+
+                sqlBuilder.End();
             }
 
             // Build the Query and other Slice Info metadata needed for optimal pagination...
-            var sqlQuery = builder.GetString();
+            var sqlQuery = sqlBuilder.GetString();
 
             var sqlQuerySliceInfo = new SqlQuerySliceInfo()
             { 
