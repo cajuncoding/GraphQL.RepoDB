@@ -146,7 +146,7 @@ namespace RepoDb.CursorPagination
 
                 if (isWhereFilterSpecified)
                 {
-                    cteBuilder
+                    sqlBuilder
                         .Where()
                         .WriteText(sqlWhereDataFilter);
                 }
