@@ -39,21 +39,22 @@ namespace HotChocolate.PreProcessingExtensions
         /// <param name="take"></param>
         /// <param name="includeTotalCount"></param>
         /// <returns></returns>
-        public static IOffsetPageResults<T> SliceAsOffsetPage<T>(this IEnumerable<T> items, int? skip, int take, bool includeTotalCount = true)
+        public static IOffsetPageResults<T> SliceAsOffsetPage<T>(this IEnumerable<T> items, int? skip, int? take, bool includeTotalCount = true)
             where T : class
         {
             //Do nothing if there are no results...
             if (!items.Any())
-                return new OffsetPageResults<T>(items, false, false, 0);
+                return new OffsetPageResults<T>(new List<T>(), false, false, 0);
 
             //NOTE: Implemented similar algorithm that would be used in a SQL Query; also similar to what the default
             //      HotChocolate QueryableCursorPagingHandler does...
             //NOTE: to ensure our pagination is complete, we materialize the Results!
             var skipPast = skip ?? 0;
-            var pagedResults = items.Skip(skipPast).Take(take + 1).ToList();
+            var takeSome = take ?? 0;
+            var pagedResults = items.Skip(skipPast).Take(takeSome + 1).ToList();
 
             var hasPreviousPage = pagedResults.Count > 0 && (skipPast > 0);
-            var hasNextPage = pagedResults.Count > take;
+            var hasNextPage = pagedResults.Count > takeSome;
 
             if (hasNextPage) pagedResults.Remove(pagedResults.Last());
 

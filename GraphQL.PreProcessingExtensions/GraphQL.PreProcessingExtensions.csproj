@@ -40,8 +40,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.Data" Version="11.3.8" />
-    <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="11.3.8" />
+    <PackageReference Include="HotChocolate.Data" Version="12.0.1" />
+    <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="12.0.1" />
   </ItemGroup>
 
 </Project>
