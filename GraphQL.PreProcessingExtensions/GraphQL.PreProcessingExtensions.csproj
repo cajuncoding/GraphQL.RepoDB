@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>11.3.8.0</Version>
+    <Version>12.0.1.0</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
     <Description>A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged in the Resolvers (and lower level Serivces/Repositories that encapsulate all data access) without dependency on IQueryable deferred execution (e.g. EntityFramework).</Description>
@@ -10,9 +10,10 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
-    <PackageReleaseNotes>- Bump HotChocolate version to v11.3.8 (latest v11 version before jumping to v12) and synced Nuget Version
+    <PackageReleaseNotes>- Upgraded to now support HotChocolate version 12 with v12.0.1 and synced Nuget Version
 
       Prior Releases Notes:
+      - Bump HotChocolate version to v11.3.8 (latest v11 version before jumping to v12) and synced Nuget Version
       - Bump HotChocolate version to v11.2.2 stable and sync Nuget version.
       - Minor code cleanup and optimizations and removed duplicated validation.
       - Eliminated dependency on Total Count to compute HasNextPage; this enalbed optimizing the paging algorthims in RepoDB (and other consuming libraries).
@@ -31,8 +32,8 @@
       - Provide ability to trace log out some details for the query, execution time, etc. Also improves support for cancellation token throughout DB calls and minor optimizations and cleanup.
 </PackageReleaseNotes>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <AssemblyVersion>11.3.8.0</AssemblyVersion>
-    <FileVersion>11.3.8.0</FileVersion>
+    <AssemblyVersion>12.0.1.0</AssemblyVersion>
+    <FileVersion>12.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

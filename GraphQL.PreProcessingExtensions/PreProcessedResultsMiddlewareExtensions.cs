@@ -65,7 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return builder.AddSorting((sortConventionDescriptor) =>
             {
-                //Add all Default Sorting Operation conventions & 
+                //Add all Default Sorting Operation conventions & the Custom PreProcessedSortProvider...
                 sortConventionDescriptor
                     .AddDefaultOperations()
                     .BindDefaultTypes()
@@ -86,9 +86,10 @@ namespace Microsoft.Extensions.DependencyInjection
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            builder.Services
-                .AddSingleton<IEnumerable<CursorPagingProvider>>(r => new List<CursorPagingProvider>() { new PreProcessedCursorPagingProvider() })
-                .AddSingleton<IEnumerable<OffsetPagingProvider>>(r => new List<OffsetPagingProvider>() { new PreProcessedOffsetPagingProvider() });
+            //Updated for v12 to now use the Extension Helpers provided to correctly initialize the Paging Providers for Pre Processed Results...
+            builder
+                .AddCursorPagingProvider<PreProcessedCursorPagingProvider>()
+                .AddOffsetPagingProvider<PreProcessedOffsetPagingProvider>();
 
             return builder;
         }
