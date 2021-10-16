@@ -58,10 +58,10 @@ namespace RepoDb.CursorPagination
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
             CancellationToken cancellationToken = default
-            )
+        )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             return await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
                     orderBy: orderBy,
@@ -119,7 +119,7 @@ namespace RepoDb.CursorPagination
             )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             return await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
                     orderBy: orderBy,
@@ -177,7 +177,7 @@ namespace RepoDb.CursorPagination
             )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             return await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
                     orderBy: orderBy,
@@ -235,7 +235,7 @@ namespace RepoDb.CursorPagination
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             //Below Logic mirrors that of RepoDb Source for managing the Connection (PerInstance or PerCall)!
             var connection = (DbConnection)(transaction?.Connection ?? baseRepo.CreateConnection());
@@ -554,7 +554,7 @@ namespace RepoDb.CursorPagination
             IDbTransaction transaction = null
         )
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             if (baseRepo.ConnectionPersistency == ConnectionPersistency.PerCall)
             {

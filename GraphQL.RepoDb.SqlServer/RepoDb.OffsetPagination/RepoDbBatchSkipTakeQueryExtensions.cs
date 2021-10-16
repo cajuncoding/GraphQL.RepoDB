@@ -60,7 +60,7 @@ namespace RepoDb.OffsetPagination
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
             //  need to maintain duplicated code for the less flexible paging approach since we can provide
@@ -128,7 +128,7 @@ namespace RepoDb.OffsetPagination
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
             //  need to maintain duplicated code for the less flexible paging approach since we can provide
@@ -196,7 +196,7 @@ namespace RepoDb.OffsetPagination
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        where TDbConnection : DbConnection
+        where TDbConnection : DbConnection, new()
         {
             //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
             //  need to maintain duplicated code for the less flexible paging approach since we can provide

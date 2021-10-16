@@ -11,12 +11,12 @@
     <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <PackageReleaseNotes>
+    <PackageReleaseNotes>- Bump HotChocolate version to v11.3.8 (latest v11 version before jumping to v12) and synced Nuget Version
+
+      Prior Releases Notes:
       - Added support for raw sql where filtering with Parameterization for complex where filtering and field processing (e.g. LOWER(), TRIM() functions on fields, or Full Text Search via CONTAINS(), FREETEXT(), etc.).
       - Fix bug with TotalCount not returning when pagination or other filtering returns no results.
       - Potential Breaking Change: Fixed method signatures to all consistently support specifying table name; this might potentially have some breaking changes to method signatures, but functionality is compatible once signatures are corrected.
-
-      Prior Releases Notes:
       - Provide RepoDb extension meethod QueryBulkResultsByIdAsync() which enalbes high performance retrieval of very large result sets in bulk based on int Id values; this safely alleviates the limitation of max 2100 parameter bindings on SqlCmd when using Contains() expressions.
       - Breaking change but simplified the RepoDB Custom extension methods for CursorPaging and OffsetPaging to take in IRepoDbCursorPagingParams and IRepoDbOffsetPagingParams respectively instead of discrete values.
       - This helps minimizes the risk of the issue arising from the Optimization to not rely on TotalCount; it introduced a non-intuitive breaking change in the ReboDB Custom extensions whereby the new 'IsTotalCountRequested' param from the GraphQLParamsContext must be explicitly provided.
@@ -47,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RepoDb.SqlServer" Version="1.1.3" />
+    <PackageReference Include="RepoDb.SqlServer" Version="1.1.4" />
   </ItemGroup>
 
   <ItemGroup>

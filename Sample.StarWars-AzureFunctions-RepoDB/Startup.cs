@@ -71,6 +71,15 @@ namespace StarWars
                     IncludeTotalCount = true,
                     MaxPageSize = 5
                 })
+                .ModifyRequestOptions(o =>
+                    {
+                        //Enable better Debugging Experience!
+                        if (Debugger.IsAttached)
+                        {
+                            o.ExecutionTimeout = TimeSpan.FromHours(1);
+                        }
+                    }
+                )
                 .AddPreProcessedResultsExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************

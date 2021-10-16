@@ -147,7 +147,7 @@ namespace System.Reflection.CustomExtensions
         {
             public bool IsObjectPlaceholderMatchingEnabled { get; }
 
-            private Type _typeOfObject = typeof(object);
+            private readonly Type _typeOfObject = typeof(object);
 
             public SimpleTypeComparer(bool objectPlaceholderMatchingEnabled = false)
             {
@@ -270,9 +270,9 @@ namespace System.Reflection.CustomExtensions
         /// NOTE: With the dynamic Delegate we create, Reflection will no longer be called when invoking the Function!
         /// </summary>
         /// <typeparam name="TDelegate"></typeparam>
-        /// <param name="methodInfo">A Reflection based Method Info defnition to use to creat the dynamic Delegate from</param>
+        /// <param name="methodInfo">A Reflection based Method Info definition to use to create the dynamic Delegate from</param>
         /// <param name="delegateDefinitionStub">Stub Func<> or Delegate defining the definition of the Delegate we want to create</param>
-        /// <param name="genericArgTypes">Types for each Generic Argument to suport Generic Methods</param>
+        /// <param name="genericArgTypes">Types for each Generic Argument to support Generic Methods</param>
         /// <returns></returns>
         public static TDelegate CreateDynamicDelegate<TDelegate>(this MethodInfo methodInfo, TDelegate delegateDefinitionStub, params Type[] genericArgTypes)
             //where TDelegate: Delegate //Delegate Type constraint only available in C# v7.3+
@@ -309,9 +309,8 @@ namespace System.Reflection.CustomExtensions
         /// NOTE: With the dynamic Delegate we create, Reflection will no longer be called when invoking the Function!
         /// </summary>
         /// <typeparam name="TDelegate"></typeparam>
-        /// <param name="methodInfo">A Reflection based Method Info defnition to use to creat the dynamic Delegate from</param>
-        /// <param name="delegateDefinitionStub">Stub Func<> or Delegate defining the definition of the Delegate we want to create</param>
-        /// <param name="genericArgTypes">Types for each Generic Argument to suport Generic Methods</param>
+        /// <param name="methodInfo">A Reflection based Method Info definition to use to create the dynamic Delegate from</param>
+        /// <param name="genericArgTypes">Types for each Generic Argument to support Generic Methods</param>
         /// <returns></returns>
         public static Delegate CreateDynamicDelegate(this MethodInfo methodInfo, params Type[] genericArgTypes)
         {
@@ -335,7 +334,7 @@ namespace System.Reflection.CustomExtensions
         /// <summary>
         /// BBernard
         /// Dynamically create the Delegate Type needed to create a Dynamic Delegate for the specified method implementation.
-        /// NOTE: For Generic method defnitions you usually need to first convert it to a valid strongly-typed generic method 
+        /// NOTE: For Generic method definitions you usually need to first convert it to a valid strongly-typed generic method 
         ///         implementation using (MethodInfo.MakeGenericMethod()).
         /// </summary>
         /// <param name="methodInfo"></param>
@@ -349,7 +348,7 @@ namespace System.Reflection.CustomExtensions
             //Per the documentation for Expression.GetDelegateType(), the return type has to be the last argument in the List!
             paramTypesList.Add(methodInfo.ReturnType);
 
-            //Create a dynamic Type based on the Parameter inforation specified
+            //Create a dynamic Type based on the Parameter information specified
             var delegateDynamicExprType = Expression.GetDelegateType(paramTypesList.ToArray());
             return delegateDynamicExprType;
         }
