@@ -42,7 +42,7 @@ namespace HotChocolate.PreProcessingExtensions
         {
             //Do nothing if there are no results...
             if (!items.Any())
-                return new CursorPageSlice<T>(null, 0, false, false);
+                return new CursorPageSlice<T>(Enumerable.Empty<ICursorResult<T>>(), 0, false, false);
 
             var afterIndex = after != null
                 ? IndexEdge<string>.DeserializeCursor(after)

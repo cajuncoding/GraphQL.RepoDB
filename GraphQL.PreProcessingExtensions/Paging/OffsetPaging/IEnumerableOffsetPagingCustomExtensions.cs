@@ -44,7 +44,7 @@ namespace HotChocolate.PreProcessingExtensions
         {
             //Do nothing if there are no results...
             if (!items.Any())
-                return new OffsetPageResults<T>(new List<T>(), false, false, 0);
+                return new OffsetPageResults<T>(Enumerable.Empty<T>(), false, false, 0);
 
             //NOTE: Implemented similar algorithm that would be used in a SQL Query; also similar to what the default
             //      HotChocolate QueryableCursorPagingHandler does...
