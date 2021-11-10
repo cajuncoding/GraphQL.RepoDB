@@ -15,7 +15,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     {
         public CursorPageSlice(IEnumerable<ICursorResult<TEntity>> results, int? totalCount, bool hasPreviousPage, bool hasNextPage)
         {
-            this.CursorResults = (results ?? throw new ArgumentException(nameof(results))).ToList();
+            this.CursorResults = results ?? throw new ArgumentException(nameof(results));
             this.TotalCount = totalCount;
             this.HasPreviousPage = hasPreviousPage;
             this.HasNextPage = hasNextPage;
