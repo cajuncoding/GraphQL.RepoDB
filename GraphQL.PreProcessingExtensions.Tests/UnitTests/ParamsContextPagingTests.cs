@@ -14,6 +14,8 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         {
         }
 
+        #region Cursor Paging Tests
+
         [TestMethod]
         public async Task TestParamsContextCursorPagingOnlyFirst()
         {
@@ -41,12 +43,42 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             Assert.AreEqual(2, cursorPagingParams.First);
 
             var resultsJson = (JObject)result.Data[queryKey];
+            Assert.IsNotNull(resultsJson);
             var results = resultsJson[SelectionNodeName.Nodes];
 
             Assert.IsNotNull(results);
             Assert.AreEqual(2, results.Count());
             Assert.AreEqual("Luke Skywalker", results.FirstOrDefault()?["name"]);
             Assert.AreEqual("Darth Vader", results.LastOrDefault()?["name"]);
+        }
+
+        [TestMethod]
+        public async Task TestParamsContextCursorPagingEmptyResults()
+        {
+            // arrange
+            var server = CreateStarWarsTestServer();
+
+            // act
+            var result = await server.PostQueryAsync(@"{
+                starWarsCharactersCursorPaginated(testEmptyResults: true) {
+                    nodes {
+                        id
+                        name
+                    }
+                }
+            }");
+
+            // assert
+            Assert.IsNotNull(result?.Data, "Query Execution Failed");
+
+            var queryKey = "starWarsCharactersCursorPaginated";
+
+            var resultsJson = (JObject)result.Data[queryKey];
+            Assert.IsNotNull(resultsJson);
+            var results = resultsJson[SelectionNodeName.Nodes];
+
+            Assert.IsNotNull(results);
+            Assert.AreEqual(0, results.Count());
         }
 
         //TODO: Implement a few more tests...
@@ -82,6 +114,10 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         //Assert.AreEqual("Darth Vader", results.LastOrDefault()?["name"]);
         //}
 
+        #endregion
+
+        #region Offset Paging Tests
+
         [TestMethod]
         public async Task TestParamsContextOffsetPaging()
         {
@@ -110,6 +146,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             Assert.AreEqual(2, offsetPagingParams.Take);
 
             var resultsJson = (JObject)result.Data[queryKey];
+            Assert.IsNotNull(resultsJson);
             var results = resultsJson[SelectionNodeName.Items];
 
             Assert.IsNotNull(results);
@@ -117,5 +154,36 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             Assert.AreEqual("Han Solo", results.FirstOrDefault()?["name"]);
             Assert.AreEqual("Leia Organa", results.LastOrDefault()?["name"]);
         }
+
+        [TestMethod]
+        public async Task TestParamsContextOffsetPagingEmptyResults()
+        {
+            // arrange
+            var server = CreateStarWarsTestServer();
+
+            // act
+            var result = await server.PostQueryAsync(@"{
+                starWarsCharactersOffsetPaginated(testEmptyResults: true) {
+                    items {
+                        id
+                        name
+                    }
+                }
+            }");
+
+            // assert
+            Assert.IsNotNull(result?.Data, "Query Execution Failed");
+
+            var queryKey = "starWarsCharactersOffsetPaginated";
+
+            var resultsJson = (JObject)result.Data[queryKey];
+            Assert.IsNotNull(resultsJson);
+            var results = resultsJson[SelectionNodeName.Items];
+
+            Assert.IsNotNull(results);
+            Assert.AreEqual(0, results.Count());
+        }
+
+        #endregion
     }
 }

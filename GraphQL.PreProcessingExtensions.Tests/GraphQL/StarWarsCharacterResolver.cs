@@ -25,10 +25,16 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         [UseSorting]
         [GraphQLName("starWarsCharactersCursorPaginated")]
         public Task<PreProcessedCursorSlice<IStarWarsCharacter>> GetStarWarsCharactersWithCursorPagingAsync(
-            [GraphQLParams] IParamsContext paramsContext
+            [GraphQLParams] IParamsContext paramsContext,
+            bool testEmptyResults = false
         )
         {
-            var results = CreateCharacters().SliceAsCursorPage(paramsContext.CursorPagingArgs);
+            var characters = testEmptyResults
+                ? Enumerable.Empty<IStarWarsCharacter>()
+                : CreateCharacters();
+            
+            var results = characters.SliceAsCursorPage(paramsContext.CursorPagingArgs);
+            
             return Task.FromResult(results.AsPreProcessedCursorSlice());
         }
 
@@ -36,10 +42,16 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         [UseSorting]
         [GraphQLName("starWarsCharactersOffsetPaginated")]
         public Task<PreProcessedOffsetPageResults<IStarWarsCharacter>> GetStarWarsCharactersWithOffsetPagingAsync(
-            [GraphQLParams] IParamsContext paramsContext
+            [GraphQLParams] IParamsContext paramsContext,
+            bool testEmptyResults = false
         )
         {
-            var results = CreateCharacters().SliceAsOffsetPage(paramsContext.OffsetPagingArgs);
+            var characters = testEmptyResults
+                ? Enumerable.Empty<IStarWarsCharacter>()
+                : CreateCharacters();
+
+            var results = characters.SliceAsOffsetPage(paramsContext.OffsetPagingArgs);
+
             return Task.FromResult(results.AsPreProcessedPageResults());
         }
 
