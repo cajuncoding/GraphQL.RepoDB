@@ -50,7 +50,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                 ? Enumerable.Empty<IStarWarsCharacter>()
                 : CreateCharacters();
 
-            var results = characters.SliceAsOffsetPage(paramsContext.OffsetPagingArgs ?? );
+            var results = characters.SliceAsOffsetPage(paramsContext.OffsetPagingArgs);
 
             return Task.FromResult(results.AsPreProcessedPageResults());
         }
