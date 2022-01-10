@@ -219,7 +219,7 @@ namespace RepoDb.OffsetPagination
         }
 
         /// <summary>
-        /// Base Repository extension for Offset Paginated Batch Query capability.
+        /// Base DbConnection (SqlConnection) extension for Offset Paginated Batch Query capability.
         /// 
         /// Public Facade method to provide dynamically paginated results using Offset based paging/slicing.
         /// 
@@ -285,7 +285,7 @@ namespace RepoDb.OffsetPagination
         }
 
         /// <summary>
-        /// Base Repository extension for Offset Paginated Batch Query capability.
+        /// Base DbConnection (SqlConnection) extension for Offset Paginated Batch Query capability.
         /// 
         /// Public Facade method to provide dynamically paginated results using Offset based paging/slicing.
         /// 
@@ -351,7 +351,7 @@ namespace RepoDb.OffsetPagination
         }
 
         /// <summary>
-        /// Base Repository extension for Offset Paginated Batch Query capability.
+        /// Base DbConnection (SqlConnection) extension for Offset Paginated Batch Query capability.
         /// 
         /// Public Facade method to provide dynamically paginated results using Offset based paging/slicing.
         /// 

@@ -4,6 +4,7 @@ using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using HotChocolate.PreProcessingExtensions.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions
@@ -43,14 +44,15 @@ namespace HotChocolate.PreProcessingExtensions
             where T : class
         {
             //Do nothing if there are no results...
-            if (!items.Any())
+            if (items?.Any() != true)
                 return new OffsetPageResults<T>(Enumerable.Empty<T>(), false, false, 0);
 
             //NOTE: Implemented similar algorithm that would be used in a SQL Query; also similar to what the default
             //      HotChocolate QueryableCursorPagingHandler does...
-            //NOTE: to ensure our pagination is complete, we materialize the Results!
-            var skipPast = skip ?? 0;
-            var takeSome = take ?? 0;
+            const int maxTakeValue = int.MaxValue - 1;
+            var skipPast = Math.Max(skip ?? 0, 0);
+            var takeSome = Math.Min(take ?? 0, maxTakeValue);
+
             var pagedResults = items.Skip(skipPast).Take(takeSome + 1).ToList();
 
             var hasPreviousPage = pagedResults.Count > 0 && (skipPast > 0);
@@ -59,7 +61,7 @@ namespace HotChocolate.PreProcessingExtensions
             if (hasNextPage) pagedResults.Remove(pagedResults.Last());
 
             //NOTE: We only materialize the FULL Count if actually requested to do so...
-            int? totalCount = includeTotalCount ? (int?)items.Count() : null;
+            var totalCount = includeTotalCount ? (int?)items.Count() : null;
 
             //Wrap all results into a Offset Page Slice result with Total Count...
             var offsetPageResults = new OffsetPageResults<T>(pagedResults, hasNextPage, hasPreviousPage, totalCount);

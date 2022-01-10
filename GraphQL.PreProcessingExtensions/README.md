@@ -50,7 +50,8 @@ NuGet package to your project and wire up your Starup  middleware and inject / i
 
 ### Pending:
 1. TODO: Enforce HotChocolate configuration defaults for DefaultPageSize in RepoDB... (MaxPageSize is already enforced by HC core default Paging Handlers).
-   - This requires a change in HC Core to allow methods to be customized that are currently *not virtual* on the default Paging Handlers. 
+   - This requires a change in HC Core to allow methods to be customized that are currently *not virtual* on the default Paging Handlers.
+   - For now, an overload that does not resolve Null/Missing param values, and/or takes in Defaults to be used instead, can be used to specify your own fallback defaults for Offset or Cursor Paging... You can then store your default wherever you like (e.g. Constants).
 1. TODO: Update Implementation summary detais below in README...
 
 ### Completed:

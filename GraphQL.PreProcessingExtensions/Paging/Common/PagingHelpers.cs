@@ -5,18 +5,20 @@ namespace GraphQL.PreProcessingExtensions.Paging
 {
     public static class PagingHelpers
     {
+        private static readonly PagingOptions _hcDefaultPagingOptions = new PagingOptions()
+        {
+            DefaultPageSize = PagingDefaults.DefaultPageSize,
+            IncludeTotalCount = PagingDefaults.IncludeTotalCount,
+            MaxPageSize = PagingDefaults.MaxPageSize
+        };
+
         /// <summary>
         /// Simplified helper to get the initialize a PagingOptions with all Default values from HC existing constants.
         /// </summary>
         /// <returns></returns>
         public static PagingOptions GetDefaultPagingOptions()
         {
-            return new PagingOptions()
-            {
-                DefaultPageSize = PagingDefaults.DefaultPageSize,
-                IncludeTotalCount = PagingDefaults.IncludeTotalCount,
-                MaxPageSize = PagingDefaults.MaxPageSize
-            };
+            return _hcDefaultPagingOptions;
         }
 
         /// <summary>
