@@ -319,19 +319,16 @@ public class HumanType : ObjectType<Human>
         descriptor.Name("human");
         descriptor.Field(t => t.Name).Type<NonNullType<StringType>>();
         descriptor.Field(t => t.Friends).Name("friends")
-            .ConfigureContextData(d =>
-            {
-                //Manually define a Selection/Projection dependency on the "Id" field of
-                //  the parent entity so that it is always provided to the parent resolver.
-                //This helps ensure that the value is not null in our resolver anytime "friends"
-                //  is part of the selection, and the parent "Id" field is not.
-                d.AddPreProcessingParentProjectionDependencies(nameof(Human.Id));
-            })
+            //Manually define a Selection/Projection dependency on the "Id" field of
+            //  the parent entity so that it is always provided to the parent resolver.
+            //This helps ensure that the value is not null in our resolver anytime "friends"
+            //  is part of the selection, and the parent "Id" field is not.
+            .AddPreProcessingParentProjectionDependencies(nameof(Human.Id))
             .Resolver(ctx =>
             {
                 var repository = ctx.Service<IRepository>();
                 var parentHumanId = ctx.Parent<Human>().Id;
-                return repository.GetHuman();
+                return repository.GetRelatedHumans(parentHumanId);
             });
     }
 }

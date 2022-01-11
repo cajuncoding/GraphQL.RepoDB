@@ -92,9 +92,9 @@ namespace HotChocolate.PreProcessingExtensions.Tests
 
             var paramsContext = server.GetParamsContext("starWarsCharacters");
             Assert.IsNotNull(paramsContext?.AllArguments);
-            Assert.AreEqual(paramsContext.AllArguments.Count, 1);
+            Assert.AreEqual(1, paramsContext.AllArguments.Count);
             Assert.IsNotNull(paramsContext?.AllArguments[0]);
-            Assert.AreEqual(paramsContext.AllArguments[0].Name, "order");
+            Assert.AreEqual("order", paramsContext.AllArguments[0].Name);
             Assert.IsNotNull(paramsContext?.AllArguments[0].Value);
         }
     }
