@@ -211,16 +211,15 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             // assert
             Assert.IsNotNull(result?.Data, "Query Execution Failed");
 
-            var paramsContext = server.GetParamsContext("droids");
+            var paramsContext = server.GetParamsContext("starWarsCharacters");
             Assert.IsNotNull(paramsContext?.SelectionDependencies);
             Assert.AreEqual(1, paramsContext.SelectionDependencies.Count);
             Assert.AreEqual(nameof(IStarWarsCharacter.Id), paramsContext.SelectionDependencies[0].DependencyMemberName);
 
             Assert.IsNotNull(paramsContext?.AllSelectionNames);
-            Assert.AreEqual(3, paramsContext.AllSelectionNames.Count);
+            Assert.AreEqual(2, paramsContext.AllSelectionNames.Count);
             Assert.AreEqual("name", paramsContext.AllSelectionNames[0]);
-            Assert.AreEqual("primaryFunction", paramsContext.AllSelectionNames[1]);
-            Assert.AreEqual("id", paramsContext.AllSelectionNames[2]);
+            Assert.AreEqual("droids", paramsContext.AllSelectionNames[1]);
         }
     }
 }
