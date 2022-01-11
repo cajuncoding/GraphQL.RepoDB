@@ -189,6 +189,37 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             Assert.AreEqual("name", selectionNames.LastOrDefault());
         }
 
+        [TestMethod]
+        public async Task TestParamsContextDependencySelectionForId()
+        {
+            // arrange
+            var server = CreateStarWarsTestServer();
 
+            // act
+            var result = await server.PostQueryAsync(@"{
+            starWarsCharacters(order: {name: ASC}) {
+                    name
+                    ... on StarWarsHuman {                    
+                        droids {
+                            name
+                            primaryFunction
+                        }
+                    }
+                }
+            }");
+
+            // assert
+            Assert.IsNotNull(result?.Data, "Query Execution Failed");
+
+            var paramsContext = server.GetParamsContext("starWarsCharacters");
+            Assert.IsNotNull(paramsContext?.SelectionDependencies);
+            Assert.AreEqual(1, paramsContext.SelectionDependencies.Count);
+            Assert.AreEqual(nameof(IStarWarsCharacter.Id), paramsContext.SelectionDependencies[0].DependencyMemberName);
+
+            Assert.IsNotNull(paramsContext?.AllSelectionNames);
+            Assert.AreEqual(2, paramsContext.AllSelectionNames.Count);
+            Assert.AreEqual("name", paramsContext.AllSelectionNames[0]);
+            Assert.AreEqual("droids", paramsContext.AllSelectionNames[1]);
+        }
     }
 }

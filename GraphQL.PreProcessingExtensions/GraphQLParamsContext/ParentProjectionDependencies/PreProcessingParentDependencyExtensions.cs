@@ -3,6 +3,8 @@ using System.Linq;
 using System.Reflection;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
+using HotChocolate.Types.Descriptors.Definitions;
+using HotChocolate.Types.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions
 {
@@ -22,19 +24,34 @@ namespace HotChocolate.PreProcessingExtensions
     /// </summary>
     public static class ExtensionDataExtensionsForPreProcessingProjectionDependencies
     {
-        public static ExtensionData AddPreProcessingParentProjectionDependencies(this ExtensionData configure, params string[] selectionDependencies)
+        public static IObjectFieldDescriptor AddPreProcessingParentProjectionDependencies(this IObjectFieldDescriptor descriptor, params string[] selectionDependencies)
         {
             //Create list of Dependency Links...
             IReadOnlyList<PreProcessingDependencyLink> dependencies = selectionDependencies
                 .Select(s => new PreProcessingDependencyLink(s))
                 .ToList();
-            
+
             //Add to the pre-compiled Field Context for future use/retrieval.
-            configure.Add(PreProcessingParentDependencies.ContextDataKey, dependencies);
-            
+            descriptor.AddDescriptorContextData(new Dictionary<string, object>()
+            {
+                [PreProcessingParentDependencies.ContextDataKey] = dependencies
+            });
+
             //Keep chainable...
-            return configure;
+            return descriptor;
         }
 
+        public static void AddDescriptorContextData(this IObjectFieldDescriptor descriptor, IReadOnlyDictionary<string, object> contextBag)
+        {
+            //var context = descriptor;
+            //context.ContextData.TryAdd(key, value);
+            descriptor
+                .Extend()
+                .OnBeforeCreate((descriptorContext, fieldDefinition) =>
+                {
+                    foreach (var (key, value) in contextBag)
+                        fieldDefinition.ContextData.TryAdd(key, value);
+                });
+        }
     }
 }

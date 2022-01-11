@@ -1,25 +1,22 @@
 ﻿using HotChocolate;
 using HotChocolate.PreProcessingExtensions;
 using HotChocolate.Types;
-using StarWars.Characters;
-using StarWars.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using HotChocolate.PreProcessingExtensions.Tests;
 
 namespace StarWars.Characters
 {
-    [ExtendObjectType(nameof(Human))]
+    [ExtendObjectType(nameof(StarWarsHuman))]
     public class HumanFieldResolvers
     {
         [GraphQLName("droids")]
-        [PreProcessingParentDependencies(nameof(ICharacter.Id))]
-        public async Task<IEnumerable<Droid>> GetDroidsAsync(
-            [Service] ICharacterRepository repository,
-            [Parent] ICharacter character,
+        [PreProcessingParentDependencies(nameof(IStarWarsCharacter.Id))]
+        public Task<IEnumerable<StarWarsDroid>> GetDroidsAsync(
+            [Parent] StarWarsHuman character,
             [GraphQLParams] IParamsContext graphQLParams    
         )
         {
@@ -27,9 +24,9 @@ namespace StarWars.Characters
             Debug.WriteLine($"Pre-processing Dependency Fields: [{string.Join(", ", graphQLParams.SelectionDependencies.Select(d => d.DependencyMemberName))}]");
             #endif
 
-            var friends = await repository.GetCharacterFriendsAsync(character.Id);
-            var droids = friends.OfType<Droid>();
-            return droids;
+            var allDroids = StarWarsCharacterRepo.CreateCharacters().OfType<StarWarsDroid>().ToLookup(d => d.Id);
+            var droids = character.DroidIds.Select(droidId => allDroids[droidId].FirstOrDefault());
+            return Task.FromResult(droids);
         }
     }
 }

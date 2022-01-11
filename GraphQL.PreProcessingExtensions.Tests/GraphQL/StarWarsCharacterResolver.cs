@@ -17,7 +17,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         [GraphQLName("starWarsCharacters")]
         public Task<IEnumerable<IStarWarsCharacter>> GetStarWarsCharactersAsync()
         {
-            var results = CreateCharacters();
+            var results = StarWarsCharacterRepo.CreateCharacters();
             return Task.FromResult(results);
         }
 
@@ -31,7 +31,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         {
             var characters = testEmptyResults
                 ? Enumerable.Empty<IStarWarsCharacter>()
-                : CreateCharacters();
+                : StarWarsCharacterRepo.CreateCharacters();
             
             var results = characters.SliceAsCursorPage(paramsContext.CursorPagingArgs);
             
@@ -48,61 +48,11 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         {
             var characters = testEmptyResults
                 ? Enumerable.Empty<IStarWarsCharacter>()
-                : CreateCharacters();
+                : StarWarsCharacterRepo.CreateCharacters();
 
             var results = characters.SliceAsOffsetPage(paramsContext.OffsetPagingArgs);
 
             return Task.FromResult(results.AsPreProcessedPageResults());
-        }
-
-        private static IEnumerable<IStarWarsCharacter> CreateCharacters()
-        {
-            yield return new StarWarsHuman
-            (
-                1000,
-                "Luke Skywalker",
-                "Tatooine"
-            );
-
-            yield return new StarWarsHuman
-            (
-                1001,
-                "Darth Vader",
-                "Tatooine"
-            );
-
-            yield return new StarWarsHuman
-            (
-                1002,
-                "Han Solo"
-            );
-
-            yield return new StarWarsHuman
-            (
-                1003,
-                "Leia Organa",
-                "Alderaan"
-            );
-
-            yield return new StarWarsHuman
-            (
-                1004,
-                "Wilhuff Tarkin"
-            );
-
-            yield return new StarWarsDroid
-            (
-                2000,
-                "C-3PO",
-                "Protocol"
-            );
-
-            yield return new StarWarsDroid
-            (
-                2001,
-                "R2-D2",
-                "Astromech"
-            );
         }
     }
 }

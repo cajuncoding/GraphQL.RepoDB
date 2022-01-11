@@ -1,5 +1,5 @@
 ﻿## Overview 
-*HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
+*HotChocolate v11/v12 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
 This library greatly simplifies working with HotChocolate to **_pre-processes_** data for
 selecting/projecting, sorting, paging, etc. before returning the data to HotChocolate from the resolver; 
@@ -50,10 +50,16 @@ NuGet package to your project and wire up your Starup  middleware and inject / i
 
 ### Pending:
 1. TODO: Enforce HotChocolate configuration defaults for DefaultPageSize in RepoDB... (MaxPageSize is already enforced by HC core default Paging Handlers).
-   - This requires a change in HC Core to allow methods to be customized that are currently *not virtual* on the default Paging Handlers. 
-1. TODO: Update Implementation summary detais below in README...
+   - This requires a change in HC Core to allow methods to be customized that are currently *not virtual* on the default Paging Handlers.
+   - For now, an overload that does not resolve Null/Missing param values, and/or takes in Defaults to be used instead, can be used to specify your own fallback defaults for Offset or Cursor Paging... You can then store your default wherever you like (e.g. Constants).
 
-### Completed:
+### Release Notes v12.4.1.0:
+- Updated to latest version of HC v12.4.1 stable
+- Fixed breaking change in HC where Field Definition context data methods were removed; now uses the new pattern that HC Core attributes (e.g. UsePaging, UseSorting).
+- Updated Demo projects to .Net 6.0 and Azure Functions v4.
+- Bump RepoDB (Sql Server) version to v1.1.4 stable
+
+### Prior Release Notes:
 1. Added full support for Offset Paging as well as CursorPaging with matching capabilities - including models, extension methods to convert from IEnumerable, etc.
    - Added examples in the StarWars Azure Functions project using in-memory processing (RepoDB Sql Server implementation is also complete).
 1. Added support to easily determine if TotalCount is selected (as it's a special case selection) to support potential performance optimizations within Resolver logic.
@@ -305,19 +311,16 @@ public class HumanType : ObjectType<Human>
         descriptor.Name("human");
         descriptor.Field(t => t.Name).Type<NonNullType<StringType>>();
         descriptor.Field(t => t.Friends).Name("friends")
-            .ConfigureContextData(d =>
-            {
-                //Manually define a Selection/Projection dependency on the "Id" field of
-                //  the parent entity so that it is always provided to the parent resolver.
-                //This helps ensure that the value is not null in our resolver anytime "friends"
-                //  is part of the selection, and the parent "Id" field is not.
-                d.AddPreProcessingParentProjectionDependencies(nameof(Human.Id));
-            })
+            //Manually define a Selection/Projection dependency on the "Id" field of
+            //  the parent entity so that it is always provided to the parent resolver.
+            //This helps ensure that the value is not null in our resolver anytime "friends"
+            //  is part of the selection, and the parent "Id" field is not.
+            .AddPreProcessingParentProjectionDependencies(nameof(Human.Id))
             .Resolver(ctx =>
             {
                 var repository = ctx.Service<IRepository>();
                 var parentHumanId = ctx.Parent<Human>().Id;
-                return repository.GetHuman();
+                return repository.GetRelatedHumans(parentHumanId);
             });
     }
 }

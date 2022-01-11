@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using HotChocolate;
-using HotChocolate.AspNetCore.Extensions;
-using HotChocolate.AspNetCore.Serialization;
-using HotChocolate.Execution.Configuration;
-using HotChocolate.PreProcessingExtensions;
 using HotChocolate.PreProcessingExtensions.Tests.GraphQL;
-using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using StarWars.Characters;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
 {
@@ -32,6 +23,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                         .AddType<StarWarsCharacterResolver>()
                         .AddType<StarWarsHuman>()
                         .AddType<StarWarsDroid>()
+                        .AddTypeExtension<HumanFieldResolvers>()
                         .SetPagingOptions(new PagingOptions()
                         {
                             DefaultPageSize = 5,
