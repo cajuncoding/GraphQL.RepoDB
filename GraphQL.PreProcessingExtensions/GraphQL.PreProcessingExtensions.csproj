@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Version>12.1.4.0</Version>
+    <Version>12.4.1.1</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
     <Description>A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged in the Resolvers (and lower level Serivces/Repositories that encapsulate all data access) without dependency on IQueryable deferred execution (e.g. EntityFramework).</Description>
@@ -37,8 +37,8 @@
 		- Provide ability to trace log out some details for the query, execution time, etc. Also improves support for cancellation token throughout DB calls and minor optimizations and cleanup.
     </PackageReleaseNotes>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <AssemblyVersion>12.1.4.0</AssemblyVersion>
-    <FileVersion>12.1.4.0</FileVersion>
+    <AssemblyVersion>12.4.1.1</AssemblyVersion>
+    <FileVersion>12.4.1.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
