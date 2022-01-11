@@ -1,5 +1,5 @@
 ﻿## Overview 
-*(Unofficial) HotChocolate v11 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
+*(Unofficial) HotChocolate v11/v12 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
 This library greatly simplifies working with HotChocolate to **_pre-processes_** data for
 selecting/projecting, sorting, paging, etc. before returning the data to HotChocolate from the resolver; 
@@ -60,11 +60,13 @@ cursor pagination/slice query api for Sql Server.
 To use this in your project, add the [GraphQL.RepDb.SqlServer](https://www.nuget.org/packages/GraphQL.RepoDb.SqlServer/) 
 NuGet package to your project, wire up your Starup middleware, and inject / instantiate params in your resolvers as outlined below...
 
+### Release Notes v12.4.1.0:
+- Updated to latest version of HC v12.4.1 stable
+- Fixed breaking change in HC where Field Definition context data methods were removed; now uses the new pattern that HC Core attributes (e.g. UsePaging, UseSorting).
+- Updated Demo projects to .Net 6.0 and Azure Functions v4.
+- Bump RepoDB (Sql Server) version to v1.1.4 stable
 
-### Pending:
-1. TODO: Update Implementation summary detais below in README...
-
-### Completed:
+### Prior Release Notes:
 1. Added full support for Offset Paging with RepoDB.
 1. Optimized the RepoDB extensions Cursor paging algorithm to no longer require the TotalCount to safely determine HasNextPage & HasPreviousPage paging metadata; this helps optimize both Cursor Paging and Offset paging queries.
 1. Added RepoDB support for of the new GraphQLParamsContext.IsTotalCountRequested property so that we now only compute the Count when actually requested.
