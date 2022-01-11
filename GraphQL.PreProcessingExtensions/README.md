@@ -60,21 +60,21 @@ NuGet package to your project and wire up your Starup  middleware and inject / i
 - Bump RepoDB (Sql Server) version to v1.1.4 stable
 
 ### Prior Release Notes:
-1. Added full support for Offset Paging as well as CursorPaging with matching capabilities - including models, extension methods to convert from IEnumerable, etc.
+- Added full support for Offset Paging as well as CursorPaging with matching capabilities - including models, extension methods to convert from IEnumerable, etc.
    - Added examples in the StarWars Azure Functions project using in-memory processing (RepoDB Sql Server implementation is also complete).
-1. Added support to easily determine if TotalCount is selected (as it's a special case selection) to support potential performance optimizations within Resolver logic.
+- Added support to easily determine if TotalCount is selected (as it's a special case selection) to support potential performance optimizations within Resolver logic.
    - `graphQLParamsContext.IsTotalCountRequested` 
-1. Added more Unit test coverage for Selections, and Paging implmentations
-1. Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
-1. Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
-1. Provides abstraction facade with *GraphQL.PreProcessingExtensions* package that can be used for any micro-orm.
-1. Implemented RepoDb on top of GraphQL.PreProcessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
-1. Supports abstracted facade for: 
+- Added more Unit test coverage for Selections, and Paging implmentations
+- Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
+- Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
+- Provides abstraction facade with *GraphQL.PreProcessingExtensions* package that can be used for any micro-orm.
+- Implemented RepoDb on top of GraphQL.PreProcessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (GraphQL Schema names -> Model properties -> DB Column names).
+- Supports abstracted facade for: 
    - Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!  And supports correct GraphQL Schema to Class property mapping.
    - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
    - Support for Cursor based Pagination arguments down to the the Repository/Service layer & into Sql queries via RepoDb -- Relay spec cursors are fully implemented via Sql Server api extensions to RepoDb.
-1. Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
-1. Fixed/Changed repo & package names to address conflicts with HotChocolate core packages.
+- Implemented configuration based control over Projection Dependencies and Pure Code First Attribute to simplify this -- so if a child or virtual field resolver needs a field of the parent, but it wasn't actually part of the selection from the client's query, it is added to the Selections if/when it is necessary.
+- Fixed/Changed repo & package names to address conflicts with HotChocolate core packages.
 
 ### Planned:
 1. Support for enhanced ability to work with Dynamic Filtering (WHERE clause) arguments; support will be added as time permits.
