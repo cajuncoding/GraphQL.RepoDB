@@ -14,7 +14,7 @@ using HotChocolate.Types.Pagination;
 
 namespace StarWars.Characters
 {
-    [ExtendObjectType(Name = "Query")]
+    [ExtendObjectType("Query")]
     public class CharacterQueries
     {
         /// <summary>

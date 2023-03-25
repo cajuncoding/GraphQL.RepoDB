@@ -1,0 +1,31 @@
+query ($first: Int, $after: String, $friendsCount: Int) {
+	characters(first: $first, after: $after) {
+		totalCount
+		pageInfo {
+			hasNextPage
+			hasPreviousPage
+			startCursor
+			endCursor
+		}
+		edges {
+			cursor
+			node {
+				personalIdentifier
+				name
+				height
+				friends(first: $friendsCount)
+				{
+					edges {
+						cursor
+					  node
+						{
+							personalIdentifier
+							name
+							height
+						}
+					}
+				}
+			}
+		}
+	}
+}

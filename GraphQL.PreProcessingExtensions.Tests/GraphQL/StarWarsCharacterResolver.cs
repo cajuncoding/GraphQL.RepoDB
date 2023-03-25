@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.Types;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
 {
-    [ExtendObjectType(Name = "Query")]
+    [ExtendObjectType("Query")]
     public class StarWarsCharacterResolver
     {
         [UseSorting]

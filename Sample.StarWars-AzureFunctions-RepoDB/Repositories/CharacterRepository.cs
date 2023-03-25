@@ -185,7 +185,7 @@ namespace StarWars.Repositories
         }
 
 
-        public async Task<ICharacter> GetHeroAsync(Episode episode)
+        public Task<ICharacter> GetHeroAsync(Episode episode)
         {
             throw new NotImplementedException();
             //if (episode == Episode.Empire)
@@ -195,7 +195,7 @@ namespace StarWars.Repositories
             //return _characters[2001];
         }
 
-        public async Task<IEnumerable<ISearchResult>> SearchAsync(string text)
+        public Task<IEnumerable<ISearchResult>> SearchAsync(string text)
         {
             throw new NotImplementedException();
             //IEnumerable<ICharacter> filteredCharacters = _characters.Values

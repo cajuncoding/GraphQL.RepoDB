@@ -1,16 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using HotChocolate;
 using StarWars.Characters;
 using StarWars.Repositories;
 using StarWars.Reviews;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using HotChocolate.AzureFunctionsProxy;
-using Microsoft.Data.SqlClient;
 using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
 using HotChocolate.Types.Pagination;
 
 //CRITICAL: Here we self-wire up the Startup into the Azure Functions framework!
@@ -43,6 +38,7 @@ namespace StarWars
             //Updated to Initialize StarWars with new v11 configuration...
             services
                 .AddGraphQLServer()
+                .UsePersistedQueryPipeline().AddReadOnlyFileSystemQueryStorage("./PersistedQueries")
                 .AddQueryType(d => d.Name("Query"))
                 .AddMutationType(d => d.Name("Mutation"))
                 //Disabled Subscriptions for v11 and Azure Functions Example due to 

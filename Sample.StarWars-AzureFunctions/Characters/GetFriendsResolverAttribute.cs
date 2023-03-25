@@ -16,7 +16,7 @@ namespace StarWars.Characters
             IObjectFieldDescriptor descriptor,
             MemberInfo member)
         {
-            descriptor.Resolver(ctx =>
+            descriptor.Resolve(ctx =>
             {
                 ICharacter character = ctx.Parent<ICharacter>();
                 ICharacterRepository repository = ctx.Service<ICharacterRepository>();
