@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using HotChocolate.PreProcessingExtensions.Tests.GraphQL;
-using HotChocolate;
-using System;
 using HotChocolate.AspNetCore.Extensions;
 using HotChocolate.AspNetCore.Serialization;
 using HotChocolate.Execution.Configuration;

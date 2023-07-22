@@ -6,7 +6,7 @@ using StarWars.Repositories;
 
 namespace StarWars.Reviews
 {
-    [ExtendObjectType(Name = "Mutation")]
+    [ExtendObjectType("Mutation")]
     public class ReviewMutations
     {
         /// <summary>
