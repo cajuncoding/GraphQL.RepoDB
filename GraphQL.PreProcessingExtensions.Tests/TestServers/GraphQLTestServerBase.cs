@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using HotChocolate.PreProcessingExtensions.Tests.GraphQL;
-using HotChocolate;
-using System;
 using HotChocolate.AspNetCore.Extensions;
-using HotChocolate.AspNetCore.Serialization;
 using HotChocolate.Execution.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
@@ -40,8 +35,8 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                 services =>
                 {
                     services
-                        .AddRouting()
-                        .AddHttpResultSerializer(HttpResultSerialization.JsonArray);
+                        .AddRouting();
+                        //.AddHttpResultSerializer(HttpResultSerialization.JsonArray);
 
                     //BBernard - Hook for IoC Services Configuration by implementing Test Servers...                    
                     var graphQLBuilder = servicesConfigure(services);
@@ -58,7 +53,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                         var paramsContext = context.GetLocalValue<GraphQLParamsContext>(nameof(GraphQLParamsContext));
                         
                         ParamsContextList.Add(new KeyValuePair<string, IParamsContext>(
-                            context.Field.Name, 
+                            context.Selection.Field.Name, 
                             new ParamsContextTestHarness(paramsContext)
                         ));
 

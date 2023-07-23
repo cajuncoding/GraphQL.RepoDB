@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Version>12.4.1.1</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
@@ -10,13 +10,15 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
-    <PackageReleaseNotes>Release Notes:
-	    - Updated to latest version of HC to v12.4.1
-	    - Fixed breaking change in HC where Field Definition context data methods were removed; now uses the new pattern that HC Core attributes (e.g. UsePaging, UseSorting).
-        - Updated Demo projects to .Net 6.0 and Azure Functions v4.
-	    - Fixed issue #8 related to the in-memory Cursor Paging custom extension handling of empty enumerable results.
+    <PackageReleaseNotes>
+		Release Notes:
+		- Update project to minimum .NET 6.0 version supported by HC v13.
 
 		Prior Releases Notes:
+		- Updated to latest version of HC to v12.4.1
+		- Fixed breaking change in HC where Field Definition context data methods were removed; now uses the new pattern that HC Core attributes (e.g. UsePaging, UseSorting).
+		- Updated Demo projects to .Net 6.0 and Azure Functions v4.
+		- Fixed issue #8 related to the in-memory Cursor Paging custom extension handling of empty enumerable results.
 		- Upgraded to now support HotChocolate version 12 with v12.0.1 and synced Nuget Version
 		- Bump HotChocolate version to v11.3.8 (latest v11 version before jumping to v12) and synced Nuget Version
 		- Bump HotChocolate version to v11.2.2 stable and sync Nuget version.
@@ -35,7 +37,7 @@
 		- Fixed new issue due to changes in Sort arguments in HotChocolate core; sort arguments are resolved correctly again.
 		- Bump to HotChocolate v11.0.1 which now resolves a bug that we helped identify with interfaces in the initial release of v11.0.0.
 		- Provide ability to trace log out some details for the query, execution time, etc. Also improves support for cancellation token throughout DB calls and minor optimizations and cleanup.
-    </PackageReleaseNotes>
+	</PackageReleaseNotes>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
     <AssemblyVersion>12.4.1.1</AssemblyVersion>
     <FileVersion>12.4.1.1</FileVersion>
@@ -46,8 +48,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.Data" Version="12.4.1" />
-    <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="12.4.1" />
+    <PackageReference Include="HotChocolate.Data" Version="13.3.3" />
+    <PackageReference Include="HotChocolate.Types.OffsetPagination" Version="13.3.3" />
   </ItemGroup>
 
 </Project>

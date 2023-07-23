@@ -6,11 +6,8 @@ using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.PreProcessingExtensions.Selections;
-using HotChocolate.Language;
 using HotChocolate.PreProcessingExtensions.Arguments;
 using HotChocolate.PreProcessingExtensions.Selections;
-using HotChocolate.Types;
 
 namespace HotChocolate.PreProcessingExtensions
 {

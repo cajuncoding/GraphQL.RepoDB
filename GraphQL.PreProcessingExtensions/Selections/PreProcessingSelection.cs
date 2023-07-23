@@ -1,13 +1,8 @@
 ﻿# nullable enable
-
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using GraphQL.PreProcessingExtensions.Selections;
+using HotChocolate.Execution.Processing;
 
 namespace HotChocolate.PreProcessingExtensions
 {
@@ -18,7 +13,7 @@ namespace HotChocolate.PreProcessingExtensions
     /// </summary>
     public class PreProcessingSelection : IHasName, IPreProcessingSelection
     {
-        public PreProcessingSelection(ObjectType objectType, IFieldSelection selectionField)
+        public PreProcessingSelection(ObjectType objectType, ISelection selectionField)
         {
             GraphQLObjectType = objectType ?? throw new ArgumentNullException(nameof(objectType));
             GraphQLFieldSelection = selectionField ?? throw new ArgumentNullException(nameof(selectionField));
@@ -27,11 +22,13 @@ namespace HotChocolate.PreProcessingExtensions
 
         public ObjectType GraphQLObjectType { get; }
 
-        public IFieldSelection GraphQLFieldSelection { get; }
+        public ISelection GraphQLFieldSelection { get; }
 
         public MemberInfo? ClassMemberInfo { get; }
 
-        public string SelectionName => GraphQLFieldSelection.ResponseName.ToString();
+        //TODO: TEST Which of these can/should be used???
+        public string Name => GraphQLFieldSelection.ResponseName;
+        public string SelectionName => GraphQLFieldSelection.Field.Name;
 
         public string SelectionMemberName => ClassMemberInfo?.Name! ?? SelectionName;
 
@@ -41,8 +38,6 @@ namespace HotChocolate.PreProcessingExtensions
         /// </summary>
         public string SelectionMemberNameOrDefault => ClassMemberInfo?.Name! ?? SelectionName;
 
-        public NameString Name => GraphQLFieldSelection.ResponseName;
-        
         public override string ToString()
         {
             return $"{GraphQLObjectType.Name}:{SelectionName}";

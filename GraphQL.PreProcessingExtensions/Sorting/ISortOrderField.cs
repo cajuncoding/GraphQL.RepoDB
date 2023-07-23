@@ -4,7 +4,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
 {
     public interface ISortOrderField
     {
-        SortField Field { get; }
+        ISortingFieldInfo Field { get; }
         string FieldName { get; }
         string MemberName { get; }
         string SortDirection { get; }

@@ -56,14 +56,13 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
                     hasNextPage: pagedResults?.HasNextPage ?? false,
                     hasPreviousPage: pagedResults?.HasPreviousPage ?? false,
                     startCursor: firstEdge?.Cursor,
-                    endCursor: lastEdge?.Cursor,
-                    totalCount: totalCount ?? 0
+                    endCursor: lastEdge?.Cursor
                 );
 
                 var graphQLConnection = new Connection<TEntity>(
                     selectedEdges,
                     connectionPageInfo,
-                    ct => new ValueTask<int>(connectionPageInfo.TotalCount ?? 0)
+                    totalCount ?? 0
                 );
 
                 return new ValueTask<Connection>(graphQLConnection);

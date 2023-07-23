@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.PreProcessingExtensions.Selections;
+using HotChocolate.Data.Projections.Context;
 
 namespace HotChocolate.PreProcessingExtensions.Selections
 {
@@ -134,7 +135,7 @@ namespace HotChocolate.PreProcessingExtensions.Selections
             var baseFieldSelection = baseSelection?.GraphQLFieldSelection;
             
             //Dynamically support re-basing to the specified baseSelection or fallback to current Context.Field
-            var field = baseFieldSelection?.Field ?? context.Field;
+            var field = context.GetSelectedField(); //baseFieldSelection?.Field ?? context.Selection.Field;
 
             //Initialize the optional SelectionSet to rebase processing as the root for GetSelections()
             //  if specified (but is optional & null safe)...
@@ -142,19 +143,23 @@ namespace HotChocolate.PreProcessingExtensions.Selections
                 ? baseISelection.SelectionSet
                 : null!;
 
+            var contextSelection = context.Selection;
+
             //Get all possible ObjectType(s); InterfaceTypes & UnionTypes will have more than one...
-            var objectTypes = GetObjectTypesSafely(field.Type, context.Schema);
+            var objectTypes = GetObjectTypesSafely((IType)field.Type, context.Schema);
 
             //Map all object types into PreProcessingSelection (adapter classes)...
             foreach (var objectType in objectTypes)
             {
                 //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
                 //  in default behavior for current field.
-                var childSelections = context.GetSelections(objectType, baseSelectionSetNode);
+                //var childSelections = context.GetSelections(objectType, baseSelectionSetNode);
+                var childSelections = context.GetSelections(objectType, contextSelection);
                 var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(objectType, s));
                 gathered.AddRange(preprocessSelections);
             }
 
+            var selectionFields = context.GetSelectedField().GetFields();
             return gathered;
         }
 

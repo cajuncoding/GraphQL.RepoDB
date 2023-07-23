@@ -33,25 +33,37 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
                 //      we need to get both the Fields (Schema) and the current order values...
                 //NOTE: Not all Queries have Fields (e.g. no Selections, just a literal result), so .Field may
                 //      throw internal NullReferenceException, hence we have the wrapper Try/Catch.
-                IInputField sortArgField = context.Field.Arguments[sortArgName];
+                var sortContext = context.GetSortingContext();
+                //if (sortContext != null)
+                //{
+                //    //var sortFieldLookup = 
+                //    var sortOrderFields = sortContext.GetFields().SelectMany(
+                //        fi => new SordOrderField(fi, fi.)
+                //    )
+                //}
+
+
+                IInputField sortArgField = context.Selection.Field.Arguments[sortArgName];
                 ObjectValueNode sortArgValue = context.ArgumentLiteral<ObjectValueNode>(sortArgName);
 
                 //Validate that we have some sort args specified and that the Type is correct (ListType of SortInputType values)...
                 //NOTE: The Following processing logic was adapted from 'QueryableSortProvider' implementation in HotChocolate.Data core.
                 //FIX: The types changed in v11.0.1/v11.0.2 the Sort Field types need to be checked with IsNull() method, and
                 //      then against NonNullType.NamedType() is ISortInputType instead.
-                if (!sortArgValue.IsNull()
+                if (sortContext != null
+                    && !sortArgValue.IsNull()
                     && sortArgField.Type is ListType lt
-                    && lt.ElementType is NonNullType nn 
+                    && lt.ElementType is NonNullType nn
                     && nn.NamedType() is ISortInputType sortInputType)
                 {
                     //Create a Lookup for the Fields...
-                    var sortFieldLookup = sortInputType.Fields.OfType<SortField>().ToLookup(f => f.Name.ToString().ToLower());
+                    //var sortFieldLookup = sortInputType.Fields.OfType<SortField>().ToLookup(f => f.Name.ToString().ToLower());
+                    var sortFieldLookup = sortContext.GetFields().SelectMany(fi => fi).ToLookup(f => f.Field.Name, StringComparer.OrdinalIgnoreCase);
 
                     //Now only process the values provided, but initialize with the corresponding Field (metadata) for each value...
                     var sortOrderFields = sortArgValue.Fields.Select(
                         f => new SortOrderField(
-                            sortFieldLookup[f.Name.ToString().ToLower()].FirstOrDefault(), 
+                            sortFieldLookup[f.Name.ToString()].FirstOrDefault(),
                             f.Value.ToString()
                         )
                     );

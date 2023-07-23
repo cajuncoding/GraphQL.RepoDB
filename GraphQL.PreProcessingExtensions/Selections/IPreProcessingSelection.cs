@@ -1,20 +1,21 @@
 ﻿# nullable enable
-
-using HotChocolate.Resolvers;
 using HotChocolate.Types;
+using HotChocolate.Data.Projections.Context;
 using System.Reflection;
+using HotChocolate.Execution.Processing;
 
 namespace HotChocolate.PreProcessingExtensions
 {
     public interface IPreProcessingSelection
     {
-        IFieldSelection GraphQLFieldSelection { get; }
+        ISelection GraphQLFieldSelection { get; }
         
         ObjectType GraphQLObjectType { get; }
         
         MemberInfo? ClassMemberInfo { get; }
         
-        NameString Name { get; }
+        //TODO: DELETE If now redundant since NameString isn't available anymore...
+        string Name { get; }
         
         string SelectionName { get; }
         

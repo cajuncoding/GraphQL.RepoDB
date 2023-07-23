@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Version>12.4.1.1</Version>
     <Authors>BBernard / CajunCoding</Authors>
     <Company>CajunCoding</Company>
@@ -11,12 +11,14 @@
     <PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDb</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDb</RepositoryUrl>
     <PackageTags>graphql, graph-ql, hotchocolate, azure, repository, service, repodb, dapper, petapoco, sqlkata, sorting, paging, cursor</PackageTags>
-    <PackageReleaseNotes>Release Notes:
-	    - Updated to latest version of HC v12.4.1
-        - Updated Demo projects to .Net 6.0 and Azure Functions v4.
-		- Bump RepoDB (Sql Server) version to v1.1.4 stable
+    <PackageReleaseNotes>
+		Release Notes:
+		- Update project to minimum .NET 6.0 version supported by HC v13.
 
 		Prior Releases Notes:
+		- Updated to latest version of HC v12.4.1
+		- Updated Demo projects to .Net 6.0 and Azure Functions v4.
+		- Bump RepoDB (Sql Server) version to v1.1.4 stable
 		- Upgraded to now support HotChocolate version 12 with v12.0.1 and synced Nuget Version
 		- Bump HotChocolate version to v11.3.8 (latest v11 version before jumping to v12) and synced Nuget Version
 		- Added support for raw sql where filtering with Parameterization for complex where filtering and field processing (e.g. LOWER(), TRIM() functions on fields, or Full Text Search via CONTAINS(), FREETEXT(), etc.).

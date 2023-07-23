@@ -18,8 +18,8 @@ namespace HotChocolate.PreProcessingExtensions.Arguments
         /// <returns></returns>
         public static IEnumerable<string> AllArgumentSchemaNamesSafely(this IResolverContext? context)
         {
-            var argFields = context?.Field?.Arguments;
-            var argNames = argFields?.Select(arg => arg.Name.Value);
+            var argsMap = context?.Selection?.Field?.Arguments;
+            var argNames = argsMap?.Select(arg => arg.Name);
             return argNames ?? new List<string>();
         }
 

@@ -9,10 +9,9 @@ using StarWars.Repositories;
 
 namespace StarWars.Characters
 {
-    public sealed class GetFriendsResolverAttribute
-        : ObjectFieldDescriptorAttribute
+    public sealed class GetFriendsResolverAttribute : ObjectFieldDescriptorAttribute
     {
-        public override void OnConfigure(
+        protected override void OnConfigure(
             IDescriptorContext context,
             IObjectFieldDescriptor descriptor,
             MemberInfo member)

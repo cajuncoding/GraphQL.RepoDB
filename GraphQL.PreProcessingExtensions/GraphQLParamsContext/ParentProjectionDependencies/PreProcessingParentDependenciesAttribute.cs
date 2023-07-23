@@ -20,7 +20,7 @@ namespace HotChocolate.PreProcessingExtensions
             SelectionDependencies = selections;
         }
 
-        public override void OnConfigure(IDescriptorContext context, IObjectFieldDescriptor descriptor, MemberInfo member)
+        protected override void OnConfigure(IDescriptorContext context, IObjectFieldDescriptor descriptor, MemberInfo member)
         {
             //Dynamically pipe the specified Dependencies into the custom ContextData for this Field!
             descriptor.AddPreProcessingParentProjectionDependencies(this.SelectionDependencies);

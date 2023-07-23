@@ -1,17 +1,12 @@
 ﻿#nullable enable
 
 using HotChocolate;
-using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.PreProcessingExtensions;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.PreProcessingExtensions.Sorting;
-using HotChocolate.Types.Pagination;
-using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using HotChocolate.Data;
 
 //Use the Same namespace as HotChocolate...
 namespace Microsoft.Extensions.DependencyInjection
@@ -68,8 +63,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 //Add all Default Sorting Operation conventions & the Custom PreProcessedSortProvider...
                 sortConventionDescriptor
                     .AddDefaultOperations()
-                    .BindDefaultTypes()
-                    .Provider(new PreProcessedSortProvider());
+                    .BindDefaultTypes();
+                    //.Provider(new PreProcessedSortProvider());
             }, name);
         }
 
