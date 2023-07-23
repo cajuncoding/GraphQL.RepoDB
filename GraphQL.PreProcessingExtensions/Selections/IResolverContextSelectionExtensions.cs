@@ -132,21 +132,11 @@ namespace HotChocolate.PreProcessingExtensions.Selections
             var gathered = new List<PreProcessingSelection>();
 
             //Initialize the optional base field selection if specified...
-            var baseFieldSelection = baseSelection?.GraphQLFieldSelection;
-            
-            //Dynamically support re-basing to the specified baseSelection or fallback to current Context.Field
-            var field = context.GetSelectedField(); //baseFieldSelection?.Field ?? context.Selection.Field;
-
-            //Initialize the optional SelectionSet to rebase processing as the root for GetSelections()
-            //  if specified (but is optional & null safe)...
-            SelectionSetNode? baseSelectionSetNode = baseFieldSelection is ISelection baseISelection
-                ? baseISelection.SelectionSet
-                : null!;
-
-            var contextSelection = context.Selection;
+            //Dynamically support re-basing to the specified baseSelection or fallback to current Context.Selection
+            var baseFieldSelection = baseSelection?.GraphQLFieldSelection ?? context.Selection;
 
             //Get all possible ObjectType(s); InterfaceTypes & UnionTypes will have more than one...
-            var objectTypes = GetObjectTypesSafely((IType)field.Type, context.Schema);
+            var objectTypes = GetObjectTypesSafely(baseFieldSelection.Type, context.Schema);
 
             //Map all object types into PreProcessingSelection (adapter classes)...
             foreach (var objectType in objectTypes)
@@ -154,12 +144,11 @@ namespace HotChocolate.PreProcessingExtensions.Selections
                 //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
                 //  in default behavior for current field.
                 //var childSelections = context.GetSelections(objectType, baseSelectionSetNode);
-                var childSelections = context.GetSelections(objectType, contextSelection);
+                var childSelections = context.GetSelections(objectType, baseFieldSelection);
                 var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(objectType, s));
                 gathered.AddRange(preprocessSelections);
             }
 
-            var selectionFields = context.GetSelectedField().GetFields();
             return gathered;
         }
 
@@ -169,7 +158,6 @@ namespace HotChocolate.PreProcessingExtensions.Selections
         /// HotChocolate.Data -> SelectionVisitor`1.cs
         /// </summary>
         /// <param name="type"></param>
-        /// <param name="objectType"></param>
         /// <param name="schema"></param>
         /// <returns></returns>
         private static List<ObjectType> GetObjectTypesSafely(IType type, ISchema schema)

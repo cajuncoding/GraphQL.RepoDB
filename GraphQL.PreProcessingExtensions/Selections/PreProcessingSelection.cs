@@ -27,7 +27,7 @@ namespace HotChocolate.PreProcessingExtensions
         public MemberInfo? ClassMemberInfo { get; }
 
         //TODO: TEST Which of these can/should be used???
-        public string Name => GraphQLFieldSelection.ResponseName;
+        public string Name => GraphQLFieldSelection.Field.Name;
         public string SelectionName => GraphQLFieldSelection.Field.Name;
 
         public string SelectionMemberName => ClassMemberInfo?.Name! ?? SelectionName;
