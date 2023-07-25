@@ -1,12 +1,9 @@
 ﻿# nullable enable
 
-using HotChocolate.Data.Sorting;
-using HotChocolate.Language;
-using HotChocolate.Resolvers;
-using HotChocolate.Types;
 using System;
+using HotChocolate.Data.Sorting;
+using HotChocolate.Resolvers;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace HotChocolate.PreProcessingExtensions.Sorting
@@ -17,6 +14,8 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
         /// Safely process the GraphQL context to retrieve the Order argument;
         /// matches the default name used by HotChocolate Sorting middleware (order: {{field1}: ASC, {field2}: DESC).
         /// Will return Empty List if the order arguments/info is not available.
+        ///NOTE: HC will set Sorting Handled() to true as Default behaviour immediately when the GetSortingContext() is called;
+        /// therefore this holds true also for when this is called.
         /// </summary>
         /// <returns></returns>
         public static List<ISortOrderField>? GetSortingArgsSafely(this IResolverContext context, string sortOrderArgName = null!)

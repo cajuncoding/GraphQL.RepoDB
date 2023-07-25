@@ -6,6 +6,7 @@ using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.Data.Sorting;
 using HotChocolate.PreProcessingExtensions.Arguments;
 using HotChocolate.PreProcessingExtensions.Selections;
 
@@ -55,10 +56,13 @@ namespace HotChocolate.PreProcessingExtensions
             => _selectionDependencies ??= GatherDependencyLinks();
 
         public virtual IReadOnlyList<IPreProcessingSelection> GetSelectionFieldsFor<TObjectType>()
-            => AllSelectionFields?.Where(s => typeof(TObjectType).IsAssignableFrom(s.GraphQLObjectType.RuntimeType)).ToList();
+            => AllSelectionFields?.Where(s => typeof(TObjectType).IsAssignableFrom(s.RuntimeType)).ToList();
 
         public virtual IReadOnlyList<ISortOrderField> SortArgs 
             => _sortArgs ??= _resolverContext.GetSortingArgsSafely();
+
+        public virtual void SetSortingIsHandled(bool isHandled = true)
+            => _resolverContext.GetSortingContext()?.Handled(isHandled);
 
         public virtual CursorPagingArguments PagingArgs => CursorPagingArgs;
 

@@ -14,14 +14,15 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
     /// As a real List<> the PureCode Schema inference works as expected!
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class PreProcessedSortedResults<TEntity> : List<TEntity>, IEnumerable<TEntity>, IAmPreProcessedResult
+    [Obsolete("It is now Recommended to use the SetSortingIsHandled() convenience method or access the SortArgs (which will then cause HC to set Sorting as already handled),"
+              + " and then return your IEnumerable, List, etc. directly from the resolver; this will simplify your code and offer some performance improvement. This will be removed in a future release.")]
+    public class PreProcessedSortedResults<TEntity> : List<TEntity>, IPreProcessedSortedResults<TEntity>, IAmPreProcessedResult
     {
         public PreProcessedSortedResults(IEnumerable<TEntity> results)
         {
             if(results != null)
                 this.AddRange(results);
         }
-
     }
 
     public static class PreprocessedSortedResultsExtensions
@@ -33,9 +34,11 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="enumerableItems"></param>
         /// <returns></returns>
+        [Obsolete("It is now Recommended to use the SetSortingIsHandled() convenience method or access the SortArgs (which will then cause HC to set Sorting as already handled),"
+                  + " and then return your IEnumerable, List, etc. directly from the resolver; this will simplify your code and offer some performance improvement. This will be removed in a future release.")]
         public static PreProcessedSortedResults<TEntity> AsPreProcessedSortResults<TEntity>(this IEnumerable<TEntity> enumerableItems)
         {
-            if (enumerableItems == null) 
+            if (enumerableItems == null)
                 return null;
 
             return new PreProcessedSortedResults<TEntity>(enumerableItems);

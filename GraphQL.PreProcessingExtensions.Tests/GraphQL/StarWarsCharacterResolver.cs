@@ -7,6 +7,7 @@ using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.Types;
+using HotChocolate.Types.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
 {
@@ -24,7 +25,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         [UsePaging]
         [UseSorting]
         [GraphQLName("starWarsCharactersCursorPaginated")]
-        public Task<PreProcessedCursorSlice<IStarWarsCharacter>> GetStarWarsCharactersWithCursorPagingAsync(
+        public Task<Connection<IStarWarsCharacter>> GetStarWarsCharactersWithCursorPagingAsync(
             [GraphQLParams] IParamsContext paramsContext,
             bool testEmptyResults = false
         )
@@ -35,7 +36,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             
             var results = characters.SliceAsCursorPage(paramsContext.CursorPagingArgs);
             
-            return Task.FromResult(results.AsPreProcessedCursorSlice());
+            return Task.FromResult(results.ToGraphQLConnection());
         }
 
         [UseOffsetPaging]

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 namespace HotChocolate.PreProcessingExtensions.Sorting
 {
-    public interface IPreProcessedSortedResults<TEntity> : IEnumerable<TEntity>, IAmPreProcessedResult
+    [Obsolete("It is now Recommended to use the SetSortingIsHandled() convenience method or access the SortArgs (which will then cause HC to set Sorting as already handled),"
+              + " and then return your IEnumerable, List, etc. directly from the resolver; this will simplify your code and offer some performance improvement. This will be removed in a future release.")]
+    public interface IPreProcessedSortedResults<out TEntity> : IEnumerable<TEntity>, IAmPreProcessedResult
     {
     }
 }

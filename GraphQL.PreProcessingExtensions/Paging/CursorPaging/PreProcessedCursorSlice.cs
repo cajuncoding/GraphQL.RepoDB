@@ -15,6 +15,9 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     /// As a real List<> the PureCode Schema inference works as expected!
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
+    [Obsolete("It is now Recommended to simply use ToGraphQLConnection() for directly returning a GraphQL Connection from Hot Chocolate Resolvers instead;"
+              + " since HC has resolved internal bug(s), a Connection result will offer improved performance. This will likely be removed in future release"
+              + " (especially once the new Paging features are available in a later version of v13.")]
     public class PreProcessedCursorSlice<TEntity> : List<TEntity>, IPreProcessedCursorSlice<TEntity>
     {
         public PreProcessedCursorSlice(ICursorPageSlice<TEntity> pageSlice)
@@ -36,15 +39,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
 
         public bool HasPreviousPage { get; protected set; }
 
-        public IEnumerable<IndexEdge<TEntity>> ToEdgeResults()
-        {
-            //The Linq Selection provides IEnumerable for us...
-            //Note: that's why we do NOT call ToList() here so that consuming classes may provide additional filtering...
-            var results = this.CursorPage?.CursorResults
-                .Where(cr => cr != null)
-                .Select(cr => IndexEdge<TEntity>.Create(cr.Entity, cr.CursorIndex));
-
-            return results;
-        }
+        public Connection<TEntity> ToGraphQLConnection()
+            => this.CursorPage.ToGraphQLConnection();
     }
 }

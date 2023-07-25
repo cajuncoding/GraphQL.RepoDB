@@ -2,6 +2,7 @@
 using HotChocolate.Types;
 using System;
 using System.Reflection;
+using HotChocolate.Data.Projections.Context;
 using HotChocolate.Execution.Processing;
 
 namespace HotChocolate.PreProcessingExtensions
@@ -13,18 +14,18 @@ namespace HotChocolate.PreProcessingExtensions
     /// </summary>
     public class PreProcessingSelection : IHasName, IPreProcessingSelection
     {
-        public PreProcessingSelection(ObjectType objectType, ISelection selectionField)
+        public PreProcessingSelection(ISelectedField selectedField)
         {
-            GraphQLObjectType = objectType ?? throw new ArgumentNullException(nameof(objectType));
-            GraphQLFieldSelection = selectionField ?? throw new ArgumentNullException(nameof(selectionField));
-            ClassMemberInfo = selectionField.Field?.Member;
+            GraphQLFieldSelection = selectedField ?? throw new ArgumentNullException(nameof(selectedField));
+            if (GraphQLFieldSelection.Field == null)
+                throw new ArgumentNullException(nameof(GraphQLFieldSelection.Field));
         }
 
-        public ObjectType GraphQLObjectType { get; }
+        public Type RuntimeType => GraphQLFieldSelection.Field.RuntimeType;
 
-        public ISelection GraphQLFieldSelection { get; }
+        public ISelectedField GraphQLFieldSelection { get; }
 
-        public MemberInfo? ClassMemberInfo { get; }
+        public MemberInfo? ClassMemberInfo => GraphQLFieldSelection.Field?.Member;
 
         //TODO: TEST Which of these can/should be used???
         public string Name => GraphQLFieldSelection.Field.Name;
@@ -40,7 +41,7 @@ namespace HotChocolate.PreProcessingExtensions
 
         public override string ToString()
         {
-            return $"{GraphQLObjectType.Name}:{SelectionName}";
+            return $"{GraphQLFieldSelection.Field.DeclaringType.Name}:{SelectionName}";
         }
     }
 }

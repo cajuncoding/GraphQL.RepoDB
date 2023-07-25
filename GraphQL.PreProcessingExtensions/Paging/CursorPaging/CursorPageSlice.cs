@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.Types.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
@@ -76,9 +77,40 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// ceremonial code for new-ing up the results.
         /// </summary>
         /// <returns></returns>
-        public PreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice()
+        [Obsolete("It is now Recommended to simply use ToGraphQLConnection() for returning data from Hot Chocolate Resolvers instead;"
+                    + " since HC has resolved internal bug(s), a Connection result will offer improved performance.")]
+        public PreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice() => new(this);
+
+        public Connection<TEntity> ToGraphQLConnection()
         {
-            return new PreProcessedCursorSlice<TEntity>(this);
+            var edges = this.ToEdgeResults().ToList();
+
+            var connectionPageInfo = new ConnectionPageInfo(
+                hasNextPage: this.HasNextPage,
+                hasPreviousPage: this.HasPreviousPage,
+                startCursor: edges.FirstOrDefault()?.Cursor,
+                endCursor: edges.LastOrDefault()?.Cursor
+            );
+
+            var graphQLConnection = new Connection<TEntity>(
+                edges,
+                connectionPageInfo,
+                this.TotalCount ?? 0
+            );
+
+            return graphQLConnection;
+        }
+
+        private IEnumerable<IndexEdge<TEntity>> ToEdgeResults()
+        {
+            //Ensure we are null safe and return a valid empty list by default.
+            //Note: We intentionally do NOT call ToList() here so that consuming classes may provide additional filtering...
+            var results = this.CursorResults
+                ?.Where(cr => cr != null)
+                .Select(cr => IndexEdge<TEntity>.Create(cr.Entity, cr.CursorIndex))
+            ?? Enumerable.Empty<IndexEdge<TEntity>>();
+
+            return results;
         }
     }
 }

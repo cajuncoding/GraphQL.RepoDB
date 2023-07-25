@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotChocolate.Types.Pagination;
+using System;
 using System.Collections.Generic;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
@@ -41,6 +42,16 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// ceremonial code for new-ing up the results.
         /// </summary>
         /// <returns></returns>
+        [Obsolete("It is Strongly Recommended to now simply use ToGraphQLConnection() for returning data from Hot Chocolate Resolvers instead; " +
+                  "since HC has resolved internal bug(s), a Connection result will offer improved performance. This will be removed in a future release to simplify the code," +
+                  "and improve use of OOTB HC features (esp. when the new Pagination features are available in a later release of v13).")]
         PreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice();
+
+        /// <summary>
+        /// Convenience method to Convert the current Page Slice to a GraphQL Connection result to return from the Resolver;
+        /// Connection results will not be processed as a Page since it's already paginated!
+        /// </summary>
+        /// <returns></returns>
+        Connection<TEntity> ToGraphQLConnection();
     }
 }

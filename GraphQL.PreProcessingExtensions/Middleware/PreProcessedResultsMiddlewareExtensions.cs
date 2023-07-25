@@ -1,13 +1,9 @@
 ﻿#nullable enable
 
-using HotChocolate;
 using HotChocolate.Execution.Configuration;
 using HotChocolate.PreProcessingExtensions;
 using HotChocolate.PreProcessingExtensions.Pagination;
-using HotChocolate.PreProcessingExtensions.Sorting;
 using System;
-using HotChocolate.Data;
-using HotChocolate.Data.Sorting;
 
 //Use the Same namespace as HotChocolate...
 namespace Microsoft.Extensions.DependencyInjection
@@ -39,36 +35,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 //Add DI Middleware for Parameter
                 .AddMiddlewareForPreProcessedResults()
                 //Add Paging extensions
-                .AddPagingForPreProcessedResults()
-                //Add Sorting Extensions
-                //TODO: Clean up Sorting Code no longer needed with Middleware use of SortingContext.Handle()...
-                ;//.AddSortingForPreProcessedResults(name);
+                .AddPagingForPreProcessedResults();
         }
-
-        ///// <summary>
-        ///// Manually add only support for PreProcessed Sorting; 
-        ///// recommended to use AddPreProcessedResultsExtensions() to enable all support instead.
-        ///// </summary>
-        ///// <param name="builder"></param>
-        ///// <param name="name"></param>
-        ///// <returns></returns>
-        //public static IRequestExecutorBuilder AddSortingForPreProcessedResults(
-        //    this IRequestExecutorBuilder builder,
-        //    string? name = null
-        //)
-        //{
-        //    if (builder is null)
-        //        throw new ArgumentNullException(nameof(builder));
-
-        //    return builder.AddSorting((sortConventionDescriptor) =>
-        //    {
-        //        //Add all Default Sorting Operation conventions & the Custom PreProcessedSortProvider...
-        //        sortConventionDescriptor
-        //            .AddDefaultOperations()
-        //            .BindDefaultTypes();
-        //            //.Provider(new PreProcessedSortProvider());
-        //    }, name);
-        //}
 
         /// <summary>
         /// Manually add only support for PreProcessed Paging; 
@@ -76,6 +44,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
+        [Obsolete("It is now Recommended to simply use ToGraphQLConnection() for directly returning a GraphQL Connection from Hot Chocolate Resolvers instead;"
+                  + " since HC has resolved internal bug(s), a Connection result will offer improved performance. This will likely be removed in future release"
+                  + " (especially once the new Paging features are available in a later version of v13.")]
         public static IRequestExecutorBuilder AddPagingForPreProcessedResults(
             this IRequestExecutorBuilder builder
         )
@@ -107,20 +78,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
 
             //Add the middleware DI logic as Local Scoped data for Parameters context...
-            return builder.UseField(next => context =>
-            {
-                context.SetLocalValue(nameof(GraphQLParamsContext), new GraphQLParamsContext(context));
-                var result = next.Invoke(context);
-                
-                if (context.Result is IAmPreProcessedResult)
-                {
-                    //Since sorting is already 'pre-processed' (e.g. by the Resolver) 
-                    //  we can immediately yield control back to the HotChocolate Pipeline
-                    context.GetSortingContext()?.Handled(true);
-                }
-
-                return result;
-            });
+            return builder.UseField<PreProcessingResultsMiddleware>();
         }
 
 

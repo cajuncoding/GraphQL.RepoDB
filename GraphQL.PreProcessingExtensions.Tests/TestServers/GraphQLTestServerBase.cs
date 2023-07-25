@@ -50,7 +50,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                         //  and expose it publicly for Test cases to utilize!
                         //NOTE: MANY middleware invocations will execute for various fields so have to track them all
                         //      for later access...
-                        var paramsContext = context.GetLocalValue<GraphQLParamsContext>(nameof(GraphQLParamsContext));
+                        var paramsContext = context.GetLocalState<GraphQLParamsContext>(nameof(GraphQLParamsContext));
                         
                         ParamsContextList.Add(new KeyValuePair<string, IParamsContext>(
                             context.Selection.Field.Name, 

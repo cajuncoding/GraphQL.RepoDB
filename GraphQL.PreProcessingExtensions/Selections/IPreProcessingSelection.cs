@@ -3,15 +3,16 @@ using HotChocolate.Types;
 using HotChocolate.Data.Projections.Context;
 using System.Reflection;
 using HotChocolate.Execution.Processing;
+using System;
 
 namespace HotChocolate.PreProcessingExtensions
 {
     public interface IPreProcessingSelection
     {
-        ISelection GraphQLFieldSelection { get; }
-        
-        ObjectType GraphQLObjectType { get; }
-        
+        ISelectedField GraphQLFieldSelection { get; }
+
+        public Type RuntimeType { get; }
+
         MemberInfo? ClassMemberInfo { get; }
         
         //TODO: DELETE If now redundant since NameString isn't available anymore...

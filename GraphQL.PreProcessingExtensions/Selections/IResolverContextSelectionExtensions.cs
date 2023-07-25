@@ -1,7 +1,5 @@
 ﻿#nullable enable
 
-using HotChocolate.Execution.Processing;
-using HotChocolate.Language;
 using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using System;
@@ -129,65 +127,24 @@ namespace HotChocolate.PreProcessingExtensions.Selections
             if (context == null)
                 return null!;
 
-            var gathered = new List<PreProcessingSelection>();
-
             //Initialize the optional base field selection if specified...
             //Dynamically support re-basing to the specified baseSelection or fallback to current Context.Selection
-            var baseFieldSelection = baseSelection?.GraphQLFieldSelection ?? context.Selection;
+            var baseFieldSelection = baseSelection?.GraphQLFieldSelection ?? context.GetSelectedField();
 
-            //Get all possible ObjectType(s); InterfaceTypes & UnionTypes will have more than one...
-            var objectTypes = GetObjectTypesSafely(baseFieldSelection.Type, context.Schema);
+            //Following Logic for processing the SelectionContext was adapted from the HotChocolate Core Unit Tests:
+            //  HotChocolate.Data.SelectionContextTests => GetFields_Should_ReturnAllTheSelectedFields()
+            // NOTE: HC will throw an Exception if you attempt to get the Fields of an Abstract Type (Interface, Union, etc.)
+            //          without specifying the type, and therefore due to all the possible combination of Lists, Connections, etc.
+            //          along with Abstract Types it's safest and far more simple to always attempt to get possible types
+            //          and enumerate them to then get the Fields for each possible type!
+            var possibleTypes = context.Schema.GetPossibleTypes(baseFieldSelection.Type.NamedType());
 
-            //Map all object types into PreProcessingSelection (adapter classes)...
-            foreach (var objectType in objectTypes)
-            {
-                //Now we can process the ObjectType with the correct context (selectionSet may be null resulting
-                //  in default behavior for current field.
-                //var childSelections = context.GetSelections(objectType, baseSelectionSetNode);
-                var childSelections = context.GetSelections(objectType, baseFieldSelection);
-                var preprocessSelections = childSelections.Select(s => new PreProcessingSelection(objectType, s));
-                gathered.AddRange(preprocessSelections);
-            }
+            var gatheredSelections = possibleTypes
+                .SelectMany(pt => baseFieldSelection.GetFields(pt))
+                .Select(sf => new PreProcessingSelection(sf))
+                .ToList();
 
-            return gathered;
-        }
-
-        /// <summary>
-        /// ObjectType resolver function to get the current object type enhanced with support
-        /// for InterfaceTypes & UnionTypes; initially modeled after from HotChocolate source:
-        /// HotChocolate.Data -> SelectionVisitor`1.cs
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="schema"></param>
-        /// <returns></returns>
-        private static List<ObjectType> GetObjectTypesSafely(IType type, ISchema schema)
-        {
-            var results = new List<ObjectType>();
-            switch (type)
-            {
-                case NonNullType nonNullType:
-                    results.AddRange(GetObjectTypesSafely(nonNullType.NamedType(), schema));
-                    break;
-                case ObjectType objType:
-                    results.Add(objType);
-                    break;
-                case ListType listType:
-                    results.AddRange(GetObjectTypesSafely(listType.InnerType(), schema));
-                    break;
-                case InterfaceType interfaceType:
-                    var possibleInterfaceTypes = schema.GetPossibleTypes(interfaceType);
-                    var objectTypesForInterface = possibleInterfaceTypes.SelectMany(t => GetObjectTypesSafely(t, schema));
-                    results.AddRange(objectTypesForInterface);
-                    break;
-                //TODO: TEST UnionTypes!
-                case UnionType unionType:
-                    var possibleUnionTypes = schema.GetPossibleTypes(unionType);
-                    var objectTypesForUnion = possibleUnionTypes.SelectMany(t => GetObjectTypesSafely(t, schema));
-                    results.AddRange(objectTypesForUnion);
-                    break;
-            }
-
-            return results;
+            return gatheredSelections;
         }
     }
 }

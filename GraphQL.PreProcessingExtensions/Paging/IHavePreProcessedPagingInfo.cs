@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HotChocolate.Types.Pagination;
+using System;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
