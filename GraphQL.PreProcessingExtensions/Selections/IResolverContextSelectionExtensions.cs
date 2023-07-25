@@ -129,7 +129,7 @@ namespace HotChocolate.PreProcessingExtensions.Selections
 
             //Initialize the optional base field selection if specified...
             //Dynamically support re-basing to the specified baseSelection or fallback to current Context.Selection
-            var baseFieldSelection = baseSelection?.GraphQLFieldSelection ?? context.GetSelectedField();
+            var baseFieldSelection = baseSelection?.graphqlFieldSelection ?? context.GetSelectedField();
 
             //Following Logic for processing the SelectionContext was adapted from the HotChocolate Core Unit Tests:
             //  HotChocolate.Data.SelectionContextTests => GetFields_Should_ReturnAllTheSelectedFields()

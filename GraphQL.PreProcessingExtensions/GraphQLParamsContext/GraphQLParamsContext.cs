@@ -158,7 +158,7 @@ namespace HotChocolate.PreProcessingExtensions
             var results = new List<PreProcessingDependencyLink>();
             foreach (var selectionField in AllSelectionFields)
             {
-                var contextData = selectionField?.GraphQLFieldSelection?.Field?.ContextData;
+                var contextData = selectionField?.graphqlFieldSelection?.Field?.ContextData;
                 if (contextData?.ContainsKey(PreProcessingParentDependencies.ContextDataKey) == true
                     && contextData[PreProcessingParentDependencies.ContextDataKey] is IEnumerable<PreProcessingDependencyLink> dependencyLinks)
                 {

@@ -17,8 +17,8 @@ namespace HotChocolate.PreProcessingExtensions
 
         public async Task InvokeAsync(IMiddlewareContext context)
         {
-            var graphqlParamsContext = new GraphQLParamsContext(context);
-            context.SetLocalState(nameof(GraphQLParamsContext), graphqlParamsContext);
+            var paramsContextFacade = new GraphQLParamsContext(context);
+            context.SetLocalState(nameof(GraphQLParamsContext), paramsContextFacade);
             
             await _next(context).ConfigureAwait(false);
 
@@ -27,7 +27,7 @@ namespace HotChocolate.PreProcessingExtensions
             {
                 //Since sorting is already 'pre-processed' (e.g. by the Resolver) 
                 //  we can immediately yield control back to the HotChocolate Pipeline
-                graphqlParamsContext.SetSortingIsHandled(true);
+                paramsContextFacade.SetSortingIsHandled(true);
             }
         }
     }

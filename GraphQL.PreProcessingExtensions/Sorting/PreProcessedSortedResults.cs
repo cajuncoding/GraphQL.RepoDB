@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Linq;
 
 namespace HotChocolate.PreProcessingExtensions.Sorting
 {
@@ -16,13 +17,49 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
     /// <typeparam name="TEntity"></typeparam>
     [Obsolete("It is now Recommended to use the SetSortingIsHandled() convenience method or access the SortArgs (which will then cause HC to set Sorting as already handled),"
               + " and then return your IEnumerable, List, etc. directly from the resolver; this will simplify your code and offer some performance improvement. This will be removed in a future release.")]
-    public class PreProcessedSortedResults<TEntity> : List<TEntity>, IPreProcessedSortedResults<TEntity>, IAmPreProcessedResult
+    public class PreProcessedSortedResults<TEntity> : IList<TEntity>, IPreProcessedSortedResults<TEntity>, IAmPreProcessedResult
     {
+        private readonly List<TEntity> _innerList;
+
         public PreProcessedSortedResults(IEnumerable<TEntity> results)
         {
-            if(results != null)
-                this.AddRange(results);
+            _innerList = results?.ToList() ?? throw new ArgumentNullException(nameof(results));
         }
+
+
+        #region IList<T> implementation
+
+        public TEntity this[int index]
+        {
+            get => _innerList[index];
+            set => _innerList[index] = value;
+        }
+
+        public int Count => _innerList.Count;
+
+        public bool IsReadOnly => ((ICollection<TEntity>)_innerList).IsReadOnly;
+
+        public void Add(TEntity item) => _innerList.Add(item);
+
+        public void Clear() => _innerList.Clear();
+
+        public bool Contains(TEntity item) => _innerList.Contains(item);
+
+        public void CopyTo(TEntity[] array, int arrayIndex) => _innerList.CopyTo(array, arrayIndex);
+
+        public IEnumerator<TEntity> GetEnumerator() => _innerList.GetEnumerator();
+
+        public int IndexOf(TEntity item) => _innerList.IndexOf(item);
+
+        public void Insert(int index, TEntity item) => _innerList.Insert(index, item);
+
+        public bool Remove(TEntity item) => _innerList.Remove(item);
+
+        public void RemoveAt(int index) => _innerList.RemoveAt(index);
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        
+        #endregion
     }
 
     public static class PreprocessedSortedResultsExtensions
@@ -36,7 +73,7 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
         /// <returns></returns>
         [Obsolete("It is now Recommended to use the SetSortingIsHandled() convenience method or access the SortArgs (which will then cause HC to set Sorting as already handled),"
                   + " and then return your IEnumerable, List, etc. directly from the resolver; this will simplify your code and offer some performance improvement. This will be removed in a future release.")]
-        public static PreProcessedSortedResults<TEntity> AsPreProcessedSortResults<TEntity>(this IEnumerable<TEntity> enumerableItems)
+        public static PreProcessedSortedResults<TEntity> ToPreProcessedSortResults<TEntity>(this IEnumerable<TEntity> enumerableItems)
         {
             if (enumerableItems == null)
                 return null;

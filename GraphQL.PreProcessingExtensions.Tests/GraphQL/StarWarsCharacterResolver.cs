@@ -11,7 +11,7 @@ using HotChocolate.Types.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
 {
-    [ExtendObjectType(Name = "Query")]
+    [ExtendObjectType("Query")]
     public class StarWarsCharacterResolver
     {
         [UseSorting]
@@ -42,7 +42,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         [UseOffsetPaging]
         [UseSorting]
         [GraphQLName("starWarsCharactersOffsetPaginated")]
-        public Task<PreProcessedOffsetPageResults<IStarWarsCharacter>> GetStarWarsCharactersWithOffsetPagingAsync(
+        public Task<CollectionSegment<IStarWarsCharacter>> GetStarWarsCharactersWithOffsetPagingAsync(
             [GraphQLParams] IParamsContext paramsContext,
             bool testEmptyResults = false
         )
@@ -53,7 +53,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
 
             var results = characters.SliceAsOffsetPage(paramsContext.OffsetPagingArgs);
 
-            return Task.FromResult(results.AsPreProcessedPageResults());
+            return Task.FromResult(results.ToGraphQLCollectionSegment());
         }
     }
 }

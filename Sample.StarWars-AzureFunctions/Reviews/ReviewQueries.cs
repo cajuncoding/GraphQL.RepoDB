@@ -6,6 +6,7 @@ using HotChocolate.PreProcessingExtensions;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.PreProcessingExtensions.Sorting;
 using HotChocolate.Types;
+using HotChocolate.Types.Pagination;
 using StarWars.Characters;
 using StarWars.Repositories;
 
@@ -17,7 +18,7 @@ namespace StarWars.Reviews
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IEnumerable<Review> GetReviews(
+        public Connection<Review> GetReviews(
             Episode episode,
             [Service]IReviewRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
@@ -39,7 +40,7 @@ namespace StarWars.Reviews
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering will be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return new PreProcessedCursorSlice<Review>(slicedreviews);
+            return slicedreviews.ToGraphQLConnection();
             //********************************************************************************
 
         }

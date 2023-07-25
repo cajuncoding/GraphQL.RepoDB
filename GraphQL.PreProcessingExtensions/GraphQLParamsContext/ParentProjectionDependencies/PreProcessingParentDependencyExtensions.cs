@@ -19,7 +19,7 @@ namespace HotChocolate.PreProcessingExtensions
     /// <summary>
     /// Configuration Extensions for "Code First" configuration of Parent Selection/Project
     /// dependencies for child resolver methods. By specifying Selection names here
-    /// we make it easy for the GraphQLParamsContext to resolve dependent Selection field
+    /// we make it easy for the graphqlParamsContext to resolve dependent Selection field
     /// names dynamically.
     /// </summary>
     public static class ExtensionDataExtensionsForPreProcessingProjectionDependencies

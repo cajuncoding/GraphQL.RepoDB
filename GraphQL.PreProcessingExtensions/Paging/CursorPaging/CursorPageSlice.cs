@@ -16,7 +16,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
     {
         public CursorPageSlice(IEnumerable<ICursorResult<TEntity>> results, int? totalCount, bool hasPreviousPage, bool hasNextPage)
         {
-            this.CursorResults = results ?? throw new ArgumentException(nameof(results));
+            this.CursorResults = results ?? throw new ArgumentNullException(nameof(results));
             this.TotalCount = totalCount;
             this.HasPreviousPage = hasPreviousPage;
             this.HasNextPage = hasNextPage;
@@ -31,6 +31,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         public bool HasNextPage { get; protected set; }
 
         public bool HasPreviousPage { get; protected set; }
+
         /// <summary>
         /// Convenience method to easily cast all types in the current page to a garget compatible type
         /// without affecting the cursor indexes, etc. Provide deferred execution via Linq Select(). Type mismatches
@@ -38,7 +39,7 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
-        public CursorPageSlice<TTargetType> OfType<TTargetType>()
+        public virtual CursorPageSlice<TTargetType> OfType<TTargetType>()
         {
             var enumerableResults = this.CursorResults
                 .Select(r =>
@@ -60,9 +61,11 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc">Specify the Func that takes the current type in and returns the target type.</param>
         /// <returns></returns>
-        public CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
+        public virtual CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
         {
-            if (mappingFunc == null) throw new ArgumentException(nameof(mappingFunc));
+            if (mappingFunc == null) 
+                throw new ArgumentException(nameof(mappingFunc));
+
             var results = this.CursorResults?.Select(r =>
             {
                 var mappedEntity = mappingFunc(r.Entity);
@@ -73,15 +76,11 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         }
 
         /// <summary>
-        /// Convenience method to Wrap the current Page Slice as PreProcessedCursorSliceResults; to eliminate
-        /// ceremonial code for new-ing up the results.
+        /// Convenience method to convert the current cursor based page slice to a GraphQL Connection result to return from the Resolver;
+        /// Connection results will not be post-processed since it's already paginated!
         /// </summary>
         /// <returns></returns>
-        [Obsolete("It is now Recommended to simply use ToGraphQLConnection() for returning data from Hot Chocolate Resolvers instead;"
-                    + " since HC has resolved internal bug(s), a Connection result will offer improved performance.")]
-        public PreProcessedCursorSlice<TEntity> AsPreProcessedCursorSlice() => new(this);
-
-        public Connection<TEntity> ToGraphQLConnection()
+        public virtual Connection<TEntity> ToGraphQLConnection()
         {
             var edges = this.ToEdgeResults().ToList();
 
@@ -92,23 +91,23 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
                 endCursor: edges.LastOrDefault()?.Cursor
             );
 
-            var graphQLConnection = new Connection<TEntity>(
+            var graphqlConnection = new Connection<TEntity>(
                 edges,
                 connectionPageInfo,
                 this.TotalCount ?? 0
             );
 
-            return graphQLConnection;
+            return graphqlConnection;
         }
 
-        private IEnumerable<IndexEdge<TEntity>> ToEdgeResults()
+        protected virtual IEnumerable<IndexEdge<TEntity>> ToEdgeResults()
         {
             //Ensure we are null safe and return a valid empty list by default.
             //Note: We intentionally do NOT call ToList() here so that consuming classes may provide additional filtering...
             var results = this.CursorResults
                 ?.Where(cr => cr != null)
                 .Select(cr => IndexEdge<TEntity>.Create(cr.Entity, cr.CursorIndex))
-            ?? Enumerable.Empty<IndexEdge<TEntity>>();
+                ?? Enumerable.Empty<IndexEdge<TEntity>>();
 
             return results;
         }

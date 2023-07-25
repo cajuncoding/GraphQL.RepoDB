@@ -4,6 +4,11 @@ using System.Text;
 
 namespace GraphQL.PreProcessingExtensions.Selections
 {
+    public static class SelectionFieldName
+    {
+        public const string TotalCount = "totalCount";
+    }
+
     public static class SelectionNodeName
     {
         public const string Nodes = "nodes";

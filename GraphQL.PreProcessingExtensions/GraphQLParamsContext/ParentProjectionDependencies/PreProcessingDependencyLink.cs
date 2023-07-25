@@ -13,7 +13,7 @@ namespace HotChocolate.PreProcessingExtensions
     {
         /// <summary>
         /// Class Property/Member name of the dependency; this is not the GraphQL Schema name,
-        /// because this is for internal dependency mapping between C# classes/models as the GraphQL
+        /// because this is for internal dependency mapping between C# classes/models as the graphql
         /// has already been processed and at this point the primary goal is to get the correct
         /// property of the C# Class Model.
         /// </summary>

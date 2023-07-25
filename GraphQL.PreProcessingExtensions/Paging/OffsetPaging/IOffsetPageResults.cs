@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using HotChocolate.Types.Pagination;
 
 namespace HotChocolate.PreProcessingExtensions.Pagination
 {
@@ -32,10 +33,10 @@ namespace HotChocolate.PreProcessingExtensions.Pagination
         OffsetPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc);
 
         /// <summary>
-        /// Convenience method to Wrap the current Page results as PreProcessedOffsetPageResults; to eliminate
-        /// ceremonial code for new-ing up the results.
+        /// Convenience method to convert the current offset based paginated results to a GraphQL CollectionSegment result to return from the Resolver;
+        /// CollectionSegment results will not be post-processed as since it's already paginated!
         /// </summary>
         /// <returns></returns>
-        PreProcessedOffsetPageResults<TEntity> AsPreProcessedPageResults();
+        CollectionSegment<TEntity> ToGraphQLCollectionSegment();
     }
 }

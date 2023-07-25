@@ -8,6 +8,16 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
 {
     public static class IEnumerableSortingCustomExtensions
     {
+        /// <summary>
+        /// Provides dynamic Linq in-memory sorting implementation for an IEnumerable using the GraphQL PreProcessing Extensions.
+        /// NOTE: This is primarily used for Unit Testing of in-memory data sets and is generally not recommended for production
+        ///     use unless you always have 100% of all your data in-memory; this is because sorting must be done on a pre-filtered and/or
+        /// complete data set to yield proper results.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="items"></param>
+        /// <param name="sortArgs"></param>
+        /// <returns></returns>
         public static IEnumerable<T> SortDynamically<T>(this IEnumerable<T> items, IReadOnlyList<ISortOrderField> sortArgs)
         {
             if (items == null || !items.Any())

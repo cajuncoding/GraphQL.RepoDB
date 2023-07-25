@@ -3,7 +3,6 @@ using HotChocolate.Types;
 using System;
 using System.Reflection;
 using HotChocolate.Data.Projections.Context;
-using HotChocolate.Execution.Processing;
 
 namespace HotChocolate.PreProcessingExtensions
 {
@@ -16,22 +15,21 @@ namespace HotChocolate.PreProcessingExtensions
     {
         public PreProcessingSelection(ISelectedField selectedField)
         {
-            GraphQLFieldSelection = selectedField ?? throw new ArgumentNullException(nameof(selectedField));
-            if (GraphQLFieldSelection.Field == null)
-                throw new ArgumentNullException(nameof(GraphQLFieldSelection.Field));
+            graphqlFieldSelection = selectedField ?? throw new ArgumentNullException(nameof(selectedField));
+            if (graphqlFieldSelection.Field == null)
+                throw new ArgumentNullException(nameof(graphqlFieldSelection.Field));
         }
 
-        public Type RuntimeType => GraphQLFieldSelection.Field.RuntimeType;
+        public Type RuntimeType => graphqlFieldSelection.Field.RuntimeType;
 
-        public ISelectedField GraphQLFieldSelection { get; }
+        public ISelectedField graphqlFieldSelection { get; }
 
-        public MemberInfo? ClassMemberInfo => GraphQLFieldSelection.Field?.Member;
+        public MemberInfo? ClassMemberInfo => graphqlFieldSelection.Field.Member;
 
-        //TODO: TEST Which of these can/should be used???
-        public string Name => GraphQLFieldSelection.Field.Name;
-        public string SelectionName => GraphQLFieldSelection.Field.Name;
+        public string Name => graphqlFieldSelection.Field.Name;
+        public string SelectionName => Name;
 
-        public string SelectionMemberName => ClassMemberInfo?.Name! ?? SelectionName;
+        public string SelectionMemberName => ClassMemberInfo?.Name ?? Name;
 
         /// <summary>
         /// Select the MemberName if possible otherwise retrieve the SelectionName
@@ -41,7 +39,7 @@ namespace HotChocolate.PreProcessingExtensions
 
         public override string ToString()
         {
-            return $"{GraphQLFieldSelection.Field.DeclaringType.Name}:{SelectionName}";
+            return $"{graphqlFieldSelection.Field.DeclaringType.Name}:{SelectionName}";
         }
     }
 }
