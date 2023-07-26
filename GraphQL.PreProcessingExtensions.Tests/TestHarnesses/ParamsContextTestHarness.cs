@@ -42,6 +42,11 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         public IReadOnlyList<string> AllSelectionNames { get; }
         public IReadOnlyList<PreProcessingDependencyLink> SelectionDependencies { get; }
         public IReadOnlyList<ISortOrderField> SortArgs { get; }
+        public void SetSortingIsHandled(bool isHandled = true)
+        {
+            throw new NotImplementedException();
+        }
+
         public CursorPagingArguments PagingArgs { get; }
         public CursorPagingArguments CursorPagingArgs { get; }
         public OffsetPagingArguments OffsetPagingArgs { get; }

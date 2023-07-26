@@ -28,6 +28,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                         .AddGraphQLServer()
                         .AddQueryType(d => d.Name("Query"))
                         .AddType<HelloWorldResolver>()
+                        .AddSorting()
                         //We ONLY Add Middleware for testing without Advanced support for Sorting, etc...
                         //  to help determine if ParamsContext has graceful fallback functionality.
                         .AddMiddlewareForPreProcessedResults();

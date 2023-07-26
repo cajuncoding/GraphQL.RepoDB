@@ -1,9 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.PreProcessingExtensions;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
@@ -29,7 +24,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
 
             var paramsContext = server.GetParamsContext("hello");
             Assert.IsNotNull(paramsContext?.AllArgumentSchemaNames);
-            Assert.AreEqual(paramsContext.AllArgumentSchemaNames.Count, 1);
+            Assert.AreEqual(paramsContext!.AllArgumentSchemaNames.Count, 1);
             Assert.AreEqual(paramsContext.AllArgumentSchemaNames[0], "name");
         }
 

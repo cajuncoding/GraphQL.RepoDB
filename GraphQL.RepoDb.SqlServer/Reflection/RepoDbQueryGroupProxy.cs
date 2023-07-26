@@ -1,8 +1,6 @@
 ﻿using RepoDb;
 using System;
-using System.Collections.Generic;
-using System.Reflection.CustomExtensions;
-using System.Text;
+using System.Reflection.GraphQLRepoDb.CustomExtensions;
 
 namespace HotChocolate.RepoDb.SqlServer.Reflection
 {

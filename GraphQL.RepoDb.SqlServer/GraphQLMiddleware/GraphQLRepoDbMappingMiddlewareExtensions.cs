@@ -1,8 +1,8 @@
 ﻿#nullable enable
 
 using HotChocolate.Execution.Configuration;
-using HotChocolate.PreProcessingExtensions;
 using System;
+using HotChocolate.RepoDb;
 
 //Use the Same namespace as HotChocolate...
 namespace Microsoft.Extensions.DependencyInjection
@@ -15,42 +15,54 @@ namespace Microsoft.Extensions.DependencyInjection
     /// This works in collaboration with OOTB Queryable functionality, intercepting only PreProcessed result
     /// decorated results.
     /// </summary>
-    public static class PreProcessedResultsMiddlewareExtensions
+    public static class GraphQLRepoDbMappingMiddlewareExtensions
     {
+        public static bool IsRegistered { get; private set; }
+
         /// <summary>
         /// This is the Primary method to wire up all extensions for working with
-        /// Pre-Processed results in the Resolver or lower layer (e.g. Services/Repositories).
+        /// RepoDb with HotChocolate GraphQL Server.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static IRequestExecutorBuilder AddPreProcessedResultsExtensions(
+        public static IRequestExecutorBuilder AddRepoDbExtensions(
             this IRequestExecutorBuilder builder,
             string? name = null
         )
         {
-            //Add DI Middleware for Parameter Facade to be Injected and results
-            //  (pre-processed in the resolver) to be correctly handled...
-            return builder.AddMiddlewareForPreProcessedResults();
+            //Dynamically detect if AddPreProcessedResultsExtensions() has been called and if not then we call it
+            //  to ensure our dependencies are initialized...
+            if (!PreProcessedResultsMiddlewareExtensions.IsRegistered)
+            {
+                builder.AddPreProcessedResultsExtensions();
+            }
+
+            IsRegistered = true;
+
+            //Add DI Middleware for RepoDb Mapping Facade to be Injected into Resolvers...
+            return builder.AddMiddlewareForRepoDbMapping();
         }
 
         /// <summary>
-        /// Add Middleware Logic that enables Dynamic Injection of the graphqlParamsContext which
+        /// Add Middleware Logic that enables Dynamic Injection of the GraphQLRepoDbMapper which
         ///  makes working with Select Fields, Sort Fields, Paging Arguments, etc. much easier and elegant
-        ///  in a pure code first use case; but can always be manually constructed from IResolverContext
+        ///  via Resolver DI; but can always be manually constructed from IResolverContext
         ///  in any other scenario needed.
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IRequestExecutorBuilder AddMiddlewareForPreProcessedResults(
+        public static IRequestExecutorBuilder AddMiddlewareForRepoDbMapping(
             this IRequestExecutorBuilder builder
         )
         {
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
+            IsRegistered = true;
+
             //Add the middleware DI logic as Local Scoped data for Parameters context...
-            return builder.UseField<PreProcessingResultsMiddleware>();
+            return builder.UseField<GraphQLRepoDbMappingMiddleware>();
         }
 
 

@@ -3,7 +3,6 @@
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using System;
-using GraphQL.PreProcessingExtensions.Paging;
 using HotChocolate.PreProcessingExtensions.Arguments;
 
 

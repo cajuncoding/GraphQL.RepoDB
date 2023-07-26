@@ -16,7 +16,9 @@ namespace HotChocolate.PreProcessingExtensions.Tests
     {
         [UseSorting]
         [GraphQLName("starWarsCharacters")]
-        public Task<IEnumerable<IStarWarsCharacter>> GetStarWarsCharactersAsync()
+        public Task<IEnumerable<IStarWarsCharacter>> GetStarWarsCharactersAsync(
+            [GraphQLParams] IParamsContext paramsContext
+        )
         {
             var results = StarWarsCharacterRepo.CreateCharacters();
             return Task.FromResult(results);

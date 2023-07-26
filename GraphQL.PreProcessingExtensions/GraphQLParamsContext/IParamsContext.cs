@@ -1,10 +1,8 @@
-﻿using HotChocolate.PreProcessingExtensions.Pagination;
-using HotChocolate.PreProcessingExtensions.Sorting;
+﻿using HotChocolate.PreProcessingExtensions.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using System;
 using System.Collections.Generic;
-using HotChocolate.Language;
 using HotChocolate.PreProcessingExtensions.Arguments;
 
 namespace HotChocolate.PreProcessingExtensions
@@ -78,7 +76,14 @@ namespace HotChocolate.PreProcessingExtensions
         IReadOnlyList<ISortOrderField> SortArgs { get; }
 
         /// <summary>
-        /// The Cursor Paging arguments for the GrqphQL request; the default paging method is Cursor based paging which 
+        /// Facade to set the status of Sorting for the current Resolver Context;
+        ///     an easy to access proxy to the OOTB ResolverContext.GetSortingContext().Handled() method.
+        /// </summary>
+        /// <param name="isHandled"></param>
+        void SetSortingIsHandled(bool isHandled = true);
+
+        /// <summary>
+        /// The Cursor Paging arguments for the GraphQL request; the default paging method is Cursor based paging which 
         /// matches HotChocolate [UsePaging] attribute. Otherwise use OffsetPagingArgs with the [UseOffsetPaging] attribute.
         /// </summary>
         CursorPagingArguments PagingArgs { get; }
@@ -94,7 +99,6 @@ namespace HotChocolate.PreProcessingExtensions
         /// HotChocolate attribute.
         /// </summary>
         OffsetPagingArguments OffsetPagingArgs { get; }
-
 
         /// <summary>
         /// The Total Count selection field (a unique system selection only available when Paging is enabled).

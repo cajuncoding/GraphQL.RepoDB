@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HotChocolate;
@@ -11,7 +12,10 @@ namespace HotChocolate.PreProcessingExtensions.Tests.GraphQL
     public class HelloWorldResolver
     {
         [GraphQLName("hello")]
-        public Task<string> GetHelloAsync(string name = "")
+        public Task<string> GetHelloAsync(
+            [GraphQLParams] IParamsContext paramsContext, 
+            string name = ""
+        )
         {
             var result = string.IsNullOrWhiteSpace(name)
                 ? "Hello World!"

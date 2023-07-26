@@ -1,9 +1,6 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using HotChocolate;
-using HotChocolate.PreProcessingExtensions;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HotChocolate.PreProcessingExtensions.Tests

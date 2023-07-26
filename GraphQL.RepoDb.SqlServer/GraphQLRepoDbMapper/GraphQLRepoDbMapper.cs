@@ -6,16 +6,15 @@ using RepoDb.CursorPagination;
 using RepoDb.Enumerations;
 using RepoDb.OffsetPagination;
 using HotChocolate.PreProcessingExtensions;
-using HotChocolate.PreProcessingExtensions.Pagination;
 
 namespace HotChocolate.RepoDb
 {
     /// <summary>
-    /// Helper class to map normal, primitive, and valuees from HotChocolate GraphQL integration to RepoDb
+    /// Helper class to map normal, primitive, and values from HotChocolate GraphQL integration to RepoDb
     /// models for processing with RepoDb.
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
-    public class GraphQLRepoDbMapper<TModel> where TModel : class
+    public class GraphQLRepoDbMapper<TModel> : IGraphQLRepoDbMapper where TModel : class
     {
         public IParamsContext GraphQLParamsContext { get; protected set; }
 
@@ -25,7 +24,7 @@ namespace HotChocolate.RepoDb
         }
 
         /// <summary>
-        /// Map the Selection name values for a specific GrqphQL type from the HotChocolate GraphQL Schema (names of the Schema) 
+        /// Map the Selection name values for a specific GraphQL type from the HotChocolate GraphQL Schema (names of the Schema) 
         /// to RepoDb specific values that have the underlying DB field name (as potentially mapped on the Model).
         /// All Fields are returned as a default if the value is undefined and/or invalid and cannot be mapped.
         /// NOTE: Property names and db fields names are not guaranteed to be the same.

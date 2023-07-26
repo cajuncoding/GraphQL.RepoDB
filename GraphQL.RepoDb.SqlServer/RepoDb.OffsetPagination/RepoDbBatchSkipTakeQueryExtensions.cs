@@ -6,7 +6,7 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.RepoDB.Sql;
+using HotChocolate.RepoDb.Sql;
 using RepoDb.CursorPagination;
 
 namespace RepoDb.OffsetPagination

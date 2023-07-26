@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.RepoDB.Sql;
+using HotChocolate.RepoDb.Sql;
 using HotChocolate.PreProcessingExtensions.Pagination;
 using Microsoft.Data.SqlClient;
 using RepoDb;

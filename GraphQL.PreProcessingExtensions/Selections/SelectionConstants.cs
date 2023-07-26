@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace GraphQL.PreProcessingExtensions.Selections
+namespace HotChocolate.PreProcessingExtensions.Selections
 {
     public static class SelectionFieldName
     {

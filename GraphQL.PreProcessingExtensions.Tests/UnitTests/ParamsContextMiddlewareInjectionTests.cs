@@ -43,7 +43,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         }
 
         [TestMethod]
-        public async Task TestParamsContextExecutionForAllFieldsOfAllResults()
+        public async Task TestParamsContextExecutionForAllFieldsOnlyWhenRequested()
         {
             // arrange
             var server = CreateStarWarsTestServer();
@@ -59,10 +59,10 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             // assert
             Assert.IsNotNull(result?.Data, "Query Execution Failed");
 
-            //SHOULD Execute Once for the main resolver, and again for each field since it is injected as FieldMiddleware!
+            //SHOULD Execute ONLY Once for the main resolver as no other Field requests it!
             var starWarsResults = (JArray)result.Data["starWarsCharacters"];
             var resultCount = starWarsResults.Count;
-            Assert.AreEqual(1 + (resultCount * 2), server.ParamsContextList.Count);
+            Assert.AreEqual(1, server.ParamsContextList.Count);
         }
     }
 }

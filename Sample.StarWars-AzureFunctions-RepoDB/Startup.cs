@@ -55,7 +55,7 @@ namespace StarWars
                 .AddType<Starship>()
                 //*******************************************************************************************
                 //*******************************************************************************************
-                //Enable extensions for Pre-Processed Results!
+                //Enable extensions for RepoDb & Pre-Processed Results!
                 //NOTE This allows all OOTB behaviors except for when we want to control the processing
                 //  of results for sorting, paging, etc. and do not want redundant post-processing to occur
                 //  by HotChocolate internals...
@@ -75,7 +75,7 @@ namespace StarWars
                         }
                     }
                 )
-                .AddPreProcessedResultsExtensions()
+                .AddRepoDbExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************
                 //Now Required in v11 to support the Attribute Usage (e.g. you may see the

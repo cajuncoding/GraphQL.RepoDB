@@ -1,7 +1,7 @@
 ﻿using System;
 using HotChocolate.Types.Pagination;
 
-namespace GraphQL.PreProcessingExtensions.Paging
+namespace HotChocolate.PreProcessingExtensions.Pagination
 {
     public static class PagingHelpers
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.PreProcessingExtensions.Selections;
+using HotChocolate.PreProcessingExtensions.Selections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
@@ -15,6 +15,32 @@ namespace HotChocolate.PreProcessingExtensions.Tests
         }
 
         #region Cursor Paging Tests
+
+        [TestMethod]
+        public async Task TestParamsContextPagingArgumentsWhenNotEnabled()
+        {
+            // arrange
+            var server = CreateHelloWorldTestServer();
+
+            // act
+            var result = await server.PostQueryAsync(@"{ hello }");
+
+            // assert
+            Assert.IsNotNull(result?.Data, "Query Execution Failed");
+
+            var paramsContext = server.GetParamsContext("hello");
+            Assert.IsNotNull(paramsContext);
+            Assert.IsNotNull(paramsContext.CursorPagingArgs);
+            
+            Assert.IsNull(paramsContext.CursorPagingArgs.First);
+            Assert.IsNull(paramsContext.CursorPagingArgs.After);
+            Assert.IsNull(paramsContext.CursorPagingArgs.Last);
+            Assert.IsNull(paramsContext.CursorPagingArgs.Before);
+
+            Assert.IsNotNull(paramsContext.OffsetPagingArgs);
+            Assert.IsNull(paramsContext.OffsetPagingArgs.Skip);
+            Assert.IsNull(paramsContext.OffsetPagingArgs.Take);
+        }
 
         [TestMethod]
         public async Task TestParamsContextCursorPagingOnlyFirst()

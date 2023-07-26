@@ -3,22 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Reflection;
-using System.Reflection.CustomExtensions;
-using System.Text;
+using System.Reflection.GraphQLRepoDb.CustomExtensions;
 
 namespace RepoDb.CustomExtensions
 {
     /// <summary>
-    /// A Proxy Class for the RepoDb FunctionCache static class.  This provides high perfomance access 
+    /// A Proxy Class for the RepoDb FunctionCache static class.  This provides high performance access 
     /// to the sealed/internal methods in the static class that otherwise is not-accessible.
     /// NOTE: This should ONLY be used as a brute force extension, but otherwise functionality that can be
-    ///         migrated into official code base or exposed publically is preferred.
+    ///         migrated into official code base or exposed publicly is preferred.
     /// </summary>
     public class RepoDbFunctionCacheProxy<TEntity>
     {
         //BBernard
-        //We ONLY ever intialize the Method Definition one time for performance!
+        //We ONLY ever initialize the Method Definition one time for performance!
         //NOTE: Our method Delegate is a Func<> that matches the signature of the Method we are looking for exactly:
         //      Func<DbDataReader, TEntity> GetDataReaderToDataEntityFunction<TEntity>(
         //          DbDataReader reader,
@@ -31,7 +29,7 @@ namespace RepoDb.CustomExtensions
             _getDataReaderToDataEntityFunctionProxy;
 
         //BBernard
-        //We ONLY ever intialize the Method Definition one time for performance!
+        //We ONLY ever initialize the Method Definition one time for performance!
         //NOTE: Our method Delegate is a Func<> that matches the signature of the Method we are looking for exactly:
         //      internal static Func<DbDataReader, TResult> GetDataReaderToTypeCompiledFunction<TResult>(
         //          DbDataReader reader,
@@ -45,7 +43,7 @@ namespace RepoDb.CustomExtensions
         /// <summary>
         /// BBernard
         /// This Static initializer ensures that the Delegate is created as a SINGLETON for each and every
-        /// Generic type of this class that is intialized.  Therefore for each Generic type, this initialization
+        /// Generic type of this class that is initialized.  Therefore for each Generic type, this initialization
         /// will only every run one time in the thread safe Static Initializer for each type improving performance 
         /// for ALL future calls of that Generic Type.
         /// </summary>

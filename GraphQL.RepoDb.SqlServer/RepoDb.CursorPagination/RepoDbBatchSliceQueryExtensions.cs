@@ -12,7 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.RepoDB.Sql;
+using HotChocolate.RepoDb.Sql;
 using HotChocolate.RepoDb;
 
 namespace RepoDb.CursorPagination

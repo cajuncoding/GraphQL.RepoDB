@@ -5,7 +5,6 @@ using HotChocolate.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GraphQL.PreProcessingExtensions.Selections;
 using HotChocolate.Data.Projections.Context;
 
 namespace HotChocolate.PreProcessingExtensions.Selections

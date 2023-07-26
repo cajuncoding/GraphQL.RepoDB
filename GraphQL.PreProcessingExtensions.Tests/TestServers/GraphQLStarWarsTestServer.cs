@@ -24,6 +24,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                         .AddType<StarWarsHuman>()
                         .AddType<StarWarsDroid>()
                         .AddTypeExtension<HumanFieldResolvers>()
+                        .AddSorting()
                         .SetPagingOptions(new PagingOptions()
                         {
                             DefaultPageSize = 5,

@@ -1,5 +1,4 @@
-﻿using HotChocolate.PreProcessingExtensions;
-using HotChocolate.PreProcessingExtensions.Pagination;
+﻿using HotChocolate.PreProcessingExtensions.Pagination;
 using HotChocolate.PreProcessingExtensions.Sorting;
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;

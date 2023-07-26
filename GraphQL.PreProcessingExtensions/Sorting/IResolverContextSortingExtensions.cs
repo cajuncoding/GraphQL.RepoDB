@@ -26,10 +26,9 @@ namespace HotChocolate.PreProcessingExtensions.Sorting
                 .SelectMany(sf => sf)
                 .Where(sf => sf?.Value?.ValueNode?.Value != null)
                 .Select(sf => new SortOrderField(sf, sf.Value!.ValueNode.Value!.ToString()))
-                .Cast<ISortOrderField>()
-                .ToList();
+                ?? Enumerable.Empty<ISortOrderField>();
 
-            return sortOrderFields;
+            return sortOrderFields.ToList();
         }
     }
 }

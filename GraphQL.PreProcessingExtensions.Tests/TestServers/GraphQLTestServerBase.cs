@@ -14,7 +14,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
     {
         public TestServer Server { get; protected set;  }
 
-        public List<KeyValuePair<string, IParamsContext>> ParamsContextList { get; } = new List<KeyValuePair<string, IParamsContext>>();
+        public List<KeyValuePair<string, IParamsContext>> ParamsContextList { get; } = new();
 
         public IParamsContext GetParamsContext(string fieldName)
         {
@@ -34,9 +34,7 @@ namespace HotChocolate.PreProcessingExtensions.Tests
             return serverFactory.Create(
                 services =>
                 {
-                    services
-                        .AddRouting();
-                        //.AddHttpResultSerializer(HttpResultSerialization.JsonArray);
+                    services.AddRouting();
 
                     //BBernard - Hook for IoC Services Configuration by implementing Test Servers...                    
                     var graphQLBuilder = servicesConfigure(services);
@@ -50,12 +48,13 @@ namespace HotChocolate.PreProcessingExtensions.Tests
                         //  and expose it publicly for Test cases to utilize!
                         //NOTE: MANY middleware invocations will execute for various fields so have to track them all
                         //      for later access...
-                        var paramsContext = context.GetLocalState<GraphQLParamsContext>(nameof(GraphQLParamsContext));
+                        var paramsContext = context.GetGraphQLParamsContext();
                         
-                        ParamsContextList.Add(new KeyValuePair<string, IParamsContext>(
-                            context.Selection.Field.Name, 
-                            new ParamsContextTestHarness(paramsContext)
-                        ));
+                        if(paramsContext != null)
+                            ParamsContextList.Add(new KeyValuePair<string, IParamsContext>(
+                                context.Selection.Field.Name, 
+                                new ParamsContextTestHarness(paramsContext)
+                            ));
 
                         //BBernard - WE MUST ALLOW THE PIPELINE TO CONTINUE!
                         return next.Invoke(context);

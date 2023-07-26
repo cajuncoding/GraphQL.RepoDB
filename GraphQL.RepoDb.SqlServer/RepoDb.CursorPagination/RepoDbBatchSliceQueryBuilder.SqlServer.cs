@@ -1,13 +1,10 @@
 ﻿using HotChocolate.PreProcessingExtensions.Pagination;
-using RepoDb;
 using RepoDb.CustomExtensions;
-using RepoDb.Enumerations;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using GraphQL.RepoDB.Sql;
+using HotChocolate.RepoDb.Sql;
 
 namespace RepoDb.CursorPagination
 {

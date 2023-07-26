@@ -1,13 +1,6 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GraphQL.PreProcessingExtensions.Selections;
-using HotChocolate;
-using HotChocolate.PreProcessingExtensions;
-using HotChocolate.PreProcessingExtensions.Selections;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Linq;
 
 namespace HotChocolate.PreProcessingExtensions.Tests
 {
@@ -16,6 +9,24 @@ namespace HotChocolate.PreProcessingExtensions.Tests
     {
         public ParamsContextSelectionTests() : base(new GraphQLTestServerFactory())
         {
+        }
+
+        [TestMethod]
+        public async Task TestParamsContextSelectionsWhenNotEnabled()
+        {
+            // arrange
+            var server = CreateHelloWorldTestServer();
+
+            // act
+            var result = await server.PostQueryAsync(@"{ hello }");
+
+            // assert
+            Assert.IsNotNull(result?.Data, "Query Execution Failed");
+
+            var paramsContext = server.GetParamsContext("hello");
+            Assert.IsNotNull(paramsContext);
+            Assert.IsNotNull(paramsContext.AllSelectionFields);
+            Assert.IsFalse(paramsContext.AllSelectionFields.Any());
         }
 
         [TestMethod]
