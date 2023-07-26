@@ -1,4 +1,4 @@
-﻿using HotChocolate.PreProcessingExtensions;
+﻿using HotChocolate.ResolverProcessingExtensions;
 using System;
 
 namespace HotChocolate.RepoDb

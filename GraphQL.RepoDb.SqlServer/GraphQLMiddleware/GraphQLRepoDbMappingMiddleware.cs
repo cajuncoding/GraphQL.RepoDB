@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Reflection.GraphQLRepoDb.CustomExtensions;
 using System.Threading.Tasks;
 using HotChocolate.Data.Projections.Context;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 
 namespace HotChocolate.RepoDb
 {

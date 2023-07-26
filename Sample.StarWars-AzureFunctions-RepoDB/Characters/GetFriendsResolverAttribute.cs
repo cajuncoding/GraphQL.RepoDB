@@ -1,5 +1,5 @@
 using System.Reflection;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.RepoDb;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
@@ -20,7 +20,7 @@ namespace StarWars.Characters
             {
                 ICharacter character = ctx.Parent<ICharacter>();
                 ICharacterRepository repository = ctx.Service<ICharacterRepository>();
-                //This is injected by the PreProcessing middleware wen enabled...
+                //This is injected by the ResolverProcessing middleware wen enabled...
                 var graphqlParams = new GraphQLParamsContext(ctx);
 
                 //********************************************************************************

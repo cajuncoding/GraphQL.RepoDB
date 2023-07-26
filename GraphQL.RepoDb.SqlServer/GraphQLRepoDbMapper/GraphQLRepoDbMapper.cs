@@ -5,7 +5,7 @@ using RepoDb;
 using RepoDb.CursorPagination;
 using RepoDb.Enumerations;
 using RepoDb.OffsetPagination;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 
 namespace HotChocolate.RepoDb
 {

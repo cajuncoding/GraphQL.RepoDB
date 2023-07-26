@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 using RepoDb;
 using RepoDb.CursorPagination;
 using RepoDb.OffsetPagination;

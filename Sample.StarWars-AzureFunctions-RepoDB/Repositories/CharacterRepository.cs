@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.RepoDb.Sql;
-using HotChocolate.PreProcessingExtensions.Pagination;
+using HotChocolate.ResolverProcessingExtensions.Pagination;
 using Microsoft.Data.SqlClient;
 using RepoDb;
 using RepoDb.Enumerations;

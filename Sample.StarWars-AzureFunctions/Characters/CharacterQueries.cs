@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 using StarWars.Repositories;
 using System.Linq;
 using System.ComponentModel;
-using HotChocolate.PreProcessingExtensions.Sorting;
-using HotChocolate.PreProcessingExtensions.Pagination;
+using HotChocolate.ResolverProcessingExtensions.Sorting;
+using HotChocolate.ResolverProcessingExtensions.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 using HotChocolate.Types.Pagination;
 
@@ -53,7 +53,7 @@ namespace StarWars.Characters
             var sortedCharacters = characters.SortDynamically(graphQLParams.SortArgs);
             var slicedCharacters = sortedCharacters.SliceAsCursorPage(graphQLParams.PagingArgs);
 
-            //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
+            //With a valid Page/Slice we can return a ResolverProcessed Cursor Result so that
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering will be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
@@ -86,7 +86,7 @@ namespace StarWars.Characters
             var sortedCharacters = characters.SortDynamically(graphQLParams.SortArgs);
             var slicedCharacters = sortedCharacters.SliceAsOffsetPage(graphQLParams.OffsetPagingArgs);
 
-            //With a valid Page/Slice we can return a PreProcessed Offset Paging Result so that
+            //With a valid Page/Slice we can return a ResolverProcessed Offset Paging Result so that
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering will be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.

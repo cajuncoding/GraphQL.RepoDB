@@ -1,4 +1,4 @@
-﻿using HotChocolate.PreProcessingExtensions.Pagination;
+﻿using HotChocolate.ResolverProcessingExtensions.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Data;

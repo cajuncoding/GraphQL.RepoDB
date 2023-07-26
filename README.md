@@ -1,7 +1,7 @@
 ﻿## Overview 
 *(Unofficial) HotChocolate v11/v12 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
-This library greatly simplifies working with HotChocolate to **_pre-processes_** data for
+This library greatly simplifies working with HotChocolate to **_resolver processes_** data for
 selecting/projecting, sorting, paging, etc. before returning the data to HotChocolate from the resolver; 
 this is in contrast to the often documented deferred execution via IQueryable whereby control over the execution
 is delegated to the HotChocolate (& EntityFramework) internals.
@@ -9,11 +9,11 @@ is delegated to the HotChocolate (& EntityFramework) internals.
 By providing a facade that enables easier selections, projections, and paging inside the resolver this library greatly simplifies working 
 with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements 
 such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged 
-in the Resolvers (and lower level Serivces/Repositories that encapsulate all data access) without dependency on IQueryable deferred 
+inside the Resolvers (and lower level Serivces/Repositories that encapsulate all data access) without dependency on IQueryable deferred 
 execution (e.g. EntityFramework).
 
 In addition, for RepoDb specifically, a full implementation is provided along with additional RepoDb extension 
-methods for efficient/easy Cursor Pagination and is built completely on top of the _graphql.PreProcessingExtensions_.
+methods for efficient/easy Cursor Pagination and is built completely on top of the _graphql.ResolverProcessingExtensions_.
 
 ### [Buy me a Coffee ☕](https://www.buymeacoffee.com/cajuncoding)
 *I'm happy to share with the community, but if you find this useful (e.g for professional use), and are so inclinded,
@@ -24,9 +24,9 @@ then I do love-me-some-coffee!*
 </a>
 
 
-## *graphql.PreprocessingExtensions*
+## *GraphQL.ResolverProcessingExtensions*
 A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as 
-RepoDb (or Dapper).  Micro ORMs normally require (and encourage) encapsulated data access that **_pre-processes_** 
+RepoDb (or Dapper).  Micro ORMs normally require (and encourage) encapsulated data access that **_resolver processes_** 
 the results prior to returning results from the resolvers to HotChocolate.
 
 This is in contrast to how many existing tutorials illustrate deferred execution of database queries via IQueryable. 
@@ -34,7 +34,7 @@ Because IQueryable is pretty much only supported by Entity Framework, it may be 
 and/or be much to large (bloated) of a dependency -- in addition to removing control over the SQL queries.  
 
 In these cases, and in other cases where existing repository/service layer code already exists, the data is
-'pre-processed', and is already filtered, sorted, paginated, etc. before being returned from the graphql
+'resolver processed', and is already filtered, sorted, paginated, etc. before being returned from the graphql
 resolvers.
 
 This extension pack provides access to key elements such as Selections/Projections, Sort arguments, & Paging 
@@ -43,7 +43,7 @@ encapsulate all data access (without dependency on IQueryable and execution outs
 of the devs control).
 
 #### Nuget Package (>=netstandard2.1)
-To use this in your project, add the [graphql.PreprocessingExtensions](https://www.nuget.org/packages/graphql.PreProcessingExtensions/) 
+To use this in your project, add the [graphql.PreprocessingExtensions](https://www.nuget.org/packages/GraphQL.ResolverProcessingExtensions/) 
 NuGet package to your project, wire up your Starup middleware, and inject / instantiate params in your resolvers as outlined below...
 
 ## *graphql.RepoDb.SqlServer*
@@ -75,10 +75,10 @@ NuGet package to your project, wire up your Starup middleware, and inject / inst
 - Added support to easily determine if TotalCount is selected (as it's a special case selection) to support potential performance optimizations within Resolver logic.
    - `graphqlParamsContext.IsTotalCountRequested` 
 - Added more Unit test coverage for Selections, and Paging implmentations
-- Generic facade for pre-processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'pre-processed'.
+- Generic facade for resolver processed results to safely bypass the HotChocolate out-of-the-box pipeline (IQueryable dependency) for Sorting & Paging; eliminatues redundant processing and possilby incorrect results from re-processing what has already been 'resolver processed'.
 - Supports encapsulated service/repository pattern whereby all data retrieval is owned in the same portable layer, and not dependent on HotChocolate internal procesing via IQueryable. 
-- Provides abstraction facade with *graphql.PreProcessingExtensions* package that can be used for any micro-orm.
-- Implemented RepoDb on top of graphql.PreProcessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (graphql Schema names -> Model properties -> DB Column names).
+- Provides abstraction facade with *graphql.ResolverProcessingExtensions* package that can be used for any micro-orm.
+- Implemented RepoDb on top of graphql.ResolverProcessingExtensions, as a great primary DB interface with helper classes for mapping Selections from GraphQL to DB layer: (graphql Schema names -> Model properties -> DB Column names).
 - Supports abstracted facade for: 
    - Projections of Selection (SELECT X, Fields) down to the Repository Layer and therefore down to the SQL Queries themselves via RepoDb -- works correctly with GraphQL Objects (classes), and now GraphQL Interfaces with query fragments (C# interfaces) too!  And supports correct GraphQL Schema to Class property mapping.
    - Support for Sorting arguments down to the Repository/Service layer & into Sql queries via RepoDb -- with full GraphQL Schema to Class property mapping.
@@ -94,14 +94,14 @@ NuGet package to your project, wire up your Starup middleware, and inject / inst
 ## Demo Site (Star Wars)
 This project provides multiple versions of the HotChocolate GraphQL *Star Wars* example project using the Pure Code First approach.  
 Each of the examples are setup to run as an AzureFunctions app and updated/enhanced to use the new v11 API along with example cases 
-for the various features of this package -- CharacterQueries and CharacterRepository now all use RepoDb and Preprocessing extensions 
+for the various features of this package -- CharacterQueries and CharacterRepository now all use RepoDb and ResolverProcessing extensions 
 to push logic down to be encapsulated in the data access layer.
 
 Two versions of the Example Project included:
-1. **StarWars-AzureFunctions:** A version using Pre-processing extensions only along with in-memory processing with Linq over IEnumerable, 
+1. **StarWars-AzureFunctions:** A version using Resolver Processing extensions only along with in-memory processing with Linq over IEnumerable, 
 but all encapsulated in the Query/Repository layer and no longer using the IQueryable interface.  This simulates the use of lower layer logic
 for Sorting, Paging, etc. as you would with a micro-orm for working with an external data source, and helps show how any micro-orm or other
-functionality can now leverage the simplified facade to HotChocolate provided by *graphql.PreProcessingExtensions*.
+functionality can now leverage the simplified facade to HotChocolate provided by *graphql.ResolverProcessingExtensions*.
 2. **StarWars-AzureFunctions-RepoDb:** A version that does the above but implements RepoDb as a fully fledged micro-orm implemenation. 
 And illustrates a number of related features to show its use in multiple typs of Resolvers (Attribute, and virtual field resolvers), with and without ProjectionDependencies, nested Paging and Sorting, etc. with all logic encapsulated in the Query
 and Repository layer with no dependency on IQueryable.
@@ -134,7 +134,7 @@ HotChocolate existing processes.
 - At the same time I want to use as much of the existing functionality of HotChocolate for 
 dynamically generating schema elements, arguments, etc. for Sorting, Paging, etc.
   - I do not want to have to create more code/classes/ceremonial elements than necessary.
-- And as a critical benefit, all pre-processed result extensions should not interfere with existing
+- And as a critical benefit, all resolver processed result extensions should not interfere with existing
 out-of-the-box functionality except when we explicitly want it to (via our Decorators and Conventions);
   - Otherwise in all other cases the original HotChocolate behavior should work as expected - 
 correctly processing both IQueryable & IEnumerable results.
@@ -144,7 +144,7 @@ dependency on types (classes, etc.)
 switching to the official Middleware will be as
 painless and simple as possible *(with a few design assumptions aside)*.
 - Provide at least one layer of abstraction between HotChocolate and the RepoDb specific Extensions;
-which is maintained in the HotChocolate.PreProcessedExtensions project (e.g. using this only a set of 
+which is maintained in the HotChocolate.ResolverProcessedExtensions project (e.g. using this only a set of 
 helpers for Dapper could be similarly created).
 - Have NO requirement for special inerfaces to be defined on the Entity Model's themselves, mitigate
 this by using Decorator classes/interfaces only as needed.
@@ -159,7 +159,7 @@ is returned. This is accomplished by ensuring that the new Sorting/Paging Provid
 implementations.*
 
 ## Configuration and Use:
-### Startup Configuration - graphql.PreProcessingExtensions
+### Startup Configuration - graphql.ResolverProcessingExtensions
 1. Add the following initializer into the Startup.cs to enable these extensions.
    - All other elements of HotChocolate initialization are the same using the v11 API. 
 ```csharp
@@ -174,9 +174,9 @@ implementations.*
             })
             //This Below is the initializer to be added...
             //NOTE: This Adds Sorting & Paging providers/conventions by default!  Do not AddPaging() & 
-            //      AddSorting() in addition to '.AddPreProcessedResultsExtensions()', or the HotChocolate 
+            //      AddSorting() in addition to '.AddResolverProcessedResultsExtensions()', or the HotChocolate 
             //      Pipeline will not work as expected!
-            .AddPreProcessedResultsExtensions()
+            .AddResolverProcessedResultsExtensions()
 ```
 ### Simplified Facade for key elements of the request [graphqlParams]
 2. Now you can Dependency Inject the new **IParamsContext** into your Resolvers:
@@ -192,9 +192,9 @@ is an easy to consume form.*
         [UsePaging]
         [UseSorting]
         [graphqlName("characters")]
-        public async Task<IPreProcessedCursorSlice<ICharacter>> GetCharactersPaginatedAsync(
+        public async Task<IResolverProcessedCursorSlice<ICharacter>> GetCharactersPaginatedAsync(
             [Service] ICharacterRepository repository,
-            //This facade is now injected by the Pre-Processing extensions middleware...
+            //This facade is now injected by the Resolver Processing extensions middleware...
             [graphqlParams] IParamsContext graphqlParams
         )
         {
@@ -215,10 +215,10 @@ namespace StarWars.Characters
         [UsePaging]
         [UseSorting]
         [graphqlName("characters")]
-        public async Task<IPreProcessedCursorSlice<ICharacter>> GetCharactersPaginatedAsync(
+        public async Task<IResolverProcessedCursorSlice<ICharacter>> GetCharactersPaginatedAsync(
             //This is just our Repository being injected as a normal Service configured in Startup.cs
             [Service] ICharacterRepository repository,
-            //This facade is now injected by the Pre-Processing extensions middleware...
+            //This facade is now injected by the Resolver Processing extensions middleware...
             [graphqlParams] IParamsContext graphqlParams
         )
         {
@@ -239,12 +239,12 @@ namespace StarWars.Characters
                 repoDbParams.PagingParameters
             ).ConfigureAwait(false);
 
-            //Now With a valid Page/Slice we can return a PreProcessed Cursor Result so that
+            //Now With a valid Page/Slice we can return a ResolverProcessed Cursor Result so that
             //  it will not have any additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering can be applied but it will ONLY be applied to the results we 
             //      are now returning because this would normally be pushed down to the 
             //      Sql Database layer also (pending support).
-            return charactersSlice.AsPreProcessedCursorSlice();
+            return charactersSlice.AsResolverProcessedCursorSlice();
             //*******************************************************************************//
         }
     }
@@ -270,7 +270,7 @@ namespace StarWars.Characters
 
 5. A Common use case that will occur is that a GraqhQL query may requested a realated child entity but not
     necessarily request the dependenty fields on the Parent entity that are required to correctly retrieve the
-    child/related data.  In a Pure Code First implementation, this can be handled easily by defining dependencies with the [PreProcessingParentDepdencies(...)]
+    child/related data.  In a Pure Code First implementation, this can be handled easily by defining dependencies with the [ResolverProcessingParentDepdencies(...)]
     attribute:
    * This will enforce the fact that anytime this Field is requested then the Selections List
         will have the dependent Selections (as defined on the Pure Code First model), and automatically
@@ -280,7 +280,7 @@ namespace StarWars.Characters
    * You can also configure a dependency for any Field via the IObjectFieldDescriptor.ConfigureContextData() method
         and the custom extension provided by this project as shown below.
 
-##### PreProcessing Field Dependencies from optimized Selection/Projections - Annotation Based (aka Pure Code First)
+##### ResolverProcessing Field Dependencies from optimized Selection/Projections - Annotation Based (aka Pure Code First)
 ```csharp
     //Here we define an extension to the Human GraphQL type and expose a 'droids' field via our virtual resolver.
     [ExtendObjectType(nameof(Human))]
@@ -288,7 +288,7 @@ namespace StarWars.Characters
     {
         //However, we MUST have the Id field of the parent entity `Character.Id` as part of the original
         //  selection in order to get related droid data!  This is done by defining a dependency here
-        //  with the [PreProcessingDependencies(....)] attribute; we state that this resolver is dependent
+        //  with the [ResolverProcessingDependencies(....)] attribute; we state that this resolver is dependent
         //  on the Character entity's Id field!
         //NOTE: The original resolver for the parent Character entities will know about this dependency
         //       automatically (auto-magically) because the `Id` field will be included in the selection fields,
@@ -296,7 +296,7 @@ namespace StarWars.Characters
          //      field when the parent resolver calls paramsContext.GetSelectFields().
         //NOTE: You can specify any number of dependencys (as string names) in the one attribute via the params aray.
         [graphqlName("droids")]
-        [PreProcessingParentDependencies(nameof(ICharacter.Id))]
+        [ResolverProcessingParentDependencies(nameof(ICharacter.Id))]
         public async Task<IEnumerable<Droid>> GetDroidsAsync(
             [Service] ICharacterRepository repository,
             [Parent] ICharacter character
@@ -312,7 +312,7 @@ namespace StarWars.Characters
     }
 ```
 
-##### PreProcessingDependencies - Code First (Manually wire-up via HotChocolate Configuration)
+##### ResolverProcessingDependencies - Code First (Manually wire-up via HotChocolate Configuration)
 ```csharp
 public class HumanType : ObjectType<Human>
 {
@@ -325,7 +325,7 @@ public class HumanType : ObjectType<Human>
             //  the parent entity so that it is always provided to the parent resolver.
             //This helps ensure that the value is not null in our resolver anytime "friends"
             //  is part of the selection, and the parent "Id" field is not.
-            .AddPreProcessingParentProjectionDependencies(nameof(Human.Id))
+            .AddResolverProcessingParentProjectionDependencies(nameof(Human.Id))
             .Resolver(ctx =>
             {
                 var repository = ctx.Service<IRepository>();

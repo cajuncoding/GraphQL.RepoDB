@@ -8,11 +8,11 @@ using HotChocolate.RepoDb;
 namespace Microsoft.Extensions.DependencyInjection
 { 
     /// <summary>
-    /// Custom Extensions to initialize the Sorting Middleware with compatibility for PreProcessed 
+    /// Custom Extensions to initialize the Sorting Middleware with compatibility for ResolverProcessed 
     /// results, interfaces and IEnumerable decorator objects returned from Resolvers whereby Sorting
     /// was already implemented at the Resolver, or lower level, business logic.
     /// 
-    /// This works in collaboration with OOTB Queryable functionality, intercepting only PreProcessed result
+    /// This works in collaboration with OOTB Queryable functionality, intercepting only ResolverProcessed result
     /// decorated results.
     /// </summary>
     public static class GraphQLRepoDbMappingMiddlewareExtensions
@@ -31,11 +31,11 @@ namespace Microsoft.Extensions.DependencyInjection
             string? name = null
         )
         {
-            //Dynamically detect if AddPreProcessedResultsExtensions() has been called and if not then we call it
+            //Dynamically detect if AddResolverProcessedResultsExtensions() has been called and if not then we call it
             //  to ensure our dependencies are initialized...
-            if (!PreProcessedResultsMiddlewareExtensions.IsRegistered)
+            if (!ResolverProcessedResultsMiddlewareExtensions.IsRegistered)
             {
-                builder.AddPreProcessedResultsExtensions();
+                builder.AddResolverProcessedResultsExtensions();
             }
 
             IsRegistered = true;

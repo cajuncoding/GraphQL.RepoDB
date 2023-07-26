@@ -1,5 +1,5 @@
 ﻿using HotChocolate;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
 using StarWars.Characters;
 using StarWars.Repositories;
@@ -16,7 +16,7 @@ namespace StarWars.Characters
     public class HumanFieldResolvers
     {
         [GraphQLName("droids")]
-        [PreProcessingParentDependencies(nameof(ICharacter.Id))]
+        [ResolverProcessingParentDependencies(nameof(ICharacter.Id))]
         public async Task<IEnumerable<Droid>> GetDroidsAsync(
             [Service] ICharacterRepository repository,
             [Parent] ICharacter character,
