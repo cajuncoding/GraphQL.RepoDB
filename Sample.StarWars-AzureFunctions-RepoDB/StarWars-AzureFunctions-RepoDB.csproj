@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-    <RootNamespace>StarWars_AzureFunctions</RootNamespace>
+    <RootNamespace>StarWars.AzureFunctions</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="RepoDb\**" />
@@ -16,6 +16,7 @@
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.0" />
     <PackageReference Include="HotChocolate.AzureFunctions" Version="13.0.0" />
     <PackageReference Include="HotChocolate.Data" Version="13.0.0" />
+    <PackageReference Include="HotChocolate.PersistedQueries.FileSystem" Version="12.4.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
     <PackageReference Include="RepoDb.SqlServer" Version="1.1.4" />
@@ -31,6 +32,9 @@
     <None Update="local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+    <None Update="PersistedQueries\AllCharactersWithFriendsPaginated-v1.graphql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>

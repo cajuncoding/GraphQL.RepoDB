@@ -38,6 +38,7 @@ namespace StarWars
             services
                 //Add the GraphQL Server for Azure Functions with Official Implementation!
                 .AddGraphQLFunction()
+                //.UsePersistedQueryPipeline().AddReadOnlyFileSystemQueryStorage("./PersistedQueries")
                 .AddQueryType(d => d.Name("Query"))
                 .AddMutationType(d => d.Name("Mutation"))
                 //Disabled Subscriptions for v11 and Azure Functions Example due to 
