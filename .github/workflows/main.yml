@@ -32,14 +32,14 @@ jobs:
       #  run: |
       #    echo Add other actions to build,
       #    echo test, and deploy your project.
-      - name: "Publish NuGet: GraphQL.PreProcessingExtensions"
-        uses: brandedoutcast/publish-nuget@v2.5.5
+      - name: "Publish NuGet: GraphQL.ResolverProcessingExtensions"
+        uses: alirezanet/publish-nuget@v3.0.4
         with:
           # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: GraphQL.PreProcessingExtensions/GraphQL.ResolverProcessingExtensions.csproj
+          PROJECT_FILE_PATH: GraphQL.ResolverProcessingExtensions/GraphQL.ResolverProcessingExtensions.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       - name: "Publish NuGet: GraphQL.RepoDb.SqlServer"
-        uses: brandedoutcast/publish-nuget@v2.5.5
+        uses: alirezanet/publish-nuget@v3.0.4
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: GraphQL.RepoDb.SqlServer/GraphQL.RepoDb.SqlServer.csproj
