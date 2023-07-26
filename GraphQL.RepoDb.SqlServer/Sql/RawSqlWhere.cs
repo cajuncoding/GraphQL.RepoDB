@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace GraphQL.RepoDB.Sql
+namespace HotChocolate.RepoDb.Sql
 {
     public class RawSqlWhere
     {

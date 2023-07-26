@@ -1,10 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using HotChocolate;
 using StarWars.Characters;
 using StarWars.Repositories;
 using StarWars.Reviews;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using HotChocolate.AzureFunctionsProxy;
 using HotChocolate.Types.Pagination;
 
 //CRITICAL: Here we self-wire up the Startup into the Azure Functions framework!
@@ -31,7 +29,8 @@ namespace StarWars
             // Add GraphQL Services
             //Updated to Initialize StarWars with new v11 configuration...
             services
-                .AddGraphQLServer()
+                //Add the GraphQL Server for Azure Functions with Official Implementation!
+                .AddGraphQLFunction()
                 .AddQueryType(d => d.Name("Query"))
                 .AddMutationType(d => d.Name("Mutation"))
                 //Disabled Subscriptions for v11 and Azure Functions Example due to 
@@ -59,18 +58,13 @@ namespace StarWars
                     IncludeTotalCount = true,
                     MaxPageSize = 100
                 })
-                .AddPreProcessedResultsExtensions()
+                .AddResolverProcessedResultsExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************
                 //Now Required in v11 to support the Attribute Usage (e.g. you may see the
                 //  error: No filter convention found for scope `none`
                 .AddFiltering();
                 //.AddSorting();
-
-            //Finally Initialize AzureFunctions Executor Proxy here...
-            //You man Provide a specific SchemaName for multiple Functions (e.g. endpoints).
-            //TODO: Test multiple SchemaNames...
-            services.AddAzureFunctionsGraphQL();
         }
     }
 }

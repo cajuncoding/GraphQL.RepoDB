@@ -1,0 +1,39 @@
+﻿using System;
+using HotChocolate.Types.Pagination;
+
+namespace HotChocolate.ResolverProcessingExtensions.Pagination
+{
+    public static class PagingHelpers
+    {
+        private static readonly PagingOptions _hcDefaultPagingOptions = new PagingOptions()
+        {
+            DefaultPageSize = PagingDefaults.DefaultPageSize,
+            IncludeTotalCount = PagingDefaults.IncludeTotalCount,
+            MaxPageSize = PagingDefaults.MaxPageSize
+        };
+
+        /// <summary>
+        /// Simplified helper to get the initialize a PagingOptions with all Default values from HC existing constants.
+        /// </summary>
+        /// <returns></returns>
+        public static PagingOptions GetDefaultPagingOptions()
+        {
+            return _hcDefaultPagingOptions;
+        }
+
+        /// <summary>
+        /// Custom Extension to easily clone existing PagingOptions (helps to keep things immutable)
+        /// </summary>
+        /// <param name="pagingOptions"></param>
+        /// <returns></returns>
+        public static PagingOptions ClonePagingOptions(this PagingOptions pagingOptions)
+        {
+            return new PagingOptions()
+            {
+                DefaultPageSize = pagingOptions.DefaultPageSize,
+                IncludeTotalCount = pagingOptions.IncludeTotalCount,
+                MaxPageSize = pagingOptions.MaxPageSize
+            };
+        }
+    }
+}

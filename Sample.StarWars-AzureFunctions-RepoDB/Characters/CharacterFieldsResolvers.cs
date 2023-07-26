@@ -1,5 +1,5 @@
 ﻿using HotChocolate;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
 using StarWars.Characters;
 using StarWars.Repositories;
@@ -16,15 +16,15 @@ namespace StarWars.Characters
     public class HumanFieldResolvers
     {
         [GraphQLName("droids")]
-        [PreProcessingParentDependencies(nameof(ICharacter.Id))]
+        [ResolverProcessingParentDependencies(nameof(ICharacter.Id))]
         public async Task<IEnumerable<Droid>> GetDroidsAsync(
             [Service] ICharacterRepository repository,
             [Parent] ICharacter character,
-            [GraphQLParams] IParamsContext graphQLParams    
+            [GraphQLParams] IParamsContext graphqlParams    
         )
         {
             #if DEBUG
-            Debug.WriteLine($"Pre-processing Dependency Fields: [{string.Join(", ", graphQLParams.SelectionDependencies.Select(d => d.DependencyMemberName))}]");
+            Debug.WriteLine($"Pre-processing Dependency Fields: [{string.Join(", ", graphqlParams.SelectionDependencies.Select(d => d.DependencyMemberName))}]");
             #endif
 
             var friends = await repository.GetCharacterFriendsAsync(character.Id);

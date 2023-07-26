@@ -1,17 +1,16 @@
 using System.Linq;
 using System.Reflection;
-using HotChocolate.PreProcessingExtensions;
-using HotChocolate.PreProcessingExtensions.Pagination;
+using HotChocolate.ResolverProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions.Pagination;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
 using StarWars.Repositories;
 
 namespace StarWars.Characters
 {
-    public sealed class GetFriendsResolverAttribute
-        : ObjectFieldDescriptorAttribute
+    public sealed class GetFriendsResolverAttribute : ObjectFieldDescriptorAttribute
     {
-        public override void OnConfigure(
+        protected override void OnConfigure(
             IDescriptorContext context,
             IObjectFieldDescriptor descriptor,
             MemberInfo member)
@@ -22,13 +21,13 @@ namespace StarWars.Characters
                 ICharacterRepository repository = ctx.Service<ICharacterRepository>();
 
                 //********************************************************************************
-                //Perform some pre-processed Paging (FYI, without sorting this may be unprdeicatble
+                //Perform some pre-processed Paging (FYI, without sorting this may be unpredictable
                 //  but works here due to the in-memory store used by Star Wars example!
                 var graphQLParams = new GraphQLParamsContext(ctx);
                 var friends = repository.GetCharacters(character.Friends.ToArray());
 
                 var pagedFriends = friends.SliceAsCursorPage(graphQLParams.PagingArgs);
-                return new PreProcessedCursorSlice<ICharacter>(pagedFriends);
+                return pagedFriends.ToGraphQLConnection();
                 //********************************************************************************
             });
         }

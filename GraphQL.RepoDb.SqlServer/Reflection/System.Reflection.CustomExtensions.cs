@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace System.Reflection.CustomExtensions
+namespace System.Reflection.GraphQLRepoDb.CustomExtensions
 {
     /// <summary>
     /// BBernard - 2017
@@ -184,7 +184,7 @@ namespace System.Reflection.CustomExtensions
         /// BBernard
         /// Convenience method for getting the MethodInfo definition of a method using the specified Delegate or Func<> defnition stub
         /// to dynamically search for a matching signature.
-        /// NOTE: The Delegate defnition stub may be null because only the Type is required.
+        /// NOTE: The Delegate definition stub may be null because only the Type is required.
         /// </summary>
         /// <typeparam name="TDelegate"></typeparam>
         /// <param name="type"></param>
@@ -192,12 +192,12 @@ namespace System.Reflection.CustomExtensions
         /// <param name="flags"></param>
         /// <param name="delegateDefinitionStub"></param>
         /// <returns></returns>
-        public static MethodInfo GetGenericMethodForDelegate<TDelegate>(this Type type, string methodName, BindingFlags flags, TDelegate delegateDefinitionStub)
+        public static MethodInfo FindMethodInfoForDelegate<TDelegate>(this Type type, string methodName, BindingFlags flags, TDelegate delegateDefinitionStub)
             //where TDelegate: Delegate //Delegate Type constraint only available in C# v7.3+
             where TDelegate : class
         {
             var parameterTypeArray = delegateDefinitionStub.GetDelegateParameterTypes();
-            return GetGenericMethod(type, methodName, flags, parameterTypeArray);
+            return FindMethodInfo(type, methodName, flags, parameterTypeArray);
         }
 
         /// <summary>
@@ -211,11 +211,9 @@ namespace System.Reflection.CustomExtensions
         /// <param name="type"></param>
         /// <param name="flags"></param>
         /// <param name="methodName"></param>
-        /// <param name="genericArgTypes"></param>
         /// <param name="parameterTypes"></param>
-        /// <param name="comparisonMode"></param>
         /// <returns></returns>
-        public static MethodInfo GetGenericMethod(this Type type, string methodName, BindingFlags flags, Type[] parameterTypes)
+        public static MethodInfo FindMethodInfo(this Type type, string methodName, BindingFlags flags, Type[] parameterTypes)
         {
             StringComparison comparisonMode = (flags & BindingFlags.IgnoreCase) == BindingFlags.IgnoreCase
                                                 ? StringComparison.OrdinalIgnoreCase
@@ -283,20 +281,8 @@ namespace System.Reflection.CustomExtensions
             var delegateType = typeof(TDelegate);
             if (!typeof(Delegate).IsAssignableFrom(delegateType)) throw new ArgumentException("A valid Delegate type must be specified.", nameof(delegateDefinitionStub));
 
-            //BBernard
-            //Handle Generic Methods which must be converted to their non-generic strongly typed form 
-            //  before Delegate can be created!
-            var delegateMethodInfo = methodInfo.IsGenericMethodDefinition && genericArgTypes.Length >= 1
-                                        ? methodInfo.MakeGenericMethod(genericArgTypes)
-                                        : methodInfo;
-
-            //We must create the Dynamic Delegate Type AFTER we've converted the Generic method definition 
-            //  into a Generic method Implementation.
-            var dynamicDelegateType = delegateMethodInfo.CreateDynamicDelegateType();
-
-            //Once we have a full Generic method implementation (not the definition) we can create a strongly 
-            //  typed Delegate for high performance Execution!
-            var dynamicDelegate = delegateMethodInfo.CreateDelegate(dynamicDelegateType);
+            //Create a fully closed Generic method implementation (not the definition) and convert it  into a typed Delegate for high performance Execution!
+            var dynamicDelegate = CreateDynamicDelegate(methodInfo, genericArgTypes);
             return dynamicDelegate as TDelegate;
         }
 
@@ -401,7 +387,7 @@ namespace System.Reflection.CustomExtensions
             //BBernard
             //We must Find the correct Method via matching name and signature for input parameter types.
             //NOTE: We support both standard methods and Generic methods based on if a Generic Arg Types were specified.
-            MethodInfo methodInfo = staticClassType.GetGenericMethod(methodName, flags, paramTypesArray);
+            MethodInfo methodInfo = staticClassType.FindMethodInfo(methodName, flags, paramTypesArray);
             return methodInfo;
         }
 

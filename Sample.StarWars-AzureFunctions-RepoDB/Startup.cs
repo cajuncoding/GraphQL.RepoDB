@@ -3,7 +3,6 @@ using StarWars.Characters;
 using StarWars.Repositories;
 using StarWars.Reviews;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using HotChocolate.AzureFunctionsProxy;
 using System;
 using System.Diagnostics;
 using HotChocolate.Types.Pagination;
@@ -37,8 +36,9 @@ namespace StarWars
             // Add GraphQL Services
             //Updated to Initialize StarWars with new v11 configuration...
             services
-                .AddGraphQLServer()
-                .UsePersistedQueryPipeline().AddReadOnlyFileSystemQueryStorage("./PersistedQueries")
+                //Add the GraphQL Server for Azure Functions with Official Implementation!
+                .AddGraphQLFunction()
+                //.UsePersistedQueryPipeline().AddReadOnlyFileSystemQueryStorage("./PersistedQueries")
                 .AddQueryType(d => d.Name("Query"))
                 .AddMutationType(d => d.Name("Mutation"))
                 //Disabled Subscriptions for v11 and Azure Functions Example due to 
@@ -56,7 +56,7 @@ namespace StarWars
                 .AddType<Starship>()
                 //*******************************************************************************************
                 //*******************************************************************************************
-                //Enable extensions for Pre-Processed Results!
+                //Enable extensions for RepoDb & Pre-Processed Results!
                 //NOTE This allows all OOTB behaviors except for when we want to control the processing
                 //  of results for sorting, paging, etc. and do not want redundant post-processing to occur
                 //  by HotChocolate internals...
@@ -76,21 +76,13 @@ namespace StarWars
                         }
                     }
                 )
-                .AddPreProcessedResultsExtensions()
+                .AddRepoDbExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************
                 //Now Required in v11 to support the Attribute Usage (e.g. you may see the
                 //  error: No filter convention found for scope `none`
-                .AddFiltering();
-                //.AddSorting();
-
-            //Finally Initialize AzureFunctions Executor Proxy here...
-            //You man Provide a specific SchemaName for multiple Functions (e.g. endpoints).
-            //TODO: Test multiple SchemaNames...
-            services.AddAzureFunctionsGraphQL(options =>
-            {
-                options.AzureFunctionsRoutePath = "/api/graphql/playground";
-            });
+                .AddFiltering()
+                .AddSorting();
         }
     }
 }

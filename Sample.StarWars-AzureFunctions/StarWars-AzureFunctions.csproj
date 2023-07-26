@@ -8,14 +8,14 @@
     <None Include="..\README.md" Link="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GraphQL.AzureFunctionsProxy" Version="12.4.1" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="12.4.1" />
-    <PackageReference Include="HotChocolate.Data" Version="12.4.1" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.0" />
+    <PackageReference Include="HotChocolate.AzureFunctions" Version="13.0.0" />
+    <PackageReference Include="HotChocolate.Data" Version="13.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.PreProcessingExtensions\GraphQL.PreProcessingExtensions.csproj" />
+    <ProjectReference Include="..\GraphQL.ResolverProcessingExtensions\GraphQL.ResolverProcessingExtensions.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.PreProcessingExtensions;
-using HotChocolate.PreProcessingExtensions.Pagination;
-using HotChocolate.PreProcessingExtensions.Sorting;
+using HotChocolate.ResolverProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions.Sorting;
 using HotChocolate.Types;
+using HotChocolate.Types.Pagination;
 using StarWars.Characters;
 using StarWars.Repositories;
 
@@ -17,11 +17,11 @@ namespace StarWars.Reviews
         [UsePaging]
         [UseFiltering]
         [UseSorting]
-        public IEnumerable<Review> GetReviews(
+        public Connection<Review> GetReviews(
             Episode episode,
             [Service]IReviewRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
-            [GraphQLParams] IParamsContext graphQLParams
+            [GraphQLParams] IParamsContext graphqlParams
         )
         {
             //********************************************************************************
@@ -32,17 +32,15 @@ namespace StarWars.Reviews
 
             //Perform some pre-processed Sorting & Then Paging!
             //This could be done in a lower repository or pushed to the Database!
-            var sortedReviews = reviews.SortDynamically(graphQLParams.SortArgs);
-            var slicedreviews = sortedReviews.SliceAsCursorPage(graphQLParams.PagingArgs);
+            var sortedReviews = reviews.SortDynamically(graphqlParams.SortArgs);
+            var slicedReviews = sortedReviews.SliceAsCursorPage(graphqlParams.PagingArgs);
 
-            //With a valid Page/Slice we can return a PreProcessed Cursor Result so that
+            //With a valid Page/Slice we can return a ResolverProcessed Cursor Result so that
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering will be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return new PreProcessedCursorSlice<Review>(slicedreviews);
+            return slicedReviews.ToGraphQLConnection();
             //********************************************************************************
-
         }
-
     }
 }

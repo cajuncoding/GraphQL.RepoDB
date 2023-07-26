@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HotChocolate.PreProcessingExtensions.Pagination;
+using HotChocolate.ResolverProcessingExtensions.Pagination;
 using RepoDb;
 using RepoDb.CursorPagination;
 using RepoDb.OffsetPagination;

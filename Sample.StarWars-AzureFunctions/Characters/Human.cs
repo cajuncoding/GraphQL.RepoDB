@@ -2,7 +2,7 @@
 #nullable enable
 
 using System.Collections.Generic;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 

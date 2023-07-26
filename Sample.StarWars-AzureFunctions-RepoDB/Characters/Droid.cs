@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using HotChocolate;
-using HotChocolate.PreProcessingExtensions;
+using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
 using HotChocolate.Types.Relay;
 
@@ -47,7 +47,7 @@ namespace StarWars.Characters
         [GetFriendsResolver]
         //Establish configured link to required Selection for Character.Id for 
         //  resolvers that implement pre-processed results within the Repository Layer.
-        [PreProcessingParentDependencies(nameof(ICharacter.Id))]
+        [ResolverProcessingParentDependencies(nameof(ICharacter.Id))]
         public IReadOnlyList<ICharacter>? Friends { get; set; }
 
         /// <inheritdoc />
