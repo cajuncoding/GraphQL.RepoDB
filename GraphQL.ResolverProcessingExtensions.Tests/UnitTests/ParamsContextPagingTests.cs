@@ -243,8 +243,6 @@ namespace HotChocolate.ResolverProcessingExtensions.Tests
 
             Assert.IsNotNull(results);
             Assert.AreEqual(0, results.Count());
-            //Assert.AreEqual("Han Solo", results.FirstOrDefault()?["name"]);
-            //Assert.AreEqual("Leia Organa", results.LastOrDefault()?["name"]);
         }
 
         #endregion
