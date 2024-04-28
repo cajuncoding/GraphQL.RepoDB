@@ -1,9 +1,7 @@
 ﻿using HotChocolate;
 using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
-using StarWars.Characters;
 using StarWars.Repositories;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

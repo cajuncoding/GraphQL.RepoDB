@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
-using HotChocolate.Types.Relay;
 
 namespace StarWars.Characters
 {
