@@ -1,16 +1,15 @@
 using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Data;
-using HotChocolate.PreProcessingExtensions;
 using HotChocolate.Types;
 using StarWars.Repositories;
-using HotChocolate.PreProcessingExtensions.Sorting;
-using HotChocolate.PreProcessingExtensions.Pagination;
 using System.Threading.Tasks;
 using HotChocolate.RepoDb;
 using RepoDb;
 using RepoDb.Enumerations;
 using StarWars.Characters.DbModels;
+using HotChocolate.Types.Pagination;
+using HotChocolate.ResolverProcessingExtensions;
 
 namespace StarWars.Characters
 {
@@ -41,7 +40,7 @@ namespace StarWars.Characters
         //[UseFiltering]
         [UseSorting]
         [GraphQLName("characters")]
-        public async Task<IPreProcessedCursorSlice<ICharacter>> GetCharactersPaginatedAsync(
+        public async Task<Connection<ICharacter>> GetCharactersPaginatedAsync(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
@@ -63,7 +62,7 @@ namespace StarWars.Characters
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering can be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return charactersSlice.AsPreProcessedCursorSlice();
+            return charactersSlice.ToGraphQLConnection();
             //********************************************************************************
         }
 
@@ -77,7 +76,7 @@ namespace StarWars.Characters
         //[UseFiltering]
         [UseSorting]
         [GraphQLName("charactersWithOffsetPaging")]
-        public async Task<IPreProcessedOffsetPageResults<ICharacter>> GetCharactersWithOffsetPagingAsync(
+        public async Task<CollectionSegment<ICharacter>> GetCharactersWithOffsetPagingAsync(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
@@ -99,7 +98,7 @@ namespace StarWars.Characters
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering can be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return charactersPage.AsPreProcessedPageResults();
+            return charactersPage.ToGraphQLCollectionSegment();
             //********************************************************************************
         }
 
@@ -107,7 +106,7 @@ namespace StarWars.Characters
         //[UseFiltering]
         [UseSorting]
         [GraphQLName("humans")]
-        public async Task<PreProcessedCursorSlice<Human>> GetHumansPaginatedAsync(
+        public async Task<Connection<Human>> GetHumansPaginatedAsync(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
@@ -131,7 +130,7 @@ namespace StarWars.Characters
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering can be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return charactersSlice.AsPreProcessedCursorSlice();
+            return charactersSlice.ToGraphQLConnection();
             //********************************************************************************
         }
 
@@ -139,7 +138,7 @@ namespace StarWars.Characters
         //[UseFiltering]
         [UseSorting]
         [GraphQLName("droids")]
-        public async Task<PreProcessedCursorSlice<Droid>> GetDroidsPaginatedAsync(
+        public async Task<Connection<Droid>> GetDroidsPaginatedAsync(
             [Service] ICharacterRepository repository,
             //THIS is now injected by Pre-Processed extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
@@ -163,7 +162,7 @@ namespace StarWars.Characters
             //  it will not have additional post-processing in the HotChocolate pipeline!
             //NOTE: Filtering can be applied but ONLY to the results we are now returning;
             //       Because this would normally be pushed down to the Sql Database layer.
-            return charactersSlice.AsPreProcessedCursorSlice();
+            return charactersSlice.ToGraphQLConnection();
             //********************************************************************************
         }
 
@@ -181,7 +180,8 @@ namespace StarWars.Characters
                 sortFields: repoDbParams.GetSortOrderFields()
             );
 
-            return sortedCharacters.AsPreProcessedSortResults();
+            graphQLParams.SetSortingIsHandled();
+            return sortedCharacters;
         }
 
         /// <summary>

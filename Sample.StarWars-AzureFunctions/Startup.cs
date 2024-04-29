@@ -61,10 +61,10 @@ namespace StarWars
                 .AddResolverProcessedResultsExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************
-                //Now Required in v11 to support the Attribute Usage (e.g. you may see the
+                //Now Required in v11+ to support the Attribute Usage (e.g. you may see the
                 //  error: No filter convention found for scope `none`
-                .AddFiltering();
-                //.AddSorting();
+                .AddFiltering()
+                .AddSorting();
         }
     }
 }
