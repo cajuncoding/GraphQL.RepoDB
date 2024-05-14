@@ -2,8 +2,8 @@
 
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
-using System;
 using HotChocolate.ResolverProcessingExtensions.Arguments;
+using RepoDb.CursorPaging;
 
 
 namespace HotChocolate.ResolverProcessingExtensions.Pagination

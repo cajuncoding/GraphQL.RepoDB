@@ -59,4 +59,8 @@
 		<PackageReference Include="HotChocolate.Types.OffsetPagination" Version="13.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDb.SqlServer.PagingOperations.csproj" />
+	</ItemGroup>
+
 </Project>

@@ -7,14 +7,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.RepoDb.Sql;
-using HotChocolate.ResolverProcessingExtensions.Pagination;
 using Microsoft.Data.SqlClient;
 using RepoDb;
 using RepoDb.Enumerations;
-using RepoDb.CursorPagination;
-using RepoDb.OffsetPagination;
+using RepoDb.CursorPaging;
+using RepoDb.OffsetPaging;
 using StarWars.Characters;
 using StarWars.Characters.DbModels;
+using RepoDb.SqlServer.PagingOperations.BulkQueryById;
+using RepoDb.SqlServer.PagingOperations.CursorPaging;
+using RepoDb.SqlServer.PagingOperations.OffsetPaging;
 
 namespace StarWars.Repositories
 {

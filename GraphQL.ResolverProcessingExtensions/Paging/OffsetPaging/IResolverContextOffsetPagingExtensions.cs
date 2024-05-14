@@ -1,8 +1,5 @@
-﻿# nullable enable
-
-using HotChocolate.Resolvers;
+﻿using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
-using System;
 using HotChocolate.ResolverProcessingExtensions.Arguments;
 
 

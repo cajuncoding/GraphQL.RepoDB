@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using HotChocolate.ResolverProcessingExtensions;
 using RepoDb;
-using RepoDb.CursorPagination;
-using RepoDb.OffsetPagination;
+using RepoDb.CursorPaging;
+using RepoDb.OffsetPaging;
 
 namespace HotChocolate.RepoDb;
 

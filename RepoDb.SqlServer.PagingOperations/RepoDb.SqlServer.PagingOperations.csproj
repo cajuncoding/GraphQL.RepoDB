@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;</TargetFrameworks>
+		<Version>1.1.5.0</Version>
+		<AssemblyVersion>1.1.5.0</AssemblyVersion>
+		<FileVersion>1.1.5.0</FileVersion>
+		<Authors>BBernard / CajunCoding</Authors>
+		<Company>CajunCoding</Company>
+		<Description>A set of extensions for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
+		<Copyright>Copyright © 2024</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/cajuncoding/graphql.RepoDb</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/cajuncoding/graphql.RepoDb</RepositoryUrl>
+		<PackageReleaseNotes>
+			Release Notes:
+			- Initial release of custom extensions for RepoDb to support enhanced Cursor &amp; Offset Paging Query Operations.
+			- These extensions have been in use in production applications using GraphQL.RepoDb.SqlServer for a long while, but are now available independently to better enable Cursor &amp; Offset based pagination in other applications (e.g. in normal REST APIs).
+		</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="InternalsVisibleTo.MSBuild" Version="1.1.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="RepoDb.SqlServer" Version="1.1.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- NOTE: See Directory.Builds.targets for dynamic MSBuild Xml script as provied by the great Blog article at: https://www.meziantou.net/declaring-internalsvisibleto-in-the-csproj.htm-->
+		<!-- Dynamically Adds: [assembly: InternalsVisibleTo("GraphQL.RepoDb.SqlServer")] -->
+		<InternalsVisibleTo Include="GraphQL.RepoDb.SqlServer" />
+	</ItemGroup>
+
+</Project>

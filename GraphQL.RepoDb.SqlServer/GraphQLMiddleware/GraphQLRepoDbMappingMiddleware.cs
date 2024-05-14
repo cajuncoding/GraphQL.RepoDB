@@ -3,10 +3,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.GraphQLRepoDb.CustomExtensions;
 using System.Threading.Tasks;
 using HotChocolate.Data.Projections.Context;
 using HotChocolate.ResolverProcessingExtensions;
+using RepoDb.SqlServer.PagingOperations.Reflection;
 
 namespace HotChocolate.RepoDb
 {
