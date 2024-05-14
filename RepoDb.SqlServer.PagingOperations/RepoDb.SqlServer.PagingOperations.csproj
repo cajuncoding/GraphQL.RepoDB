@@ -14,8 +14,9 @@
 		<RepositoryUrl>https://github.com/cajuncoding/graphql.RepoDb</RepositoryUrl>
 		<PackageReleaseNotes>
 			Release Notes:
-			- Initial release of custom extensions for RepoDb to support enhanced Cursor &amp; Offset Paging Query Operations.
-			- These extensions have been in use in production applications using GraphQL.RepoDb.SqlServer for a long while, but are now available independently to better enable Cursor &amp; Offset based pagination in other applications (e.g. in normal REST APIs).
+			- Initial release of independent custom extensions for RepoDb to support enhanced Cursor &amp; Offset Paging Query Operations.
+			- This allows non-GraphQL projects (e.g. normal REST APIs) to more easily implement modern paging (Cursor or Offset) with the RepoDb ORM and SQL Server.
+			- These extensions have been in use in production applications using GraphQL.RepoDb.SqlServer for a long while, but are now available independently.
 		</PackageReleaseNotes>
 	</PropertyGroup>
 
