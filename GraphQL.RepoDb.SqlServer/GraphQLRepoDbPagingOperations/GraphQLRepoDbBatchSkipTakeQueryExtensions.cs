@@ -5,10 +5,11 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RepoDb.OffsetPaging;
-using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
+using RepoDb;
+using RepoDb.PagingPrimitives.OffsetPaging;
+using RepoDb.SqlServer.PagingOperations;
 
-namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
+namespace HotChocolate.RepoDb
 {
     public static class GraphQLRepoDbBatchSkipTakeQueryExtensions
     {

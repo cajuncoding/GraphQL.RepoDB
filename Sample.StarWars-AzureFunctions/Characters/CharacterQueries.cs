@@ -3,13 +3,10 @@ using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
-using HotChocolate.Types.Relay;
 using StarWars.Repositories;
 using System.Linq;
-using System.ComponentModel;
+using HotChocolate.RepoDb.InMemoryPaging;
 using HotChocolate.ResolverProcessingExtensions.Sorting;
-using HotChocolate.ResolverProcessingExtensions.Pagination;
-using Microsoft.Extensions.DependencyInjection;
 using HotChocolate.Types.Pagination;
 
 namespace StarWars.Characters

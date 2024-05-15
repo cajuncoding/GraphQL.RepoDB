@@ -1,6 +1,7 @@
 ﻿using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using HotChocolate.ResolverProcessingExtensions.Arguments;
+using RepoDb.PagingPrimitives.OffsetPaging;
 
 
 namespace HotChocolate.ResolverProcessingExtensions.Pagination

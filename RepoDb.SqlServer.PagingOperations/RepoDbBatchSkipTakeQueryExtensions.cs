@@ -5,9 +5,8 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RepoDb.CursorPaging;
-using RepoDb.OffsetPaging;
-using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
+using RepoDb.PagingPrimitives.CursorPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 
 namespace RepoDb.SqlServer.PagingOperations
 {

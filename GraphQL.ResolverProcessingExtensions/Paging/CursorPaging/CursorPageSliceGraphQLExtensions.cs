@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HotChocolate.Types.Pagination;
-using RepoDb.CursorPaging;
+using RepoDb.PagingPrimitives.CursorPaging;
 
 namespace HotChocolate.ResolverProcessingExtensions
 {

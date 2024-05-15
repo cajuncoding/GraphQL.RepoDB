@@ -1,4 +1,4 @@
-﻿namespace RepoDb.CommonPaging
+﻿namespace RepoDb.PagingPrimitives.Common
 {
 
     /// <summary>

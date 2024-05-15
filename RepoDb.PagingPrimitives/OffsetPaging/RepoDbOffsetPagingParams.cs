@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RepoDb.OffsetPaging
+namespace RepoDb.PagingPrimitives.OffsetPaging
 {
     /// <summary>
     /// RepoDb specific class representing Offset Paging parameters. This provides a specific class for RepoDb

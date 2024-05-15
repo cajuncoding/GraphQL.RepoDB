@@ -1,9 +1,9 @@
 ﻿using HotChocolate.Types.Pagination;
 using System.Collections.Generic;
-using RepoDb.OffsetPaging;
-using RepoDb.SqlServer.PagingOperations.InMemoryProcessing;
+using RepoDb.PagingPrimitives.OffsetPaging;
+using RepoDb.SqlServer.PagingOperations.InMemoryPaging;
 
-namespace HotChocolate.ResolverProcessingExtensions
+namespace HotChocolate.RepoDb.InMemoryPaging
 {
     public static class IEnumerableOffsetPagingCustomExtensions
     {

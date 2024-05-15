@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RepoDb;
-using RepoDb.OffsetPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 
-namespace RepoDb.SqlServer.PagingOperations.InMemoryProcessing
+namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
 {
     public static class IEnumerableInMemoryOffsetPagingExtensions
     {

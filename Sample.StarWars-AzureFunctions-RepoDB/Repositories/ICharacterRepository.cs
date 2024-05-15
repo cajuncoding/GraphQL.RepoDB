@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HotChocolate.ResolverProcessingExtensions.Pagination;
 using RepoDb;
-using RepoDb.CursorPaging;
-using RepoDb.OffsetPaging;
+using RepoDb.PagingPrimitives.CursorPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 using StarWars.Characters;
 
 namespace StarWars.Repositories

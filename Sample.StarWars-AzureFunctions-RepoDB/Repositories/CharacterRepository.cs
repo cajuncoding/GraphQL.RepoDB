@@ -10,13 +10,12 @@ using HotChocolate.RepoDb;
 using Microsoft.Data.SqlClient;
 using RepoDb;
 using RepoDb.Enumerations;
-using RepoDb.CursorPaging;
-using RepoDb.OffsetPaging;
+using RepoDb.PagingPrimitives.CursorPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 using StarWars.Characters;
 using StarWars.Characters.DbModels;
 using RepoDb.SqlServer.PagingOperations.BulkQueryById;
-using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
-using RepoDb.SqlServer.PagingOperations.OffsetPaging;
+using RepoDb.SqlServer.PagingOperations;
 
 namespace StarWars.Repositories
 {

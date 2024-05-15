@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using HotChocolate.Types.Pagination;
-using RepoDb.OffsetPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 
 namespace HotChocolate.ResolverProcessingExtensions
 {

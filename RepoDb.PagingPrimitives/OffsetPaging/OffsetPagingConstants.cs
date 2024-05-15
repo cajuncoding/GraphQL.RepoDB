@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HotChocolate.ResolverProcessingExtensions.Pagination
+﻿namespace RepoDb.PagingPrimitives.OffsetPaging
 {
     /// <summary>
     /// NOTE: These must be defined here because the constants in the HC Core are marked as Internal and not accessible.

@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.RepoDb.InMemoryPaging;
 using HotChocolate.ResolverProcessingExtensions;
-using HotChocolate.ResolverProcessingExtensions.Pagination;
 using HotChocolate.ResolverProcessingExtensions.Sorting;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;

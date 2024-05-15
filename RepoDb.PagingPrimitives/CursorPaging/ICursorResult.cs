@@ -1,4 +1,4 @@
-﻿namespace RepoDb.CursorPaging
+﻿namespace RepoDb.PagingPrimitives.CursorPaging
 {
     /// <summary>
     /// Interface representing a Decorator class for any TEntity model provided along 
@@ -12,7 +12,6 @@
     /// <typeparam name="TEntity"></typeparam>
     public interface ICursorResult<out TEntity>
     {
-        int CursorIndex { get; }
         string Cursor { get; }
         TEntity Entity { get; }
     }

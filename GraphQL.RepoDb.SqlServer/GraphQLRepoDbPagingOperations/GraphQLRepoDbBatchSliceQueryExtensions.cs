@@ -6,9 +6,8 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using RepoDb;
-using RepoDb.CursorPaging;
+using RepoDb.PagingPrimitives.CursorPaging;
 using RepoDb.SqlServer.PagingOperations;
-using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
 
 namespace HotChocolate.RepoDb
 {

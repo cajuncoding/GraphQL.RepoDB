@@ -1,4 +1,4 @@
-﻿namespace RepoDb.OffsetPaging
+﻿namespace RepoDb.PagingPrimitives.OffsetPaging
 {
     public interface IRepoDbOffsetPagingParams
     {

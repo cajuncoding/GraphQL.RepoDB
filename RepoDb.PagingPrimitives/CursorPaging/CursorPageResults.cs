@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RepoDb.CursorPaging
+namespace RepoDb.PagingPrimitives.CursorPaging
 {
     /// <summary>
     /// Model class for representing a paging result set that was computed using Cursor Pagination process by offering
@@ -43,7 +43,7 @@ namespace RepoDb.CursorPaging
                 {
                     // ReSharper disable once ConvertToLambdaExpression
                     return r.Entity is TTargetType entityAsTargetType
-                        ? new CursorResult<TTargetType>(entityAsTargetType, r.CursorIndex)
+                        ? new CursorResult<TTargetType>(entityAsTargetType, r.Cursor)
                         : null;
                 })
                 .Where(c => c != null);
@@ -66,7 +66,7 @@ namespace RepoDb.CursorPaging
             var results = this.CursorResults?.Select(r =>
             {
                 var mappedEntity = mappingFunc(r.Entity);
-                return new CursorResult<TTargetType>(mappedEntity, r.CursorIndex);
+                return new CursorResult<TTargetType>(mappedEntity, r.Cursor);
             });
 
             return new CursorPageResults<TTargetType>(results, this.TotalCount, this.HasPreviousPage, this.HasNextPage);

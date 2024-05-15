@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using RepoDb;
-using RepoDb.CursorPaging;
 using RepoDb.Enumerations;
-using RepoDb.OffsetPaging;
 using HotChocolate.ResolverProcessingExtensions;
+using RepoDb.PagingPrimitives.CursorPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 using RepoDb.SqlServer.PagingOperations;
 
 namespace HotChocolate.RepoDb

@@ -1,4 +1,4 @@
-﻿namespace RepoDb.CursorPaging
+﻿namespace RepoDb.PagingPrimitives.CursorPaging
 {
     /// <summary>
     /// Optional Marker interface that denotes a Model as specifically having a Cursor Index Field. Can be used for processing

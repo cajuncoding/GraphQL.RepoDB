@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using RepoDb.CommonPaging;
+using RepoDb.PagingPrimitives.Common;
 
-namespace RepoDb.OffsetPaging
+namespace RepoDb.PagingPrimitives.OffsetPaging
 
 {
     /// <summary>

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using RepoDb.CursorPaging;
-using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
+using RepoDb.PagingPrimitives.CursorPaging;
 
 namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
 {

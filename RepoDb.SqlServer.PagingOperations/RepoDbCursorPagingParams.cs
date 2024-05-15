@@ -1,4 +1,4 @@
-﻿using RepoDb.CursorPaging;
+﻿using RepoDb.PagingPrimitives.CursorPaging;
 
 namespace RepoDb.SqlServer.PagingOperations
 {

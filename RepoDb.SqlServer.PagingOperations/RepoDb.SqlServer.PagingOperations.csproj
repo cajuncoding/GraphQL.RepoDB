@@ -35,4 +35,8 @@
 		<InternalsVisibleTo Include="GraphQL.RepoDb.SqlServer" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\RepoDb.PagingPrimitives\RepoDb.PagingPrimitives.csproj" />
+	</ItemGroup>
+
 </Project>

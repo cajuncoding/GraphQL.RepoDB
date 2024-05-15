@@ -1,4 +1,4 @@
-﻿namespace RepoDb.CursorPaging
+﻿namespace RepoDb.PagingPrimitives.CursorPaging
 {
     public interface IRepoDbCursorPagingParams
     {

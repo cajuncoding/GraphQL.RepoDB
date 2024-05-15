@@ -7,9 +7,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using RepoDb.CursorPaging;
 using RepoDb.Enumerations;
-using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
+using RepoDb.PagingPrimitives.CursorPaging;
 using RepoDb.SqlServer.PagingOperations.DotNetExtensions;
 using RepoDb.SqlServer.PagingOperations.QueryBuilders;
 using RepoDb.SqlServer.PagingOperations.Reflection;
@@ -637,7 +636,11 @@ namespace RepoDb.SqlServer.PagingOperations
 
                             //This allows us to extract the CursorIndex field and return in a Decorator class 
                             //  so there's NO REQUIREMENT that the Model (TEntity) have any special fields/interfaces added.
-                            var cursorResult = new CursorResult<TEntity>(entity, cursorIndex);
+                            var cursorResult = CursorResult<TEntity>.CreateIndexedCursor(
+                                entity, 
+                                RepoDbCursorHelper.CreateCursor(cursorIndex),
+                                cursorIndex
+                            );
                             results.Add(cursorResult);
                         }
                     }

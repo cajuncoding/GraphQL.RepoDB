@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RepoDb.OffsetPaging
+namespace RepoDb.PagingPrimitives.OffsetPaging
 {
     /// <summary>
     /// Model class for representing a paging result set that was computed using Cursor Pagination process by offering

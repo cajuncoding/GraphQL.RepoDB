@@ -60,7 +60,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDb.SqlServer.PagingOperations.csproj" />
+	  <ProjectReference Include="..\RepoDb.PagingPrimitives\RepoDb.PagingPrimitives.csproj" />
 	</ItemGroup>
 
 </Project>

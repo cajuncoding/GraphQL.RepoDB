@@ -3,8 +3,7 @@
 using HotChocolate.Resolvers;
 using HotChocolate.Types.Pagination;
 using HotChocolate.ResolverProcessingExtensions.Arguments;
-using RepoDb.CursorPaging;
-
+using RepoDb.PagingPrimitives.CursorPaging;
 
 namespace HotChocolate.ResolverProcessingExtensions.Pagination
 {

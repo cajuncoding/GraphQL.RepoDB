@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RepoDb.SqlServer.PagingOperations.CommonPrimitives
+namespace RepoDb.SqlServer.PagingOperations
 {
     public class RawSqlWhere
     {

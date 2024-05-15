@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RepoDb;
-using RepoDb.CursorPaging;
+using RepoDb.PagingPrimitives.CursorPaging;
 
-namespace RepoDb.SqlServer.PagingOperations.InMemoryProcessing
+namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
 {
     public static class IEnumerableInMemoryCursorPagingExtensions
     {
@@ -38,9 +37,8 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryProcessing
             //  around the Entity Models.
 
             //NOTE: We MUST materialize this after applying index values to prevent ongoing increments...
-            int index = 0;
-            IEnumerable<ICursorResult<T>> slice = items
-                .Select(c => new CursorResult<T>(c, ++index))
+            IEnumerable<CursorResult<T>> slice = items
+                .Select((item, index) => CursorResult<T>.CreateIndexedCursor(item, RepoDbCursorHelper.CreateCursor(index), index))
                 .ToList();
 
             int totalCount = slice.Count();
@@ -84,7 +82,7 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryProcessing
             return cursorPageSlice;
         }
 
-#if NETSTANDARD2_0
+        #if NETSTANDARD2_0
 
         /// <summary>
         /// Adapted/inspired by Stack Overflow post here:
@@ -110,6 +108,6 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryProcessing
             // ReSharper disable once PossibleMultipleEnumeration
             return source.Skip(Math.Max(0, sourceCount - count));
         }
-#endif
+        #endif
     }
 }
