@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using HotChocolate.RepoDb.Sql;
+using HotChocolate.RepoDb;
 using Microsoft.Data.SqlClient;
 using RepoDb;
 using RepoDb.Enumerations;
@@ -15,7 +15,7 @@ using RepoDb.OffsetPaging;
 using StarWars.Characters;
 using StarWars.Characters.DbModels;
 using RepoDb.SqlServer.PagingOperations.BulkQueryById;
-using RepoDb.SqlServer.PagingOperations.CursorPaging;
+using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
 using RepoDb.SqlServer.PagingOperations.OffsetPaging;
 
 namespace StarWars.Repositories
@@ -50,7 +50,7 @@ namespace StarWars.Repositories
         }
 
 
-        public async Task<ICursorPageSlice<ICharacter>> GetCursorPagedCharactersAsync(
+        public async Task<ICursorPageResults<ICharacter>> GetCursorPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
             IRepoDbCursorPagingParams pagingParams
@@ -88,7 +88,7 @@ namespace StarWars.Repositories
             return convertedPage;
         }
 
-        public async Task<ICursorPageSlice<Human>> GetPagedHumanCharactersAsync(
+        public async Task<ICursorPageResults<Human>> GetPagedHumanCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
             IRepoDbCursorPagingParams pagingParams
@@ -108,7 +108,7 @@ namespace StarWars.Repositories
             return convertedSlice;
         }
 
-        public async Task<ICursorPageSlice<Droid>> GetPagedDroidCharactersAsync(
+        public async Task<ICursorPageResults<Droid>> GetPagedDroidCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
             IRepoDbCursorPagingParams pagingParams
@@ -125,7 +125,7 @@ namespace StarWars.Repositories
             var pageSlice = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterDbModel>(
                 orderBy: sortFields ?? DefaultCharacterSortFields,
                 fields: selectFields,
-                whereRawSql: new RawSqlWhere(@$"{idFieldName} >= @StartId AND {idFieldName} < @EndId", new {StartId = 2000, EndId = 3000}),
+                whereRawSql: RawSqlWhere.From(@$"{idFieldName} >= @StartId AND {idFieldName} < @EndId", new {StartId = 2000, EndId = 3000}),
                 pagingParams: pagingParams,
                 commandTimeout: 15
             );
@@ -157,7 +157,7 @@ namespace StarWars.Repositories
             return mappedResults;
         }
 
-        public async Task<ICursorPageSlice<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams)
+        public async Task<ICursorPageResults<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams)
         {
             await using var sqlConn = CreateConnection();
             var results = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterFriendDbModel>(

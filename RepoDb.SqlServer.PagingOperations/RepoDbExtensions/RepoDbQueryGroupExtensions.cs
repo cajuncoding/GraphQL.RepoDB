@@ -2,7 +2,7 @@
 //using System.Collections.Generic;
 //using System.Text;
 
-//namespace HotChocolate.RepoDb
+//namespace RepoDb.SqlServer
 //{
 //    public static class RepoDbQueryGroupExtensions
 //    {

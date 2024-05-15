@@ -1,7 +1,7 @@
 ﻿using HotChocolate.Types.Pagination;
 using System.Collections.Generic;
 using RepoDb.CursorPaging;
-using RepoDb.CursorPaging.InMemoryProcessing;
+using RepoDb.SqlServer.PagingOperations.InMemoryProcessing;
 
 namespace HotChocolate.ResolverProcessingExtensions
 {
@@ -17,7 +17,7 @@ namespace HotChocolate.ResolverProcessingExtensions
         /// <param name="items"></param>
         /// <param name="graphqlPagingArgs"></param>
         /// <returns></returns>
-        public static ICursorPageSlice<T> SliceAsCursorPage<T>(this IEnumerable<T> items, CursorPagingArguments graphqlPagingArgs)
+        public static ICursorPageResults<T> SliceAsCursorPage<T>(this IEnumerable<T> items, CursorPagingArguments graphqlPagingArgs)
             where T : class
         {
             return items.SliceAsCursorPage(

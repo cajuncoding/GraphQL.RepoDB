@@ -5,9 +5,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate.RepoDb;
 using Microsoft.Data.SqlClient;
 using RepoDb.Interfaces;
+using RepoDb.SqlServer.PagingOperations.DotNetExtensions;
 using RepoDb.SqlServer.PagingOperations.QueryBuilders;
 
 namespace RepoDb.SqlServer.PagingOperations.BulkQueryById

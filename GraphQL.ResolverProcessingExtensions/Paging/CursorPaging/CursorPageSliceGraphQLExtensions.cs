@@ -16,7 +16,7 @@ namespace HotChocolate.ResolverProcessingExtensions
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <returns></returns>
-        public static Connection<TEntity> ToGraphQLConnection<TEntity>(this ICursorPageSlice<TEntity> cursorPage)
+        public static Connection<TEntity> ToGraphQLConnection<TEntity>(this ICursorPageResults<TEntity> cursorPage)
         {
             var edges = cursorPage.ToEdgeResults().ToList();
 
@@ -36,14 +36,15 @@ namespace HotChocolate.ResolverProcessingExtensions
             return graphqlConnection;
         }
 
-        private static IEnumerable<IndexEdge<TEntity>> ToEdgeResults<TEntity>(this ICursorPageSlice<TEntity> cursorPage)
+        private static IEnumerable<Edge<TEntity>> ToEdgeResults<TEntity>(this ICursorPageResults<TEntity> cursorPage)
         {
             //Ensure we are null safe and return a valid empty list by default.
             //Note: We intentionally do NOT call ToList() here so that consuming classes may provide additional filtering...
             var results = cursorPage.CursorResults
                 ?.Where(cr => cr != null)
-                .Select(cr => IndexEdge<TEntity>.Create(cr.Entity, cr.CursorIndex))
-                ?? Enumerable.Empty<IndexEdge<TEntity>>();
+                //.Select(cr => IndexEdge<TEntity>.Create(cr.Entity, cr.CursorIndex))
+                .Select(cr => new Edge<TEntity>(cr.Entity, cr.Cursor))
+                ?? Enumerable.Empty<Edge<TEntity>>();
 
             return results;
         }

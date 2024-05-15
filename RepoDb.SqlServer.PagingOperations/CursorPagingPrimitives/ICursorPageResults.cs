@@ -10,7 +10,7 @@ namespace RepoDb.CursorPaging
     /// This class represents a set of results/nodes of an edge/slice/page.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public interface ICursorPageSlice<out TEntity> : IPageNavigationInfo
+    public interface ICursorPageResults<out TEntity> : IPageNavigationInfo
     {
         /// <summary>
         /// The set of all CursorResults decorator classes for TEntity model with Cursor Index values.
@@ -27,7 +27,7 @@ namespace RepoDb.CursorPaging
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
-        CursorPageSlice<TTargetType> OfType<TTargetType>();
+        CursorPageResults<TTargetType> OfType<TTargetType>();
 
         /// <summary>
         /// Convenience method to easily map/convert/project all types in the current page to a different object type
@@ -36,6 +36,6 @@ namespace RepoDb.CursorPaging
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc"></param>
         /// <returns></returns>
-        CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc);
+        CursorPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc);
     }
 }

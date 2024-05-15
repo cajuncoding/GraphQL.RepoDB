@@ -6,6 +6,7 @@ using RepoDb.CursorPaging;
 using RepoDb.Enumerations;
 using RepoDb.OffsetPaging;
 using HotChocolate.ResolverProcessingExtensions;
+using RepoDb.SqlServer.PagingOperations;
 
 namespace HotChocolate.RepoDb
 {

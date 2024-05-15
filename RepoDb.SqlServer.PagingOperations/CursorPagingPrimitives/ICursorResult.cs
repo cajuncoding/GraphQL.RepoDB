@@ -12,9 +12,8 @@
     /// <typeparam name="TEntity"></typeparam>
     public interface ICursorResult<out TEntity>
     {
-        //As a general cover-all solution, the Cursor should be an Index value (e.g. Sql ROW_NUMBER()) 
-        // so that it can be efficiently queried with Between X & Y or greater than X and less than Y syntax!
         int CursorIndex { get; }
+        string Cursor { get; }
         TEntity Entity { get; }
     }
 }

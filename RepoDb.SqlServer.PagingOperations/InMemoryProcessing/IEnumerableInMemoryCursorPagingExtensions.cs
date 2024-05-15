@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RepoDb;
+using RepoDb.CursorPaging;
 
-namespace RepoDb.CursorPaging.InMemoryProcessing
+namespace RepoDb.SqlServer.PagingOperations.InMemoryProcessing
 {
     public static class IEnumerableInMemoryCursorPagingExtensions
     {
@@ -16,12 +18,12 @@ namespace RepoDb.CursorPaging.InMemoryProcessing
         /// <param name="items"></param>
         /// <param name="pagingArgs"></param>
         /// <returns></returns>
-        public static ICursorPageSlice<T> SliceAsCursorPage<T>(this IEnumerable<T> items, string after, int? first, string before, int? last)
+        public static ICursorPageResults<T> SliceAsCursorPage<T>(this IEnumerable<T> items, string after, int? first, string before, int? last)
         where T : class
         {
             //Do nothing if there are no results...
             if (!items.Any())
-                return new CursorPageSlice<T>(Enumerable.Empty<ICursorResult<T>>(), 0, false, false);
+                return new CursorPageResults<T>(Enumerable.Empty<ICursorResult<T>>(), 0, false, false);
 
             var afterIndex = after != null
                 ? RepoDbCursorHelper.ParseCursor(after)
@@ -73,7 +75,7 @@ namespace RepoDb.CursorPaging.InMemoryProcessing
             var firstCursor = results.FirstOrDefault();
             var lastCursor = results.LastOrDefault();
 
-            var cursorPageSlice = new CursorPageSlice<T>(
+            var cursorPageSlice = new CursorPageResults<T>(
                 results,
                 totalCount,
                 hasPreviousPage: firstCursor?.CursorIndex > 1,
@@ -82,7 +84,7 @@ namespace RepoDb.CursorPaging.InMemoryProcessing
             return cursorPageSlice;
         }
 
-        #if NETSTANDARD2_0
+#if NETSTANDARD2_0
 
         /// <summary>
         /// Adapted/inspired by Stack Overflow post here:
@@ -108,6 +110,6 @@ namespace RepoDb.CursorPaging.InMemoryProcessing
             // ReSharper disable once PossibleMultipleEnumeration
             return source.Skip(Math.Max(0, sourceCount - count));
         }
-        #endif
+#endif
     }
 }

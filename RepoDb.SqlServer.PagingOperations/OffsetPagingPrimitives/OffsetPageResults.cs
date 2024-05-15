@@ -6,9 +6,7 @@ namespace RepoDb.OffsetPaging
 {
     /// <summary>
     /// Model class for representing a paging result set that was computed using Cursor Pagination process by offering
-    /// a default implementation of the IOffsetPageResults interface which de-couples the code that executes queries 
-    /// from the actual ResolverProcessing extension classes used for the HotChocolate.
-    /// This class generally to be used by libraries and/or lower level code that executes queries and renders page results.
+    /// a default implementation of the IOffsetPageResults interface.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     public class OffsetPageResults<TEntity> : IOffsetPageResults<TEntity>

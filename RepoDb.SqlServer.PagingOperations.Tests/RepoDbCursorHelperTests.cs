@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using FluentAssertions;
-using RepoDb.CursorPaging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 

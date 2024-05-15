@@ -5,14 +5,12 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate.RepoDb.Sql;
-using RepoDb.CursorPaging;
 using RepoDb.OffsetPaging;
-using RepoDb.SqlServer.PagingOperations.CursorPaging;
+using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
 
 namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
 {
-    public static class RepoDbBatchSkipTakeQueryExtensions
+    public static class GraphQLRepoDbBatchSkipTakeQueryExtensions
     {
         /// <summary>
         /// Base Repository extension for Offset Paginated Batch Query capability.
@@ -45,7 +43,8 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
-        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+        [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
+        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
@@ -62,14 +61,10 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection, new()
-        {
-            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
-            //  need to maintain duplicated code for the less flexible paging approach since we can provide
-            //  the simplified Offset Paging facade on top of the existing Slice Queries!
-            var sliceResults = await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+            => baseRepo.PagingOffsetQueryAsync<TEntity, TDbConnection>(
                 orderBy: orderBy,
                 whereExpression: whereExpression,
-                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
+                pagingParams: pagingParams,
                 tableName: tableName,
                 hints: hints,
                 fields: fields,
@@ -77,11 +72,7 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
                 transaction: transaction,
                 logTrace: logTrace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-
-            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
-            return sliceResults.ToOffsetPageResults();
-        }
+            );
 
         /// <summary>
         /// Base Repository extension for Offset Paginated Batch Query capability.
@@ -114,7 +105,8 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
-        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+        [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
+        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup = null,
@@ -130,14 +122,10 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         where TDbConnection : DbConnection, new()
-        {
-            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
-            //  need to maintain duplicated code for the less flexible paging approach since we can provide
-            //  the simplified Offset Paging facade on top of the existing Slice Queries!
-            var sliceResults = await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+            => baseRepo.PagingOffsetQueryAsync<TEntity, TDbConnection>(
                 orderBy: orderBy,
                 whereQueryGroup: whereQueryGroup,
-                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
+                pagingParams: pagingParams,
                 tableName: tableName,
                 hints: hints,
                 fields: fields,
@@ -145,11 +133,7 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
                 transaction: transaction,
                 logTrace: logTrace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-
-            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
-            return sliceResults.ToOffsetPageResults();
-        }
+            );
 
         /// <summary>
         /// Base Repository extension for Offset Paginated Batch Query capability.
@@ -182,30 +166,27 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
-        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
-            this BaseRepository<TEntity, TDbConnection> baseRepo,
-            IEnumerable<OrderField> orderBy,
-            RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
-            IRepoDbOffsetPagingParams pagingParams = default,
-            string tableName = null,
-            string hints = null,
-            IEnumerable<Field> fields = null,
-            int? commandTimeout = null,
-            IDbTransaction transaction = null,
-            Action<string> logTrace = null,
-            CancellationToken cancellationToken = default
-        )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-        where TEntity : class
-        where TDbConnection : DbConnection, new()
-        {
-            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
-            //  need to maintain duplicated code for the less flexible paging approach since we can provide
-            //  the simplified Offset Paging facade on top of the existing Slice Queries!
-            var sliceResults = await baseRepo.GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
+        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+                this BaseRepository<TEntity, TDbConnection> baseRepo,
+                IEnumerable<OrderField> orderBy,
+                RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+                IRepoDbOffsetPagingParams pagingParams = default,
+                string tableName = null,
+                string hints = null,
+                IEnumerable<Field> fields = null,
+                int? commandTimeout = null,
+                IDbTransaction transaction = null,
+                Action<string> logTrace = null,
+                CancellationToken cancellationToken = default
+            )
+            //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
+            where TEntity : class
+            where TDbConnection : DbConnection, new()
+            => baseRepo.PagingOffsetQueryAsync<TEntity, TDbConnection>(
                 orderBy: orderBy,
                 whereRawSql: whereRawSql,
-                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
+                pagingParams: pagingParams,
                 tableName: tableName,
                 hints: hints,
                 fields: fields,
@@ -213,11 +194,7 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
                 transaction: transaction,
                 logTrace: logTrace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-
-            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
-            return sliceResults.ToOffsetPageResults();
-        }
+            );
 
         /// <summary>
         /// Base DbConnection (SqlConnection) extension for Offset Paginated Batch Query capability.
@@ -249,6 +226,7 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
+        [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
         public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
@@ -264,14 +242,10 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-        {
-            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
-            //  need to maintain duplicated code for the less flexible paging approach since we can provide
-            //  the simplified Offset Paging facade on top of the existing Slice Queries!
-            var sliceResults = await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
+            =>await dbConnection.PagingOffsetQueryAsync<TEntity>(
                 orderBy: orderBy,
                 whereExpression: whereExpression,
-                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
+                pagingParams: pagingParams,
                 tableName: tableName,
                 hints: hints,
                 fields: fields,
@@ -279,11 +253,7 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
                 transaction: transaction,
                 logTrace: logTrace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false); 
-
-            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
-            return sliceResults.ToOffsetPageResults(); ;
-        }
+            );
 
         /// <summary>
         /// Base DbConnection (SqlConnection) extension for Offset Paginated Batch Query capability.
@@ -315,7 +285,8 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
-        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
+        [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
+        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
@@ -327,17 +298,11 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
             CancellationToken cancellationToken = default
-        )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-        where TEntity : class
-        {
-            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
-            //  need to maintain duplicated code for the less flexible paging approach since we can provide
-            //  the simplified Offset Paging facade on top of the existing Slice Queries!
-            var sliceResults = await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
+        ) where TEntity : class
+            => dbConnection.PagingOffsetQueryAsync<TEntity>(
                 orderBy: orderBy,
                 whereQueryGroup: whereQueryGroup,
-                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
+                pagingParams: pagingParams,
                 tableName: tableName,
                 hints: hints,
                 fields: fields,
@@ -345,11 +310,7 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
                 transaction: transaction,
                 logTrace: logTrace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-
-            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
-            return sliceResults.ToOffsetPageResults(); ;
-        }
+            );
 
         /// <summary>
         /// Base DbConnection (SqlConnection) extension for Offset Paginated Batch Query capability.
@@ -381,7 +342,8 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
-        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
+        [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
+        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
@@ -393,57 +355,18 @@ namespace RepoDb.SqlServer.PagingOperations.OffsetPaging
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
             CancellationToken cancellationToken = default
-        )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-        where TEntity : class
-        {
-            //Slice Querying is more flexible and works perfectly for Offset Based processing also so there is no
-            //  need to maintain duplicated code for the less flexible paging approach since we can provide
-            //  the simplified Offset Paging facade on top of the existing Slice Queries!
-            var sliceResults = await dbConnection.GraphQLBatchSliceQueryAsync<TEntity>(
-                orderBy: orderBy,
-                whereRawSql: whereRawSql,
-                pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
-                tableName: tableName,
-                hints: hints,
-                fields: fields,
-                commandTimeout: commandTimeout,
-                transaction: transaction,
-                logTrace: logTrace,
-                cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-
-            //Map the Slice into the OffsetPageResults for simplified processing by calling code...
-            return sliceResults.ToOffsetPageResults(); ;
-        }
-
-
-        /// <summary>
-        /// Helper method for converting Cursor Slice to OffsetPageResults for easier processing by calling code.
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="cursorPageSlice"></param>
-        /// <returns></returns>
-        public static OffsetPageResults<TEntity> ToOffsetPageResults<TEntity>(this CursorPageSlice<TEntity> cursorPageSlice)
-            //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-            where TEntity : class
-        {
-            return new OffsetPageResults<TEntity>(
-                cursorPageSlice.Results,
-                cursorPageSlice.HasNextPage,
-                cursorPageSlice.HasPreviousPage,
-                cursorPageSlice.TotalCount
-            );
-        }
-
-        private static IRepoDbCursorPagingParams ConvertOffsetParamsToCursorParams(IRepoDbOffsetPagingParams offsetParams)
-        {
-            return new RepoDbCursorPagingParams(
-                after: offsetParams?.Skip,
-                first: offsetParams?.Take,
-                isTotalCountRequested: offsetParams?.IsTotalCountRequested ?? false
-            );
-        }
+        ) where TEntity : class
+            => dbConnection.PagingOffsetQueryAsync<TEntity>(
+                    orderBy: orderBy,
+                    whereRawSql: whereRawSql,
+                    pagingParams: pagingParams,
+                    tableName: tableName,
+                    hints: hints,
+                    fields: fields,
+                    commandTimeout: commandTimeout,
+                    transaction: transaction,
+                    logTrace: logTrace,
+                    cancellationToken: cancellationToken
+                );
     }
-
 }

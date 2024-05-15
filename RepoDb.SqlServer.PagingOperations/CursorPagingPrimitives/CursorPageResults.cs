@@ -6,14 +6,12 @@ namespace RepoDb.CursorPaging
 {
     /// <summary>
     /// Model class for representing a paging result set that was computed using Cursor Pagination process by offering
-    /// a default implementation of the ICursorPageSlice interface which de-couples the code that executes queries 
-    /// from the actual ResolverProcessing extension classes used for the HotChocolate.
-    /// This class generally to be used by libraries and/or lower level code that executes queries and renders page results.
+    /// a default implementation of the ICursorPageResult interface.
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class CursorPageSlice<TEntity> : ICursorPageSlice<TEntity>
+    public class CursorPageResults<TEntity> : ICursorPageResults<TEntity>
     {
-        public CursorPageSlice(IEnumerable<ICursorResult<TEntity>> results, int? totalCount, bool hasPreviousPage, bool hasNextPage)
+        public CursorPageResults(IEnumerable<ICursorResult<TEntity>> results, int? totalCount, bool hasPreviousPage, bool hasNextPage)
         {
             this.CursorResults = results ?? throw new ArgumentNullException(nameof(results));
             this.TotalCount = totalCount;
@@ -38,7 +36,7 @@ namespace RepoDb.CursorPaging
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
-        public virtual CursorPageSlice<TTargetType> OfType<TTargetType>()
+        public virtual CursorPageResults<TTargetType> OfType<TTargetType>()
         {
             var enumerableResults = this.CursorResults
                 .Select(r =>
@@ -50,7 +48,7 @@ namespace RepoDb.CursorPaging
                 })
                 .Where(c => c != null);
 
-            return new CursorPageSlice<TTargetType>(enumerableResults, this.TotalCount, this.HasPreviousPage, this.HasNextPage);
+            return new CursorPageResults<TTargetType>(enumerableResults, this.TotalCount, this.HasPreviousPage, this.HasNextPage);
         }
 
         /// <summary>
@@ -60,7 +58,7 @@ namespace RepoDb.CursorPaging
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc">Specify the Func that takes the current type in and returns the target type.</param>
         /// <returns></returns>
-        public virtual CursorPageSlice<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
+        public virtual CursorPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
         {
             if (mappingFunc == null) 
                 throw new ArgumentException(nameof(mappingFunc));
@@ -71,7 +69,7 @@ namespace RepoDb.CursorPaging
                 return new CursorResult<TTargetType>(mappedEntity, r.CursorIndex);
             });
 
-            return new CursorPageSlice<TTargetType>(results, this.TotalCount, this.HasPreviousPage, this.HasNextPage);
+            return new CursorPageResults<TTargetType>(results, this.TotalCount, this.HasPreviousPage, this.HasNextPage);
         }
     }
 }

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
 {
+    /// <summary>
+    /// NOTE: These may be useful for consumers to help build valid SQL queries dynamically, so we share them as public methods.
+    /// </summary>
     public static class RepoDbQueryBuilderHelperExtensions
     {
         public static async Task<IEnumerable<Field>> GetValidatedDbFieldsAsync<TEntity>(

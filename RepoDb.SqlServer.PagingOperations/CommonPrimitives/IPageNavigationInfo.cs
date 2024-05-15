@@ -2,7 +2,7 @@
 {
 
     /// <summary>
-    /// Interface representing a Decorator class for common Page/Set/Slice navigation info.
+    /// Interface representing a Decorator class for common Paging navigation info.
     /// </summary>
     public interface IPageNavigationInfo
     {

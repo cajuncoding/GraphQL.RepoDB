@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.Buffers.Text;
 using System.Text;
 
-namespace RepoDb.CursorPaging
+namespace RepoDb.SqlServer.PagingOperations
 {
     /// <summary>
     /// Helper Class for serializing and deserializing Opaque cursors from Indexed based result sets.
@@ -24,7 +24,7 @@ namespace RepoDb.CursorPaging
 
             Base64.EncodeToUtf8InPlace(bufferSpan, IntegerByteLength, out var bytesWritten);
             var encodedSpan = bufferSpan.Slice(0, bytesWritten);
-            
+
             var cursor = Utf8.GetString(encodedSpan);
             return cursor;
         }
@@ -34,19 +34,19 @@ namespace RepoDb.CursorPaging
             Span<byte> bufferSpan = stackalloc byte[IntegerUtf8EncodedMaxByteLength];
 
             Utf8.GetBytes(cursor.AsSpan(), bufferSpan);
-            
+
             Base64.DecodeFromUtf8InPlace(bufferSpan, out var bytesWritten);
             var decodedSpan = bufferSpan.Slice(0, bytesWritten);
 
             if (!BinaryPrimitives.TryReadInt32LittleEndian(decodedSpan, out var cursorIndex))
                 throw new ArgumentException($"Unable to parse the Integer Index value for the UTF8 Cursor value [{cursor}] specified.");
-                
+
             return cursorIndex;
         }
-}
+    }
 
-    #if NETSTANDARD2_0
-    internal static class NetStandard20Extensions
+#if NETSTANDARD2_0
+    internal static class NetStandard20ShimExtensions
     {
         public static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)
         {
@@ -65,6 +65,6 @@ namespace RepoDb.CursorPaging
             }
         }
     }
-    #endif
+#endif
 
 }

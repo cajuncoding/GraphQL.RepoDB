@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ResolverProcessingE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "Sample.StarWars-AzureFunctions\StarWars-AzureFunctions.csproj", "{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepoDB", "Sample.StarWars-AzureFunctions-RepoDB\StarWars-AzureFunctions-RepoDB.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepoDb", "Sample.StarWars-AzureFunctions-RepoDB\StarWars-AzureFunctions-RepoDb.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ResolverProcessingExtensions.Tests", "GraphQL.ResolverProcessingExtensions.Tests\GraphQL.ResolverProcessingExtensions.Tests.csproj", "{2334C956-DC54-4A52-8277-0FA6A269C330}"
 EndProject

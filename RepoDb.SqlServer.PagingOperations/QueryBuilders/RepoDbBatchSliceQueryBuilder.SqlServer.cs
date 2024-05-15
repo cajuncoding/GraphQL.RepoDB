@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using HotChocolate.RepoDb.Sql;
 using RepoDb.CursorPaging;
+using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
 
 namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
 {
     //TODO: Abstract this out so that DBSettings is Injected and this can support other RepoDb database targets... etc.
-    public class RepoDbBatchSliceQueryBuilder
+    internal class RepoDbCursorPagingQueryBuilder
     {
         /// <summary>
         /// BBernard
@@ -28,7 +28,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
         /// <param name="lastTake"></param>
         /// <param name="includeTotalCountQuery"></param>
         /// <returns></returns>
-        public static SqlQuerySliceInfo BuildSqlServerBatchSliceQuery<TEntity>(
+        internal static SqlQuerySliceInfo BuildSqlServerCursorPagingQuery<TEntity>(
             string tableName,
             IEnumerable<Field> fields,
             IEnumerable<OrderField> orderBy,
@@ -39,8 +39,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             int? beforeCursorIndex = null,
             int? lastTake = null,
             bool includeTotalCountQuery = true
-        )
-            where TEntity : class
+        ) where TEntity : class
         {
             var dbSetting = RepoDbSettings.SqlServerSettings;
             string cursorIndexName = nameof(IHaveCursor.CursorIndex);
@@ -63,7 +62,6 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             {
                 cteFields.AddRange(missingSortFieldNames.Select(n => new Field(n)));
             }
-
 
             var selectFields = new List<Field>();
             selectFields.AddRange(fieldsList);
@@ -166,36 +164,27 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             return sqlQuerySliceInfo;
         }
 
-        public static void AssertCursorPagingArgsAreValid(
-            int? after, int? before, int? first, int? last,
-            IEnumerable<OrderField> orderBy = null
-        )
+        public static void AssertCursorPagingArgsAreValid(int? after, int? before, int? first, int? last, IEnumerable<OrderField> orderBy = null)
         {
             //If both cursors are specified we can provide some validation rather than resulting in an 
             //  unexpected set of results (e.g. none).
-            if (after.HasValue && before.HasValue && after > before)
-            {
+            if (after > before)
                 throw new ArgumentException($"The cursor values are invalid; the '{CursorPagingArgNames.After}' cursor " +
                     $"must occur before the '{CursorPagingArgNames.Before}' cursor argument.");
-            }
 
             //Implement Exception as defined by Relay Spec.
-            if (first.HasValue && first < 0)
-            {
+            if (first < 0)
                 throw new ArgumentException(
                     $"The value for '{CursorPagingArgNames.First}' must be greater than zero.",
                     CursorPagingArgNames.First
                 );
-            }
 
             //Implement Exception as defined by Relay Spec.
-            if (last.HasValue && last < 0)
-            {
+            if (last < 0)
                 throw new ArgumentException(
                     $"The value for '{CursorPagingArgNames.Last}' must be greater than zero.",
                     CursorPagingArgNames.Last
                 );
-            }
 
             if (orderBy?.Any() == false)
                 throw new ArgumentException(
@@ -256,7 +245,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             //SECOND we process first/last args which may applied in combination...
             //********************************************************************************
             //NOTE: This may be the first time endIndex is initialized, based on FIRST filter step above...
-            if (firstTake.HasValue && count > firstTake)
+            if (count > firstTake)
             {
                 endIndex = startIndex + (int)firstTake - 1;
                 count = (int)firstTake;
@@ -266,7 +255,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             //NOTE: We only allow the Last Filter Here if there are enough items expected (expected count)
             //      to be available; meaning the expected count from the FIRST filter step above has to
             //      be greater than the take from the end (as outlined in Relay Spec).
-            if (lastTake.HasValue && count > lastTake)
+            if (count > lastTake)
             {
                 if (endIndex.HasValue)
                 {
@@ -276,7 +265,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                 {
                     //This is the Case where We are requested to select from the End of all results
                     //  dynamically because no Before Cursor (ending cursor) was provided...
-                    //Therefore this requires a special Query condition to Dynamically compute 
+                    //Therefore, this requires a special Query condition to Dynamically compute 
                     //  the currently unknown StartIndex...
                     startIndex = null;
                     endIndex = null;
@@ -286,7 +275,6 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                 //  since it's smaller than the original count expected from the FIRST filter step above...
                 count = (int)lastTake;
             }
-
 
             var sqlSliceInfo = new SqlQuerySliceInfo() { ExpectedCount = count };
 
@@ -336,7 +324,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
         }
     }
 
-    public class SqlQuerySliceInfo
+    internal class SqlQuerySliceInfo
     {
         // ReSharper disable once InconsistentNaming
         public string SQL { get; set; }

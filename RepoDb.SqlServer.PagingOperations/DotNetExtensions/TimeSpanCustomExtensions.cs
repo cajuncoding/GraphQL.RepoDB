@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace HotChocolate.RepoDb
+namespace RepoDb.SqlServer.PagingOperations.DotNetExtensions
 {
     internal static class TimeSpanCustomExtensions
     {

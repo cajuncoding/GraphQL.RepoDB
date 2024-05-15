@@ -7,14 +7,14 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using HotChocolate.RepoDb;
-using HotChocolate.RepoDb.Sql;
 using RepoDb.CursorPaging;
 using RepoDb.Enumerations;
+using RepoDb.SqlServer.PagingOperations.CommonPrimitives;
+using RepoDb.SqlServer.PagingOperations.DotNetExtensions;
 using RepoDb.SqlServer.PagingOperations.QueryBuilders;
 using RepoDb.SqlServer.PagingOperations.Reflection;
 
-namespace RepoDb.SqlServer.PagingOperations.CursorPaging
+namespace RepoDb.SqlServer.PagingOperations
 {
     public static class RepoDbBatchSliceQueryExtensions
     {
@@ -45,7 +45,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             Expression<Func<TEntity, bool>> whereExpression,
@@ -60,9 +60,9 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         )
         where TEntity : class
         where TDbConnection : DbConnection, new()
-            => await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
+            => await baseRepo.PagingCursorQueryForRepoInternalAsync(
                     orderBy: orderBy,
-                    where: whereExpression != null ? QueryGroup.Parse<TEntity>(whereExpression) : (QueryGroup)null,
+                    where: whereExpression != null ? QueryGroup.Parse(whereExpression) : null,
                     pagingParams: pagingParams,
                     tableName: tableName,
                     hints: hints,
@@ -100,7 +100,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
@@ -112,8 +112,10 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
             CancellationToken cancellationToken = default
-        ) where TEntity : class where TDbConnection : DbConnection, new()
-            => await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
+        )
+        where TEntity : class
+        where TDbConnection : DbConnection, new()
+            => await baseRepo.PagingCursorQueryForRepoInternalAsync(
                     orderBy: orderBy,
                     where: whereQueryGroup,
                     pagingParams: pagingParams,
@@ -153,7 +155,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
@@ -168,7 +170,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         )
         where TEntity : class
         where TDbConnection : DbConnection, new()
-            => await baseRepo.GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
+            => await baseRepo.PagingCursorQueryForRepoInternalAsync(
                     orderBy: orderBy,
                     where: whereRawSql,
                     pagingParams: pagingParams,
@@ -208,7 +210,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        private static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryForRepoInternalAsync<TEntity, TDbConnection>(
+        private static async Task<CursorPageResults<TEntity>> PagingCursorQueryForRepoInternalAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             object where = null,
@@ -230,7 +232,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
 
             try
             {
-                var cursorPageResult = await connection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
+                var cursorPageResult = await connection.PagingCursorQueryInternalAsync<TEntity>(
                     orderBy: orderBy,
                     where: where,
                     pagingParams: pagingParams,
@@ -283,7 +285,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
@@ -299,9 +301,9 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         )
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
-            => await dbConnection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
+            => await dbConnection.PagingCursorQueryInternalAsync<TEntity>(
                     orderBy: orderBy,
-                    where: whereExpression != null ? QueryGroup.Parse<TEntity>(whereExpression) : (QueryGroup)null,
+                    where: whereExpression != null ? QueryGroup.Parse(whereExpression) : null,
                     pagingParams: pagingParams,
                     tableName: tableName,
                     hints: hints,
@@ -338,7 +340,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: RawSql Where is required to prevent Ambiguous Signatures
@@ -355,7 +357,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
         where TEntity : class
         {
-            return await dbConnection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
+            return await dbConnection.PagingCursorQueryInternalAsync<TEntity>(
                 orderBy: orderBy,
                 //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
                 where: whereQueryGroup,
@@ -396,7 +398,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
@@ -408,11 +410,8 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
             CancellationToken cancellationToken = default
-        )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-        where TEntity : class
-        {
-            return await dbConnection.GraphQLBatchSliceQueryInternalAsync<TEntity>(
+        ) where TEntity : class
+            => dbConnection.PagingCursorQueryInternalAsync<TEntity>(
                 orderBy: orderBy,
                 //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
                 where: whereRawSql,
@@ -424,8 +423,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
                 transaction: transaction,
                 logTrace: logTrace,
                 cancellationToken: cancellationToken
-            ).ConfigureAwait(false);
-        }
+            );
 
         /// <summary>
         /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
@@ -453,7 +451,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        internal static async Task<CursorPageSlice<TEntity>> GraphQLBatchSliceQueryInternalAsync<TEntity>(
+        internal static async Task<CursorPageResults<TEntity>> PagingCursorQueryInternalAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             object where = null, //NOTE: May be either a QueryGroup or RawSqlWhere object
@@ -465,9 +463,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
             CancellationToken cancellationToken = default
-        )
-        //ALL entities retrieved and Mapped for Cursor Pagination must support IHaveCursor interface.
-        where TEntity : class
+        ) where TEntity : class
         {
             if (orderBy == null)
                 throw new ArgumentNullException(nameof(orderBy), "A sort order must be specified to provide valid cursor paging results.");
@@ -478,7 +474,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
 
             //Ensure we have default fields; default is to include All Fields...
             var fieldsList = fields?.ToList();
-            
+
             var selectFields = fieldsList?.Any() == true
                 ? fieldsList
                 : FieldCache.Get<TEntity>();
@@ -491,14 +487,14 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
 
             //Dynamically handle RepoDb where filters (QueryGroup or now supporting Raw Sql and Params object)...
             object validatedWhereParams = null;
-            switch(where)
+            switch (where)
             {
                 case QueryGroup whereQueryGroup: validatedWhereParams = RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(whereQueryGroup); break;
                 case RawSqlWhere whereRawSql: validatedWhereParams = whereRawSql.WhereParams; break;
             };
 
             //Build the Cursor Paging query...
-            var querySliceInfo = RepoDbBatchSliceQueryBuilder.BuildSqlServerBatchSliceQuery<TEntity>(
+            var querySliceInfo = RepoDbCursorPagingQueryBuilder.BuildSqlServerCursorPagingQuery<TEntity>(
                 tableName: dbTableName,
                 fields: validSelectFields,
                 orderBy: orderBy,
@@ -513,7 +509,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
             );
 
             //Now we can execute the process and get the results!
-            var cursorPageResult = await dbConnection.ExecuteBatchSliceQueryAsync<TEntity>(
+            var cursorPageResult = await dbConnection.ExecuteCursorPagingQueryInternalAsync<TEntity>(
                 sqlQuerySliceInfo: querySliceInfo,
                 queryParams: validatedWhereParams,
                 tableName: dbTableName,
@@ -572,7 +568,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        private static async Task<CursorPageSlice<TEntity>> ExecuteBatchSliceQueryAsync<TEntity>(
+        private static async Task<CursorPageResults<TEntity>> ExecuteCursorPagingQueryInternalAsync<TEntity>(
             this DbConnection dbConn,
             SqlQuerySliceInfo sqlQuerySliceInfo,
             object queryParams = null,
@@ -623,7 +619,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
                     //BUGFIX: Fix issue where when there are no results we still need to check and see if TotalCount has any results...
                     if (reader.HasRows)
                     {
-                        var cursorIndexPropOrdinal = reader.GetOrdinal(nameof(IHaveCursor.CursorIndex));
+                        var cursorIndexFieldOrdinal = reader.GetOrdinal(nameof(IHaveCursor.CursorIndex));
 
                         //It's exposed for easy use by extensions, so we use Brute Force Reflection to get the Model Mapping Function
                         //  because RepoDb does this very well already!
@@ -637,7 +633,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
                             TEntity entity = repoDbModelMappingFunc(reader);
 
                             //Manually Process the Cursor for each record...
-                            var cursorIndex = Convert.ToInt32(reader.GetValue(cursorIndexPropOrdinal));
+                            var cursorIndex = (int)reader.GetInt64(cursorIndexFieldOrdinal);
 
                             //This allows us to extract the CursorIndex field and return in a Decorator class 
                             //  so there's NO REQUIREMENT that the Model (TEntity) have any special fields/interfaces added.
@@ -652,7 +648,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
                         && await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                     {
                         //This is a Scalar query so the first ordinal value is the Total Count!
-                        totalCount = Convert.ToInt32(reader.GetValue(0));
+                        totalCount = reader.GetInt32(0);
                     }
 
                     timer.Stop();
@@ -661,7 +657,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
             }
 
             //Process the Results and determine Pagination metadata, etc.
-            var cursorPage = PostProcessResultsIntoCursorPageSlice(results, sqlQuerySliceInfo, totalCount);
+            var cursorPage = PostProcessResultsIntoCursorPage(results, sqlQuerySliceInfo, totalCount);
             return cursorPage;
         }
 
@@ -695,9 +691,9 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
             return repoDbMappingFunc;
         }
 
-        private static CursorPageSlice<TEntity> PostProcessResultsIntoCursorPageSlice<TEntity>(
-            List<CursorResult<TEntity>> results, 
-            SqlQuerySliceInfo sqlQuerySliceInfo, 
+        private static CursorPageResults<TEntity> PostProcessResultsIntoCursorPage<TEntity>(
+            List<CursorResult<TEntity>> results,
+            SqlQuerySliceInfo sqlQuerySliceInfo,
             int? totalCount
         ) where TEntity : class
         {
@@ -727,7 +723,7 @@ namespace RepoDb.SqlServer.PagingOperations.CursorPaging
             }
 
             //Return a CursorPagedResult decorator for the results along with the Total Count!
-            var cursorPage = new CursorPageSlice<TEntity>(results, totalCount, hasPreviousPage, hasNextPage);
+            var cursorPage = new CursorPageResults<TEntity>(results, totalCount, hasPreviousPage, hasNextPage);
             return cursorPage;
         }
 

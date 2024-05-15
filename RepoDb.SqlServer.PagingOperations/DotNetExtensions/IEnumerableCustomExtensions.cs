@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace HotChocolate.RepoDb
+namespace RepoDb.SqlServer.PagingOperations.DotNetExtensions
 {
     internal static class IEnumerableCustomExtensions
     {
