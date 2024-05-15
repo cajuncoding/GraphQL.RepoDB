@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDb.SqlServer.PagingOper
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepoDb Extensions", "RepoDb Extensions", "{B206CD28-5ED8-48AF-89AB-558208CCAC18}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoDb.SqlServer.PagingOperations.Tests", "RepoDb.SqlServer.PagingOperations.Tests\RepoDb.SqlServer.PagingOperations.Tests.csproj", "{B2806638-C496-469B-8E8E-DC855E735643}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,12 +49,17 @@ Global
 		{8CCDB80F-5C51-475A-A28F-0FAD001A1540}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CCDB80F-5C51-475A-A28F-0FAD001A1540}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CCDB80F-5C51-475A-A28F-0FAD001A1540}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8CCDB80F-5C51-475A-A28F-0FAD001A1540} = {B206CD28-5ED8-48AF-89AB-558208CCAC18}
+		{B2806638-C496-469B-8E8E-DC855E735643} = {B206CD28-5ED8-48AF-89AB-558208CCAC18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B234830F-2CBB-40AB-907A-224A5DD21DDE}
