@@ -1,4 +1,5 @@
-﻿using RepoDb.PagingPrimitives.CursorPaging;
+﻿using System.Security.Cryptography;
+using RepoDb.PagingPrimitives.CursorPaging;
 
 namespace RepoDb.SqlServer.PagingOperations
 {
@@ -23,16 +24,22 @@ namespace RepoDb.SqlServer.PagingOperations
             IsTotalCountRequested = isTotalCountRequested;
         }
 
-        public RepoDbCursorPagingParams(int? after = null, int? first = null, int? before = null, int? last = null, bool isTotalCountRequested = false)
+        public RepoDbCursorPagingParams(int? firstTake = null, int? lastTake = null, int? afterIndex = null, int? beforeIndex = null, bool isTotalCountRequested = false)
         {
-            First = first;
-            Last = last;
-            AfterIndex = after;
-            BeforeIndex = before;
-            After = SerializeCursor(after);
-            Before = SerializeCursor(before);
+            First = firstTake;
+            Last = lastTake;
+            AfterIndex = afterIndex;
+            BeforeIndex = beforeIndex;
+            After = SerializeCursor(afterIndex);
+            Before = SerializeCursor(beforeIndex);
             IsTotalCountRequested = isTotalCountRequested;
         }
+
+        public static RepoDbCursorPagingParams ForCursors(int? first = null, int? last = null, string afterCursor = null, string beforeCursor = null, bool isTotalCountRequested = false)
+            => new RepoDbCursorPagingParams(first, last, afterCursor, beforeCursor, isTotalCountRequested);
+
+        public static RepoDbCursorPagingParams ForIndexes(int? first = null, int? last = null, int? afterIndex = null, int? beforeIndex = null, bool isTotalCountRequested = false)
+            => new RepoDbCursorPagingParams(first, last, afterIndex, beforeIndex, isTotalCountRequested);
 
         public static string SerializeCursor(int? index) => index != null
             ? RepoDbCursorHelper.CreateCursor((int)index) //IndexEdge<string>.Create(String.Empty, (int)index)?.Cursor

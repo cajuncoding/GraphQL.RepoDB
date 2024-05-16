@@ -25,7 +25,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -80,7 +80,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -135,7 +135,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -190,7 +190,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -266,7 +266,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -287,7 +287,7 @@ namespace RepoDb.SqlServer.PagingOperations
         public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
-            //NOTE: Expression is required to prevent Ambiguous Signatures
+            //NOTE: Where Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> whereExpression,
             IRepoDbCursorPagingParams pagingParams = default,
             string tableName = null,
@@ -321,7 +321,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -342,7 +342,7 @@ namespace RepoDb.SqlServer.PagingOperations
         public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
-            //NOTE: RawSql Where is required to prevent Ambiguous Signatures
+            //NOTE: Where filter is required to prevent Ambiguous Signatures
             QueryGroup whereQueryGroup,
             IRepoDbCursorPagingParams pagingParams = default,
             string hints = null,
@@ -379,7 +379,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -400,7 +400,8 @@ namespace RepoDb.SqlServer.PagingOperations
         public static Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
-            RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            RawSqlWhere whereRawSql = null,
             IRepoDbCursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
@@ -432,24 +433,56 @@ namespace RepoDb.SqlServer.PagingOperations
         /// 
         /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
         ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
-        ///     this facade will remain as a proxy to core feature.
+        ///     this facade will remain as a proxy.
         ///     
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
-        /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="dbConnection">Extends DbConnection directly</param>
-        /// <param name="orderBy"></param>
-        /// <param name="where">May be either a QueryGroup or RawSqlWhere object</param>
+        /// </summary>        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="rawSqlStatement">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
+        /// <param name="orderBy">Order By is required and must be specified as an independent list for proper support to rewrite the query for paging.</param>
+        /// <param name="sqlParams"></param>
         /// <param name="pagingParams"></param>
-        /// <param name="tableName"></param>
-        /// <param name="hints"></param>
-        /// <param name="fields"></param>
         /// <param name="commandTimeout"></param>
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns></returns>
+        public static Task<CursorPageResults<TEntity>> ExecutePagingCursorQueryAsync<TEntity>(
+            this DbConnection dbConnection,
+            string rawSqlStatement,
+            IEnumerable<OrderField> orderBy,
+            object sqlParams = null,
+            IRepoDbCursorPagingParams pagingParams = default,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+        ) where TEntity : class
+            => dbConnection.PagingCursorQueryInternalAsync<TEntity>(
+                orderBy: orderBy,
+                //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
+                rawSql: RawSql.From(rawSqlStatement, sqlParams),
+                pagingParams: pagingParams,
+                commandTimeout: commandTimeout,
+                transaction: transaction,
+                logTrace: logTrace,
+                cancellationToken: cancellationToken
+            );
+
+        /// <summary>
+        /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>
         internal static async Task<CursorPageResults<TEntity>> PagingCursorQueryInternalAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
@@ -458,6 +491,7 @@ namespace RepoDb.SqlServer.PagingOperations
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
+            RawSql rawSql = null,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
@@ -486,16 +520,18 @@ namespace RepoDb.SqlServer.PagingOperations
 
             //Dynamically handle RepoDb where filters (QueryGroup or now supporting Raw Sql and Params object)...
             object validatedWhereParams = null;
-            switch (where)
+            switch (where ?? rawSql)
             {
-                case QueryGroup whereQueryGroup: validatedWhereParams = RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(whereQueryGroup); break;
-                case RawSqlWhere whereRawSql: validatedWhereParams = whereRawSql.WhereParams; break;
+                case QueryGroup whereQueryGroupParam: validatedWhereParams = RepoDbQueryGroupProxy.GetMappedParamsObject<TEntity>(whereQueryGroupParam); break;
+                case RawSqlWhere rawSqlWhereParam: validatedWhereParams = rawSqlWhereParam.WhereParams; break;
+                case RawSql rawSqlParam: validatedWhereParams = rawSqlParam.SqlParams; break;
             };
 
             //Build the Cursor Paging query...
             var querySliceInfo = RepoDbCursorPagingQueryBuilder.BuildSqlServerCursorPagingQuery<TEntity>(
                 tableName: dbTableName,
                 fields: validSelectFields,
+                rawSqlStatement: rawSql?.RawSqlStatement,
                 orderBy: orderBy,
                 where: where,
                 hints: hints,

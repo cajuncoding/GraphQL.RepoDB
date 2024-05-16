@@ -10,7 +10,7 @@ using RepoDb.PagingPrimitives.OffsetPaging;
 
 namespace RepoDb.SqlServer.PagingOperations
 {
-    public static class RepoDbBatchSkipTakeQueryExtensions
+    public static class RepoDbPagingOffsetQueryExtensions
     {
         /// <summary>
         /// Base Repository extension for Offset Paginated Batch Query capability.
@@ -183,7 +183,8 @@ namespace RepoDb.SqlServer.PagingOperations
         public static async Task<OffsetPageResults<TEntity>> PagingOffsetQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
-            RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            RawSqlWhere whereRawSql = null,
             IRepoDbOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
@@ -382,7 +383,8 @@ namespace RepoDb.SqlServer.PagingOperations
         public static async Task<OffsetPageResults<TEntity>> PagingOffsetQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
-            RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            //NOTE: This Overload allows cases where NO WHERE Filter is needed...
+            RawSqlWhere whereRawSql = null,
             IRepoDbOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
@@ -432,8 +434,8 @@ namespace RepoDb.SqlServer.PagingOperations
 
         private static IRepoDbCursorPagingParams ConvertOffsetParamsToCursorParams(IRepoDbOffsetPagingParams offsetParams)
             => new RepoDbCursorPagingParams(
-                after: offsetParams?.Skip,
-                first: offsetParams?.Take,
+                firstTake: offsetParams?.Take,
+                afterIndex: offsetParams?.Skip,
                 isTotalCountRequested: offsetParams?.IsTotalCountRequested ?? false
             );
     }

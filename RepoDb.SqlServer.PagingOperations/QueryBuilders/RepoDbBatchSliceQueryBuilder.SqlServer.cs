@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using RepoDb.Interfaces;
 using RepoDb.PagingPrimitives.CursorPaging;
 
 namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
@@ -9,27 +10,18 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
     //TODO: Abstract this out so that DBSettings is Injected and this can support other RepoDb database targets... etc.
     internal class RepoDbCursorPagingQueryBuilder
     {
+        private const string CursorIndexName = nameof(IHaveCursor.CursorIndex);
+
         /// <summary>
         /// BBernard
         /// Borrowed and Adapted from RepoDb source code: SqlServerStatementBuilder.CreateBatchQuery.
         /// NOTE: Due to internally only accessible elements it was easier to just construct the query as needed
         ///         to allow us to return the RowNumber as the CursorIndex!
         /// </summary>
-        /// <typeparam name="TEntity"></typeparam>
-        /// <param name="tableName"></param>
-        /// <param name="fields"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="where">May be either a QueryGroup or RawSqlWhere object</param>
-        /// <param name="hints"></param>
-        /// <param name="afterCursorIndex"></param>
-        /// <param name="firstTake"></param>
-        /// <param name="beforeCursorIndex"></param>
-        /// <param name="lastTake"></param>
-        /// <param name="includeTotalCountQuery"></param>
-        /// <returns></returns>
         internal static SqlQuerySliceInfo BuildSqlServerCursorPagingQuery<TEntity>(
             string tableName,
             IEnumerable<Field> fields,
+            string rawSqlStatement,
             IEnumerable<OrderField> orderBy,
             object where = null,
             string hints = null,
@@ -41,80 +33,45 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
         ) where TEntity : class
         {
             var dbSetting = RepoDbSettings.SqlServerSettings;
-            string cursorIndexName = nameof(IHaveCursor.CursorIndex);
 
-            var fieldsList = fields.ToList();
+            var fieldsList = fields?.ToList();
             var orderByList = orderBy.ToList();
-            var orderByLookup = orderByList.ToLookup(o => o.Name.ToLower());
 
-            //Ensure that we Remove any risk of Name conflicts with the CursorIndex field on the CTE
-            //  because we are dynamically adding ROW_NUMBER() as [CursorIndex]! And, ensure
-            //  that there are no conflicts with the OrderBy
-            var cteFields = new List<Field>(fieldsList);
-            cteFields.RemoveAll(f => f.Name.Equals(cursorIndexName, StringComparison.OrdinalIgnoreCase));
-
-            //We must ensure that all OrderBy fields are also part of the CTE Select Clause so that they are
-            //  actually available to be sorted on (or else 'Invalid Column Errors' will occur if the field is not 
-            //  originally part of the Select Fields list.
-            var missingSortFieldNames = orderByList.Select(o => o.Name).Except(cteFields.Select(f => f.Name)).ToList();
-            if (missingSortFieldNames.Count > 0)
-            {
-                cteFields.AddRange(missingSortFieldNames.Select(n => new Field(n)));
-            }
-
-            var selectFields = new List<Field>();
-            selectFields.AddRange(fieldsList);
-            selectFields.Add(new Field(cursorIndexName));
-
-            // Initialize the builder
-            var cteBuilder = new QueryBuilder();
-
-            //Support either QueryGroup object model or Raw SQL; which enables support for complex Field processing & filtering not supported
-            //  by QueryField/QueryGroup objects (e.g. LOWER(), TRIM()), use of Sql Server Full Text Searching on Fields (e.g. CONTAINS(), FREETEXT()), etc.
-            //var sqlWhereDataFilter = whereQueryGroup?.GetString(0, dbSetting) ?? whereRawSql;
-            string sqlWhereDataFilter = null;
-            switch (where)
-            {
-                case QueryGroup whereQueryGroup: sqlWhereDataFilter = whereQueryGroup?.GetString(0, dbSetting); break;
-                case RawSqlWhere whereRawSql: sqlWhereDataFilter = whereRawSql.RawSqlWhereClause; break;
-                case string whereRawSql: sqlWhereDataFilter = whereRawSql; break;
-            };
-
-            bool isWhereFilterSpecified = !string.IsNullOrWhiteSpace(sqlWhereDataFilter);
+            var primaryResultsSql =
+                fieldsList != null ? BuildSqlServerPrimaryResultsSql(tableName, fieldsList, orderByList, dbSetting, where, hints)
+                : !string.IsNullOrWhiteSpace(rawSqlStatement) ? rawSqlStatement
+                : throw new ArgumentException("Either a Fields set or Raw Sql statement must be specified.");
 
             //Dynamically build/optimize the core data SQL that will be used as a CTE wrapped by the Pagination logic!
-            cteBuilder.Clear()
+            var rowNumCteBuilder = new QueryBuilder().Clear()
                 .Select()
-                .RowNumber().Over().OpenParen().OrderByFrom(orderByList, dbSetting).CloseParen().As($"[{cursorIndexName}],")
-                .FieldsFrom(cteFields, dbSetting)
-                .From().TableNameFrom(tableName, dbSetting)
-                .HintsFrom(hints);
+                    .RowNumber().Over().OpenParen().OrderByFrom(orderByList, dbSetting).CloseParen().As($"[{CursorIndexName}],")
+                    .WriteText("p.*")
+                .From().WriteText("PrimaryResultsCte p");
 
-            if (isWhereFilterSpecified)
-            {
-                cteBuilder
-                    .Where()
-                    .WriteText(sqlWhereDataFilter);
-            }
-
-            var sqlCte = cteBuilder.GetString();
-            var sqlWhereClauseSliceInfo = BuildRelaySpecQuerySliceInfo(cursorIndexName, afterCursorIndex, beforeCursorIndex, firstTake, lastTake);
+            var sqlWhereClauseSliceInfo = BuildRelaySpecQuerySliceInfo($"r.{CursorIndexName}", "RowNumResultsCte", afterCursorIndex, beforeCursorIndex, firstTake, lastTake);
 
             // Build the base Paginated Query
-            var sqlBuilder = new QueryBuilder();
-            sqlBuilder.Clear()
-                .With()
-                .WriteText("CTE").As().OpenParen()
-                    //Dynamically insert the CTE that is built separately...
-                    .WriteText(sqlCte)
-                .CloseParen()
-                .Select()
-                    .FieldsFrom(selectFields, dbSetting)
-                .From().WriteText("CTE")
+            var sqlBuilder = new QueryBuilder().Clear()
+                //.With()
+                //.WriteText("CTE").As().OpenParen()
+                //    //Dynamically insert the CTE that is built separately...
+                //    .WriteText(sqlCte)
+                //.CloseParen()
+                .WriteText($@"
+                    WITH PrimaryResultsCte AS (
+                        {primaryResultsSql}
+                    ),
+                    RowNumResultsCte AS (
+                        {rowNumCteBuilder.GetString()}
+                    )
+                    SELECT r.*
+                    FROM RowNumResultsCte r
+                ")
                 //Implement Relay Spec Cursor Slicing Algorithm!
                 .WriteText(sqlWhereClauseSliceInfo.SQL)
                 .OrderByFrom(orderByList, dbSetting)
-                .End();
+                .End(); //Appends ';'
 
             if (includeTotalCountQuery)
             {
@@ -132,19 +89,13 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                 //      eliminated due to Null values.
                 //NOTE We also rely on SqlServer to optimize this query instead of trying to do too much ourselves (with other unknown risks
                 //      such as column permissions, etc.
-                sqlBuilder.Select()
-                    .Count(null, dbSetting)
-                    .From().TableNameFrom(tableName, dbSetting)
-                    .HintsFrom(hints);
-
-                if (isWhereFilterSpecified)
-                {
-                    sqlBuilder
-                        .Where()
-                        .WriteText(sqlWhereDataFilter);
-                }
-
-                sqlBuilder.End();
+                sqlBuilder.WriteText($@"
+                    WITH PrimaryResultsCte AS (
+                        {primaryResultsSql}
+                    )
+                    SELECT COUNT(1) FROM PrimaryResultsCte
+                ")
+                .End();
             }
 
             // Build the Query and other Slice Info metadata needed for optimal pagination...
@@ -161,6 +112,64 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
 
             // Return the query
             return sqlQuerySliceInfo;
+        }
+
+        internal static string BuildSqlServerPrimaryResultsSql(
+            string tableName,
+            List<Field> fieldsList,
+            List<OrderField> orderByList,
+            IDbSetting dbSetting,
+            object where = null,
+            string hints = null
+        )
+        {
+            //Ensure that we Remove any risk of Name conflicts with the CursorIndex field on the CTE
+            //  because we are dynamically adding ROW_NUMBER() as [CursorIndex]!
+            //  And, ensure that there are no conflicts with the OrderBy
+            var cteFields = new List<Field>(fieldsList);
+            cteFields.RemoveAll(f => f.Name.Equals(CursorIndexName, StringComparison.OrdinalIgnoreCase));
+
+            //We must ensure that all OrderBy fields are also part of the CTE Select Clause so that they are
+            //  actually available to be sorted on; or else 'Invalid Column Errors' will occur if the field is not 
+            //  originally part of the Select Fields list.
+            var missingSortFieldNames = orderByList
+                .Select(o => o.Name)
+                .Except(cteFields.Select(f => f.Name), StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            if (missingSortFieldNames.Count > 0)
+                cteFields.AddRange(missingSortFieldNames.Select(n => new Field(n)));
+
+            //Support either QueryGroup object model or Raw SQL; which enables support for complex Field processing & filtering not supported
+            //  by QueryField/QueryGroup objects (e.g. LOWER(), TRIM()), use of Sql Server Full Text Searching on Fields (e.g. CONTAINS(), FREETEXT()), etc.
+            //var sqlWhereDataFilter = whereQueryGroup?.GetString(0, dbSetting) ?? whereRawSql;
+            string sqlWhereDataFilter = null;
+            switch (where)
+            {
+                case QueryGroup whereQueryGroup:
+                    sqlWhereDataFilter = whereQueryGroup.GetString(0, dbSetting);
+                    break;
+                case RawSqlWhere whereRawSql:
+                    sqlWhereDataFilter = whereRawSql.RawSqlWhereClause;
+                    break;
+                case string whereRawSql:
+                    sqlWhereDataFilter = whereRawSql;
+                    break;
+            }
+
+            bool isWhereFilterSpecified = !string.IsNullOrWhiteSpace(sqlWhereDataFilter);
+
+            //Dynamically build/optimize the core data SQL that will be used as a CTE wrapped by the Pagination logic!
+            var primaryResultsCteBuilder = new QueryBuilder().Clear()
+                .Select()
+                .FieldsFrom(cteFields, dbSetting)
+                .From().TableNameFrom(tableName, dbSetting)
+                .HintsFrom(hints);
+
+            if (isWhereFilterSpecified)
+                primaryResultsCteBuilder.Where().WriteText(sqlWhereDataFilter);
+
+            return primaryResultsCteBuilder.GetString();
         }
 
         public static void AssertCursorPagingArgsAreValid(int? after, int? before, int? first, int? last, IEnumerable<OrderField> orderBy = null)
@@ -192,8 +201,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                 );
         }
 
-        [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        private static SqlQuerySliceInfo BuildRelaySpecQuerySliceInfo(string cursorFieldName, int? afterCursorIndex, int? beforeCursorIndex, int? firstTake, int? lastTake)
+        private static SqlQuerySliceInfo BuildRelaySpecQuerySliceInfo(string cursorFieldName, string resultsCteTableName, int? afterCursorIndex, int? beforeCursorIndex, int? firstTake, int? lastTake)
         {
             //Implement Cursor pagination algorithm in alignment with industry accepted Relay Spec. for GraphQL
             //For more info. see: https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
@@ -282,14 +290,14 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             {
                 //NOTE: We INCREMENT End Index by one here to intentionally Over Fetch so that we can optimize
                 //      the computation of HasNextPage without knowing the Full table Count!
-                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] BETWEEN {startIndex} AND {endIndex + 1})";
+                sqlSliceInfo.SQL = $"WHERE ({cursorFieldName} BETWEEN {startIndex} AND {endIndex + 1})";
                 sqlSliceInfo.IsPreviousPagePossible = true;
                 sqlSliceInfo.IsNextPagePossible = true;
                 sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = true;
             }
             else if (startIndex.HasValue)
             {
-                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] >= {startIndex})";
+                sqlSliceInfo.SQL = $"WHERE ({cursorFieldName} >= {startIndex})";
                 sqlSliceInfo.IsPreviousPagePossible = true;
                 sqlSliceInfo.IsNextPagePossible = false;
                 sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = false;
@@ -300,7 +308,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             {
                 //NOTE: We INCREMENT End Index by one here to intentionally Over Fetch so that we can optimize
                 //      the computation of HasNextPage without knowing the Full table Count!
-                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] <= {endIndex + 1})";
+                sqlSliceInfo.SQL = $"WHERE ({cursorFieldName} <= {endIndex + 1})";
                 sqlSliceInfo.IsPreviousPagePossible = false;
                 sqlSliceInfo.IsNextPagePossible = true;
                 sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = true;
@@ -313,7 +321,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             {
                 //Computing from the End is the most complex so some performance hit is likely acceptable since it's a less used use-case.
                 //NOTE: This must use the Dynamic Count() to determine the End of the existing result set...
-                sqlSliceInfo.SQL = $"WHERE ([{cursorFieldName}] > (SELECT (COUNT([{cursorFieldName}]) - {(int)lastTake}) FROM CTE))";
+                sqlSliceInfo.SQL = $"WHERE ({cursorFieldName} > (SELECT (COUNT({cursorFieldName}) - {(int)lastTake}) FROM {resultsCteTableName}))";
                 sqlSliceInfo.IsPreviousPagePossible = true;
                 sqlSliceInfo.IsNextPagePossible = false;
                 sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = false;
