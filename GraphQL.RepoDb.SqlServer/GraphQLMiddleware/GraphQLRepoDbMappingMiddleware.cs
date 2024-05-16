@@ -68,8 +68,8 @@ namespace HotChocolate.RepoDb
                     if (repoDbMapperParam?.ParameterType is {} paramType)
                     {
                         //In order to correctly Map the GraphQL Params Context to an Entity for RepoDb, we must know
-                        //  the have a Generic Type for the Entity therefore we require that the Resolver Param be a concrete type with Generic Parameter.
-                        //  
+                        //  the Generic Type for the Entity therefore we require that the Resolver Param be a
+                        //  concrete type with Generic Parameter.
                         if (paramType.IsGenericType)
                         {
                             var genericType = paramType.GenericTypeArguments.First();
@@ -77,9 +77,11 @@ namespace HotChocolate.RepoDb
                         }
                         else if (paramType == typeof(IGraphQLRepoDbMapper))
                         {
-                            throw new ArgumentException($"The Resolver method signature is expecting a parameter of type [{nameof(IGraphQLRepoDbMapper)}]"
-                                                        + " however, a concrete generic type must be specified so that the correct mapping can be resolved;"
-                                                        + " use GraphQLRepoDbMapper<TEntity> instead.");
+                            throw new ArgumentException(
+                            $"The Resolver method signature is expecting a parameter of type [{nameof(IGraphQLRepoDbMapper)}]"
+                                    + " however, a concrete generic type must be specified so that the correct mapping can be resolved;"
+                                    + " use GraphQLRepoDbMapper<TEntity> instead."
+                            );
                         }
                     }
 

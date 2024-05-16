@@ -35,7 +35,7 @@ namespace StarWars.Characters
         [UseSorting]
         public Connection<ICharacter> GetCharacters(
             [Service] ICharacterRepository repository,
-            //THIS is now injected by Pre-Processed extensions middleware...
+            //THIS is now injected by the Resolver Processing Extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
@@ -68,7 +68,7 @@ namespace StarWars.Characters
         [UseSorting]
         public CollectionSegment<ICharacter> GetCharactersWithOffsetPaging(
             [Service] ICharacterRepository repository,
-            //THIS is now injected by Pre-Processed extensions middleware...
+            //THIS is now injected by the Resolver Processing Extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
         )
         {

@@ -20,7 +20,7 @@ namespace StarWars.Reviews
         public Connection<Review> GetReviews(
             Episode episode,
             [Service]IReviewRepository repository,
-            //THIS is now injected by Pre-Processed extensions middleware...
+            //THIS is now injected by the Resolver Processing Extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
         )
         {

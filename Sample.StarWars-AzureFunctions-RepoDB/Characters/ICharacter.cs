@@ -7,7 +7,7 @@ namespace StarWars.Characters
     /// <summary>
     /// A character in the Star Wars universe.
     /// </summary>
-    //TODO: Fix this Interface type when SubTypes are re-registered in Starup...
+    //TODO: Fix this Interface type when SubTypes are re-registered in Startup...
     [InterfaceType(Name = "Character")]
     public interface ICharacter : ISearchResult
     {

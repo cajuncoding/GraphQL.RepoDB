@@ -13,7 +13,6 @@
 		<RepositoryUrl>https://github.com/cajuncoding/graphql.RepoDb</RepositoryUrl>
 		<PackageReleaseNotes>
 			Release Notes:
-			Release Notes:
 			- Updated and Optimized now with HC v13 -- leveraging more out-of-the-box features, simplifying code, and improving performance.
 			- Update project to .NET 6.0 which is now the minimum version supported by HC v13.
 			- Implemented support for dynamic injection of the GraphQL RepoDb Mapper via Resolver parameters.

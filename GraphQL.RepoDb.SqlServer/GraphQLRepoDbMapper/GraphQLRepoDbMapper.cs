@@ -31,7 +31,7 @@ namespace HotChocolate.RepoDb
         /// NOTE: Property names and db fields names are not guaranteed to be the same.
         /// </summary>
         /// <returns>
-        /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+        /// List of Database fields mapped from all the available GraphQL Selections mapped to the generics
         /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
         /// GraphQL ParamsContext.
         /// </returns>
@@ -51,7 +51,7 @@ namespace HotChocolate.RepoDb
         /// NOTE: Property names and db fields names are not guaranteed to be the same.
         /// </summary>
         /// <returns>
-        /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+        /// List of Database fields mapped from all the available GraphQL Selections mapped to the generics
         /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
         /// GraphQL ParamsContext.
         /// </returns>
@@ -72,7 +72,7 @@ namespace HotChocolate.RepoDb
         /// </summary>
         /// <param name="selectionNamesFilter"></param>
         /// <returns>
-        /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+        /// List of Database fields mapped from all the available GraphQL Selections mapped to the generics
         /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
         /// GraphQL ParamsContext.
         /// </returns>
@@ -86,10 +86,10 @@ namespace HotChocolate.RepoDb
             }
             else
             {
-                //NOTE: For GraphQL we need to lookup the actual Db field by the Model's Property Name
+                //NOTE: For GraphQL we need to look up the actual Db field by the Model's Property Name
                 //  and then convert to the actual DB field name; which might also be mapped name via RepoDb attribute. 
                 //  For more info see: https://repodb.net/cacher/propertymappednamecache
-                //TODO: Add Caching Layer here if needed to Cached a Reverse Dictionary of mappings by Model Name!
+                //TODO: Add Caching Layer here if needed to cache a Reverse Dictionary of mappings by Model Name!
                 var mappingLookup = PropertyCache.Get<TModel>().ToLookup(p => p.PropertyInfo.Name.ToLower());
 
                 var selectFields = selectionNamesFilter
@@ -116,10 +116,10 @@ namespace HotChocolate.RepoDb
                 return null;
 
             //NOTE: the RepDb PropertyCache provides mapping lookups, but only by mapped name (e.g. Database name)
-            //  for GraphQL (Pure Code First) we need to lookup the field by the Model's Property Name
+            //  for GraphQL (Pure Code First) we need to look up the field by the Model's Property Name
             //  and then convert to the mapped name. So we create a Lookup by Model Property Name!
             //  For more info see: https://repodb.net/cacher/propertymappednamecache
-            //TODO: Add Caching Layer here if needed to Cached a Reverse Dictionary of mappings by Model Name!
+            //TODO: Add Caching Layer here if needed to cache a Reverse Dictionary of mappings by Model Name!
             var mappingLookup = PropertyCache.Get<TModel>().ToLookup(p => p.PropertyInfo.Name.ToLower());
 
             var orderByFields = graphQLSortFields
@@ -143,7 +143,7 @@ namespace HotChocolate.RepoDb
         /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
         /// The naming convention matches the correct usage along with the [UsePaging] HotChocolate attribute; 
         /// whereby the default paging method is Cursor based paging. 
-        /// Otherwise use OffsetPagingArgs with the [UseOffsetPaging] attribute.
+        /// Otherwise, use OffsetPagingArgs with the [UseOffsetPaging] attribute.
         /// </summary>
         /// <returns></returns>
 

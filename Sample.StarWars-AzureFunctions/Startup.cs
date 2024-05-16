@@ -58,7 +58,7 @@ namespace StarWars
                     IncludeTotalCount = true,
                     MaxPageSize = 100
                 })
-                .AddResolverProcessedResultsExtensions()
+                .AddResolverProcessingExtensions()
                 //*******************************************************************************************
                 //*******************************************************************************************
                 //Now Required in v11+ to support the Attribute Usage (e.g. you may see the
