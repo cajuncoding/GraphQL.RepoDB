@@ -45,7 +45,7 @@ namespace HotChocolate.RepoDb
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             Expression<Func<TEntity, bool>> whereExpression,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -101,7 +101,7 @@ namespace HotChocolate.RepoDb
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -157,7 +157,7 @@ namespace HotChocolate.RepoDb
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -214,7 +214,7 @@ namespace HotChocolate.RepoDb
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> whereExpression,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -268,7 +268,7 @@ namespace HotChocolate.RepoDb
             IEnumerable<OrderField> orderBy,
             //NOTE: RawSql Where is required to prevent Ambiguous Signatures
             QueryGroup whereQueryGroup,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
@@ -322,7 +322,7 @@ namespace HotChocolate.RepoDb
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,

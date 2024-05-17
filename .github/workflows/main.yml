@@ -23,27 +23,23 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: echo Executing Main Branch commit Workflow!
+        run: echo Executing Main Branch NuGet Publish Workflow!
 
-      # Runs a set of commands using the runners shell
-      #- name: Run a multi-line script
-      #  run: |
-      #    echo Add other actions to build,
-      #    echo test, and deploy your project.
       - name: "Publish NuGet: RepoDb.SqlServer.PagingOperations"
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: RepoDb.SqlServer.PagingOperations/RepoDb.SqlServer.PagingOperations.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      
       - name: "Publish NuGet: GraphQL.ResolverProcessingExtensions"
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           # Filepath of the project to be packaged, relative to root of repository
           PROJECT_FILE_PATH: GraphQL.ResolverProcessingExtensions/GraphQL.ResolverProcessingExtensions.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+      
       - name: "Publish NuGet: GraphQL.RepoDb.SqlServer"
         uses: alirezanet/publish-nuget@v3.0.4
         with:

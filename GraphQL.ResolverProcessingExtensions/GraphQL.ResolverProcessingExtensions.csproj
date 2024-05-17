@@ -9,8 +9,8 @@
 		<Description>A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged in the Resolvers (and lower level Serivces/Repositories that encapsulate all data access) without dependency on IQueryable deferred execution (e.g. EntityFramework).</Description>
 		<Copyright>Copyright © 2020</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageProjectUrl>https://github.com/cajuncoding/graphql.RepoDb</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/cajuncoding/graphql.RepoDb</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDB/tree/main/GraphQL.ResolverProcessingExtensions</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDB/tree/main/GraphQL.ResolverProcessingExtensions</RepositoryUrl>
 		<PackageReleaseNotes>
 			Release Notes:
 			- Updated and Optimized now with HC v13 -- leveraging more out-of-the-box features, simplifying code, and improving performance.

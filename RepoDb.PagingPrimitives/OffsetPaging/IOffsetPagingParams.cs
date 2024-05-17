@@ -1,6 +1,6 @@
 ﻿namespace RepoDb.PagingPrimitives.OffsetPaging
 {
-    public interface IRepoDbOffsetPagingParams
+    public interface IOffsetPagingParams
     {
         int? Skip { get; }
         int? Take { get; }

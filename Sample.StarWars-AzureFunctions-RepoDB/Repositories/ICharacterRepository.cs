@@ -18,30 +18,30 @@ namespace StarWars.Repositories
         Task<ICursorPageResults<ICharacter>> GetCursorPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
-            IRepoDbCursorPagingParams pagingParams
+            ICursorPagingParams pagingParams
         );
 
         Task<IOffsetPageResults<ICharacter>> GetOffsetPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
-            IRepoDbOffsetPagingParams pagingParams
+            IOffsetPagingParams pagingParams
         );
 
         Task<ICursorPageResults<Human>> GetPagedHumanCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
-            IRepoDbCursorPagingParams pagingParams
+            ICursorPagingParams pagingParams
         );
 
         Task<ICursorPageResults<Droid>> GetPagedDroidCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
-            IRepoDbCursorPagingParams pagingParams
+            ICursorPagingParams pagingParams
         );
 
         Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(int characterId);
 
-        Task<ICursorPageResults<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams);
+        Task<ICursorPageResults<ICharacter>> GetCharacterFriendsAsync(int characterId, ICursorPagingParams pagingParams);
 
         Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(IEnumerable<Field> selectFields, int[] ids);
         

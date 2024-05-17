@@ -147,7 +147,7 @@ namespace HotChocolate.RepoDb
         /// </summary>
         /// <returns></returns>
 
-        public IRepoDbCursorPagingParams GetPagingParameters() => GetCursorPagingParameters();
+        public ICursorPagingParams GetPagingParameters() => GetCursorPagingParameters();
 
         /// <summary>
         /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
@@ -156,11 +156,11 @@ namespace HotChocolate.RepoDb
         /// paging default as HotChocolate does with the [UsePaging] attribute.
         /// </summary>
         /// <returns></returns>
-        public IRepoDbCursorPagingParams GetCursorPagingParameters()
+        public ICursorPagingParams GetCursorPagingParameters()
         {
             var graphQLPagingArgs = this.GraphQLParamsContext.CursorPagingArgs;
 
-            return new RepoDbCursorPagingParams(
+            return new CursorPagingParams(
                 afterCursor: graphQLPagingArgs.After,
                 first: graphQLPagingArgs.First,
                 beforeCursor: graphQLPagingArgs.Before,
@@ -175,11 +175,11 @@ namespace HotChocolate.RepoDb
         /// The naming convention matches the correct usage along with the [UseOffsetPaging] HotChocolate attribute.
         /// </summary>
         /// <returns></returns>
-        public RepoDbOffsetPagingParams GetOffsetPagingParameters()
+        public OffsetPagingParams GetOffsetPagingParameters()
         {
             var graphQLPagingArgs = this.GraphQLParamsContext.OffsetPagingArgs;
 
-            return new RepoDbOffsetPagingParams(
+            return new OffsetPagingParams(
                 graphQLPagingArgs.Skip, 
                 graphQLPagingArgs.Take,
                 retrieveTotalCount: this.GraphQLParamsContext.IsTotalCountRequested
