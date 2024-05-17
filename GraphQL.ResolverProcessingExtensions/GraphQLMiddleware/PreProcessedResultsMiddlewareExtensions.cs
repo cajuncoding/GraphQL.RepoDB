@@ -15,7 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
     /// This works in collaboration with OOTB Queryable functionality, intercepting only ResolverProcessed result
     /// decorated results.
     /// </summary>
-    public static class ResolverProcessedResultsMiddlewareExtensions
+    public static class ResolverProcessingMiddlewareExtensions
     {
         public static bool IsRegistered { get; private set; }
 
@@ -26,10 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="builder"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static IRequestExecutorBuilder AddResolverProcessedResultsExtensions(
-            this IRequestExecutorBuilder builder,
-            string? name = null
-        )
+        public static IRequestExecutorBuilder AddResolverProcessingExtensions(this IRequestExecutorBuilder builder)
         {
             IsRegistered = true;
 
@@ -46,9 +43,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IRequestExecutorBuilder AddMiddlewareForResolverProcessedResults(
-            this IRequestExecutorBuilder builder
-        )
+        public static IRequestExecutorBuilder AddMiddlewareForResolverProcessedResults(this IRequestExecutorBuilder builder)
         {
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));

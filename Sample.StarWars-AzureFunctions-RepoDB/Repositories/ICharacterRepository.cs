@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HotChocolate.ResolverProcessingExtensions.Pagination;
 using RepoDb;
-using RepoDb.CursorPagination;
-using RepoDb.OffsetPagination;
+using RepoDb.PagingPrimitives.CursorPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 using StarWars.Characters;
 
 namespace StarWars.Repositories
@@ -15,7 +15,7 @@ namespace StarWars.Repositories
             IEnumerable<OrderField> sortFields
         );
 
-        Task<ICursorPageSlice<ICharacter>> GetCursorPagedCharactersAsync(
+        Task<ICursorPageResults<ICharacter>> GetCursorPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
             IRepoDbCursorPagingParams pagingParams
@@ -27,13 +27,13 @@ namespace StarWars.Repositories
             IRepoDbOffsetPagingParams pagingParams
         );
 
-        Task<ICursorPageSlice<Human>> GetPagedHumanCharactersAsync(
+        Task<ICursorPageResults<Human>> GetPagedHumanCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
             IRepoDbCursorPagingParams pagingParams
         );
 
-        Task<ICursorPageSlice<Droid>> GetPagedDroidCharactersAsync(
+        Task<ICursorPageResults<Droid>> GetPagedDroidCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
             IRepoDbCursorPagingParams pagingParams
@@ -41,7 +41,7 @@ namespace StarWars.Repositories
 
         Task<IEnumerable<ICharacter>> GetCharacterFriendsAsync(int characterId);
 
-        Task<ICursorPageSlice<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams);
+        Task<ICursorPageResults<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams);
 
         Task<IEnumerable<ICharacter>> GetCharactersByIdAsync(IEnumerable<Field> selectFields, int[] ids);
         

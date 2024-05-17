@@ -1,0 +1,5 @@
+{
+  "Values": {
+    "SqlConnectionString": "{{CONNECTION STRING GOES HERE}}"
+  }
+}

@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Reflection;
+using HotChocolate.RepoDb.InMemoryPaging;
 using HotChocolate.ResolverProcessingExtensions;
-using HotChocolate.ResolverProcessingExtensions.Pagination;
 using HotChocolate.Types;
 using HotChocolate.Types.Descriptors;
 using StarWars.Repositories;

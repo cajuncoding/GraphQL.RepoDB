@@ -3,13 +3,10 @@ using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
-using HotChocolate.Types.Relay;
 using StarWars.Repositories;
 using System.Linq;
-using System.ComponentModel;
+using HotChocolate.RepoDb.InMemoryPaging;
 using HotChocolate.ResolverProcessingExtensions.Sorting;
-using HotChocolate.ResolverProcessingExtensions.Pagination;
-using Microsoft.Extensions.DependencyInjection;
 using HotChocolate.Types.Pagination;
 
 namespace StarWars.Characters
@@ -38,7 +35,7 @@ namespace StarWars.Characters
         [UseSorting]
         public Connection<ICharacter> GetCharacters(
             [Service] ICharacterRepository repository,
-            //THIS is now injected by Pre-Processed extensions middleware...
+            //THIS is now injected by the Resolver Processing Extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
         )
         {
@@ -71,7 +68,7 @@ namespace StarWars.Characters
         [UseSorting]
         public CollectionSegment<ICharacter> GetCharactersWithOffsetPaging(
             [Service] ICharacterRepository repository,
-            //THIS is now injected by Pre-Processed extensions middleware...
+            //THIS is now injected by the Resolver Processing Extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
         )
         {

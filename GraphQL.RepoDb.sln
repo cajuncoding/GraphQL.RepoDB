@@ -3,15 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33103.201
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.RepoDB.SqlServer", "GraphQL.RepoDB.SqlServer\GraphQL.RepoDB.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.RepoDb.SqlServer", "GraphQL.RepoDb.SqlServer\GraphQL.RepoDb.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ResolverProcessingExtensions", "GraphQL.ResolverProcessingExtensions\GraphQL.ResolverProcessingExtensions.csproj", "{747B95FC-FFA7-4966-A0F9-7FA315D7F823}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions", "Sample.StarWars-AzureFunctions\StarWars-AzureFunctions.csproj", "{CB1A25F3-B64E-44DA-8BCD-FA4A2743D4EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepoDB", "Sample.StarWars-AzureFunctions-RepoDB\StarWars-AzureFunctions-RepoDB.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-RepoDb", "Sample.StarWars-AzureFunctions-RepoDB\StarWars-AzureFunctions-RepoDb.csproj", "{D7F71A73-473A-4C26-95F1-3AC699491A8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ResolverProcessingExtensions.Tests", "GraphQL.ResolverProcessingExtensions.Tests\GraphQL.ResolverProcessingExtensions.Tests.csproj", "{2334C956-DC54-4A52-8277-0FA6A269C330}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDb.SqlServer.PagingOperations", "RepoDb.SqlServer.PagingOperations\RepoDb.SqlServer.PagingOperations.csproj", "{8CCDB80F-5C51-475A-A28F-0FAD001A1540}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepoDb Extensions", "RepoDb Extensions", "{B206CD28-5ED8-48AF-89AB-558208CCAC18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoDb.SqlServer.PagingOperations.Tests", "RepoDb.SqlServer.PagingOperations.Tests\RepoDb.SqlServer.PagingOperations.Tests.csproj", "{B2806638-C496-469B-8E8E-DC855E735643}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepoDb.PagingPrimitives", "RepoDb.PagingPrimitives\RepoDb.PagingPrimitives.csproj", "{E3375FA1-F179-4A77-A5F7-C7C89A544ECA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +47,26 @@ Global
 		{2334C956-DC54-4A52-8277-0FA6A269C330}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2334C956-DC54-4A52-8277-0FA6A269C330}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2334C956-DC54-4A52-8277-0FA6A269C330}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CCDB80F-5C51-475A-A28F-0FAD001A1540}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CCDB80F-5C51-475A-A28F-0FAD001A1540}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CCDB80F-5C51-475A-A28F-0FAD001A1540}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CCDB80F-5C51-475A-A28F-0FAD001A1540}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2806638-C496-469B-8E8E-DC855E735643}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3375FA1-F179-4A77-A5F7-C7C89A544ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3375FA1-F179-4A77-A5F7-C7C89A544ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3375FA1-F179-4A77-A5F7-C7C89A544ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3375FA1-F179-4A77-A5F7-C7C89A544ECA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8CCDB80F-5C51-475A-A28F-0FAD001A1540} = {B206CD28-5ED8-48AF-89AB-558208CCAC18}
+		{B2806638-C496-469B-8E8E-DC855E735643} = {B206CD28-5ED8-48AF-89AB-558208CCAC18}
+		{E3375FA1-F179-4A77-A5F7-C7C89A544ECA} = {B206CD28-5ED8-48AF-89AB-558208CCAC18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B234830F-2CBB-40AB-907A-224A5DD21DDE}

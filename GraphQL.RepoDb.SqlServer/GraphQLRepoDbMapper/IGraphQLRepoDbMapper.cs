@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using HotChocolate.ResolverProcessingExtensions;
 using RepoDb;
-using RepoDb.CursorPagination;
-using RepoDb.OffsetPagination;
+using RepoDb.PagingPrimitives.CursorPaging;
+using RepoDb.PagingPrimitives.OffsetPaging;
 
 namespace HotChocolate.RepoDb;
 
@@ -30,7 +30,7 @@ public interface IGraphQLRepoDbMapper
     /// NOTE: Property names and db fields names are not guaranteed to be the same.
     /// </summary>
     /// <returns>
-    /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+    /// List of Database fields mapped from all the available GraphQL Selections mapped to the generics
     /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
     /// GraphQL ParamsContext.
     /// </returns>
@@ -44,7 +44,7 @@ public interface IGraphQLRepoDbMapper
     /// </summary>
     /// <param name="selectionNamesFilter"></param>
     /// <returns>
-    /// List of Database fields mapped from all of the available GraphQL Selections mapped to the generics
+    /// List of Database fields mapped from all the available GraphQL Selections mapped to the generics
     /// model type TEntity specified. As a fallback default, all DB Fields are returned if no Selections are available from the 
     /// GraphQL ParamsContext.
     /// </returns>
@@ -64,7 +64,7 @@ public interface IGraphQLRepoDbMapper
     /// Null is returned if the value is undefined and/or invalid and cannot be mapped.
     /// The naming convention matches the correct usage along with the [UsePaging] HotChocolate attribute; 
     /// whereby the default paging method is Cursor based paging. 
-    /// Otherwise use OffsetPagingArgs with the [UseOffsetPaging] attribute.
+    /// Otherwise, use OffsetPagingArgs with the [UseOffsetPaging] attribute.
     /// </summary>
     /// <returns></returns>
     IRepoDbCursorPagingParams GetPagingParameters();

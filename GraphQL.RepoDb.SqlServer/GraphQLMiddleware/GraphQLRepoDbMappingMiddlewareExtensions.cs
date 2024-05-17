@@ -33,9 +33,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             //Dynamically detect if AddResolverProcessedResultsExtensions() has been called and if not then we call it
             //  to ensure our dependencies are initialized...
-            if (!ResolverProcessedResultsMiddlewareExtensions.IsRegistered)
+            if (!ResolverProcessingMiddlewareExtensions.IsRegistered)
             {
-                builder.AddResolverProcessedResultsExtensions();
+                builder.AddResolverProcessingExtensions();
             }
 
             IsRegistered = true;

@@ -1,5 +1,5 @@
 ﻿## Overview 
-*HotChocolate v11/v12 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
+*HotChocolate v13 Extension Pack for working with Micro-ORM(s) and encapsulated data access (instead of IQueryable).*
 
 This library greatly simplifies working with HotChocolate to **_resolver processes_** data for
 selecting/projecting, sorting, paging, etc. before returning the data to HotChocolate from the resolver; 

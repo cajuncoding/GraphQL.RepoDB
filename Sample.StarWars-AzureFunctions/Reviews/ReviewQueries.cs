@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.RepoDb.InMemoryPaging;
 using HotChocolate.ResolverProcessingExtensions;
-using HotChocolate.ResolverProcessingExtensions.Pagination;
 using HotChocolate.ResolverProcessingExtensions.Sorting;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
@@ -21,7 +20,7 @@ namespace StarWars.Reviews
         public Connection<Review> GetReviews(
             Episode episode,
             [Service]IReviewRepository repository,
-            //THIS is now injected by Pre-Processed extensions middleware...
+            //THIS is now injected by the Resolver Processing Extensions middleware...
             [GraphQLParams] IParamsContext graphQLParams
         )
         {

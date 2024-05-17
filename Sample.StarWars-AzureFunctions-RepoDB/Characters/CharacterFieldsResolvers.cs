@@ -1,6 +1,8 @@
 ﻿using HotChocolate;
+using HotChocolate.RepoDb;
 using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
+using StarWars.Characters.DbModels;
 using StarWars.Repositories;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,11 +20,12 @@ namespace StarWars.Characters
         public async Task<IEnumerable<Droid>> GetDroidsAsync(
             [Service] ICharacterRepository repository,
             [Parent] ICharacter character,
-            [GraphQLParams] IParamsContext graphqlParams    
+            [GraphQLRepoDbMapper] GraphQLRepoDbMapper<Droid> repoDbGraphQL
         )
         {
+            //Log Debug info. for the Dependency Fields for this Field Resolver...
             #if DEBUG
-            Debug.WriteLine($"Pre-processing Dependency Fields: [{string.Join(", ", graphqlParams.SelectionDependencies.Select(d => d.DependencyMemberName))}]");
+            Debug.WriteLine($"Pre-processing Dependency Fields: [{string.Join(", ", repoDbGraphQL.GraphQLParamsContext.SelectionDependencies.Select(d => d.DependencyMemberName))}]");
             #endif
 
             var friends = await repository.GetCharacterFriendsAsync(character.Id);

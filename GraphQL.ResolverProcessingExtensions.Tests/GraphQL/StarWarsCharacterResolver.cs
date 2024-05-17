@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate.Data;
-using HotChocolate.ResolverProcessingExtensions.Pagination;
+using HotChocolate.RepoDb.InMemoryPaging;
 using HotChocolate.Types;
 using HotChocolate.Types.Pagination;
 

@@ -31,7 +31,7 @@ namespace HotChocolate.ResolverProcessingExtensions.Tests
                             IncludeTotalCount = true,
                             MaxPageSize = 10
                         })
-                        .AddResolverProcessedResultsExtensions();
+                        .AddResolverProcessingExtensions();
 
                     return graphQLBuilder;
                 }
