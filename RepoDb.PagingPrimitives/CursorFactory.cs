@@ -3,12 +3,12 @@ using System.Buffers.Binary;
 using System.Buffers.Text;
 using System.Text;
 
-namespace RepoDb.SqlServer.PagingOperations
+namespace RepoDb.PagingPrimitives
 {
     /// <summary>
     /// Helper Class for serializing and deserializing Opaque cursors from Indexed based result sets.
     /// </summary>
-    public static class RepoDbCursorHelper
+    public static class CursorFactory
     {
         //Integers use 4 bytes!
         private const int IntegerByteLength = 4;

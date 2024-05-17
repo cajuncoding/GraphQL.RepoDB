@@ -67,7 +67,7 @@ public interface IGraphQLRepoDbMapper
     /// Otherwise, use OffsetPagingArgs with the [UseOffsetPaging] attribute.
     /// </summary>
     /// <returns></returns>
-    IRepoDbCursorPagingParams GetPagingParameters();
+    ICursorPagingParams GetPagingParameters();
 
     /// <summary>
     /// Map the HotChocolate CursorPagingArguments into the RepoDb specific Cursor paging parameter.
@@ -76,7 +76,7 @@ public interface IGraphQLRepoDbMapper
     /// paging default as HotChocolate does with the [UsePaging] attribute.
     /// </summary>
     /// <returns></returns>
-    IRepoDbCursorPagingParams GetCursorPagingParameters();
+    ICursorPagingParams GetCursorPagingParameters();
 
     /// <summary>
     /// Map the HotChocolate OffsetPagingArguments into the RepoDb specific offset paging parameter.
@@ -84,5 +84,5 @@ public interface IGraphQLRepoDbMapper
     /// The naming convention matches the correct usage along with the [UseOffsetPaging] HotChocolate attribute.
     /// </summary>
     /// <returns></returns>
-    RepoDbOffsetPagingParams GetOffsetPagingParameters();
+    OffsetPagingParams GetOffsetPagingParameters();
 }

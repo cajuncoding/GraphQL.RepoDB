@@ -52,7 +52,7 @@ namespace StarWars.Repositories
         public async Task<ICursorPageResults<ICharacter>> GetCursorPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields, 
-            IRepoDbCursorPagingParams pagingParams
+            ICursorPagingParams pagingParams
         )
         {
             await using var sqlConn = CreateConnection();
@@ -72,7 +72,7 @@ namespace StarWars.Repositories
         public async Task<IOffsetPageResults<ICharacter>> GetOffsetPagedCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
-            IRepoDbOffsetPagingParams pagingParams
+            IOffsetPagingParams pagingParams
         )
         {
             await using var sqlConn = CreateConnection();
@@ -90,7 +90,7 @@ namespace StarWars.Repositories
         public async Task<ICursorPageResults<Human>> GetPagedHumanCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
-            IRepoDbCursorPagingParams pagingParams
+            ICursorPagingParams pagingParams
         )
         {
             await using var sqlConn = CreateConnection();
@@ -110,7 +110,7 @@ namespace StarWars.Repositories
         public async Task<ICursorPageResults<Droid>> GetPagedDroidCharactersAsync(
             IEnumerable<Field> selectFields,
             IEnumerable<OrderField> sortFields,
-            IRepoDbCursorPagingParams pagingParams
+            ICursorPagingParams pagingParams
         )
         {
             await using var sqlConn = CreateConnection();
@@ -156,7 +156,7 @@ namespace StarWars.Repositories
             return mappedResults;
         }
 
-        public async Task<ICursorPageResults<ICharacter>> GetCharacterFriendsAsync(int characterId, IRepoDbCursorPagingParams pagingParams)
+        public async Task<ICursorPageResults<ICharacter>> GetCharacterFriendsAsync(int characterId, ICursorPagingParams pagingParams)
         {
             await using var sqlConn = CreateConnection();
             var results = await sqlConn.GraphQLBatchSliceQueryAsync<CharacterFriendDbModel>(

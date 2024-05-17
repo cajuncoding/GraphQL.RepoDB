@@ -11,7 +11,7 @@ using StarWars.Characters.DbModels;
 namespace RepoDb.SqlServer.PagingOperations.Tests
 {
     [TestClass]
-    public class RawSqlPagingTests : BaseTest
+    public class PagingTestsUsingExecuteQueryApiForRawSql : BaseTest
     {
         [TestMethod]
         public async Task TestCursorPagingWithRawSql()
@@ -26,7 +26,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
                 do
                 {
                     page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
-                        "SELECT [Id], [Name] FROM [dbo].[StarWarsCharacters]",
+                        "SELECT * FROM [dbo].[StarWarsCharacters]",
                         new [] {OrderField.Descending<CharacterDbModel>(c => c.Id) },
                         first: pageSize, 
                         afterCursor: page?.EndCursor,
@@ -46,7 +46,6 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
                         TestContext.WriteLine("*********************************************************");
                         TestContext.WriteLine($"[{totalCount}] Total Results to be processed...");
                         TestContext.WriteLine("*********************************************************");
-
                     }
                     else
                     {
@@ -84,7 +83,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
                 do
                 {
                     page = await sqlConnection.ExecutePagingOffsetQueryAsync<CharacterDbModel>(
-                        "SELECT [Id], [Name] FROM [dbo].[StarWarsCharacters]",
+                        "SELECT * FROM [dbo].[StarWarsCharacters]",
                         new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
                         skip: page?.EndIndex,
                         take: pageSize,

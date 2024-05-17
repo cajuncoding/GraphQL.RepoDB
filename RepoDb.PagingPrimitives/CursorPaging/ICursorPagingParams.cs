@@ -1,6 +1,6 @@
 ﻿namespace RepoDb.PagingPrimitives.CursorPaging
 {
-    public interface IRepoDbCursorPagingParams
+    public interface ICursorPagingParams
     {
         string After { get; }
         int? AfterIndex { get; }
