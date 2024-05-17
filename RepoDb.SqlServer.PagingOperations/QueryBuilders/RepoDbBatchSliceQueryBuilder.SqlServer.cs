@@ -196,7 +196,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
 
             if (orderBy?.Any() == false)
                 throw new ArgumentException(
-                    "A valid Order By field must be specified to ensure consistent ordering of data.",
+                    "At least one valid Order By field must be specified to ensure consistent ordering of data.",
                     nameof(orderBy)
                 );
         }
@@ -241,7 +241,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                 endIndex = (int)beforeCursorIndex - 1;
                 count = (int)endIndex;
             }
-            else //NEITHER After or Before where Specified...
+            else //NEITHER After nor Before where Specified...
             {
                 //Even now start from 1; with undefined End...
                 startIndex = 1;
@@ -302,7 +302,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                 sqlSliceInfo.IsNextPagePossible = false;
                 sqlSliceInfo.IsEndIndexOverFetchedForNextPageCheck = false;
             }
-            //NOTE: Is Always False as note by Re-sharper; in all cases where EndIndex has a value so will StartIndex also have a value hitting the first case above!
+            //NOTE: Is Always False as noted by Re-sharper; in all cases where EndIndex has a value so will StartIndex also have a value hitting the first case above!
             //  But algorithmically it feels right to just leave this since we may optimize code above and risk changing this in the future
             else if (endIndex.HasValue)
             {

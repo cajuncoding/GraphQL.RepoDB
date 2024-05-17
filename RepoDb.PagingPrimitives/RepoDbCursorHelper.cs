@@ -45,7 +45,7 @@ namespace RepoDb.SqlServer.PagingOperations
         }
     }
 
-#if NETSTANDARD2_0
+    #if NETSTANDARD2_0
     internal static class NetStandard20ShimExtensions
     {
         public static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)
@@ -65,6 +65,6 @@ namespace RepoDb.SqlServer.PagingOperations
             }
         }
     }
-#endif
+    #endif
 
 }

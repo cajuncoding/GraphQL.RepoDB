@@ -23,8 +23,8 @@ namespace HotChocolate.ResolverProcessingExtensions
             var connectionPageInfo = new ConnectionPageInfo(
                 hasNextPage: cursorPage.HasNextPage,
                 hasPreviousPage: cursorPage.HasPreviousPage,
-                startCursor: edges.FirstOrDefault()?.Cursor,
-                endCursor: edges.LastOrDefault()?.Cursor
+                startCursor: cursorPage.StartCursor,
+                endCursor: cursorPage.EndCursor
             );
 
             var graphqlConnection = new Connection<TEntity>(

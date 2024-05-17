@@ -13,15 +13,24 @@ namespace RepoDb.PagingPrimitives.CursorPaging
     {
         public CursorPageResults(IEnumerable<ICursorResult<TEntity>> results, int? totalCount, bool hasPreviousPage, bool hasNextPage)
         {
-            this.CursorResults = results ?? throw new ArgumentNullException(nameof(results));
+            this.CursorResults = results?.ToList().AsReadOnly() ?? throw new ArgumentNullException(nameof(results));
+            this.PageCount = CursorResults?.Count ?? 0;
+            this.StartCursor = CursorResults?.FirstOrDefault()?.Cursor;
+            this.EndCursor = CursorResults?.LastOrDefault()?.Cursor;
             this.TotalCount = totalCount;
             this.HasPreviousPage = hasPreviousPage;
             this.HasNextPage = hasNextPage;
         }
 
-        public IEnumerable<ICursorResult<TEntity>> CursorResults { get; protected set; }
+        public IReadOnlyList<ICursorResult<TEntity>> CursorResults { get; protected set; }
 
         public IEnumerable<TEntity> Results => CursorResults?.Select(cr => cr.Entity);
+
+        public string StartCursor { get; }
+
+        public string EndCursor { get; }
+
+        public int PageCount { get; }
 
         public int? TotalCount { get; }
 
@@ -30,9 +39,9 @@ namespace RepoDb.PagingPrimitives.CursorPaging
         public bool HasPreviousPage { get; protected set; }
 
         /// <summary>
-        /// Convenience method to easily cast all types in the current page to a garget compatible type
-        /// without affecting the cursor indexes, etc. Provide deferred execution via Linq Select(). Type mismatches
-        /// will be ignored and not returned for behaviour matching Linq OfType().
+        /// Convenience method to easily cast all types in the current page to another compatible type
+        /// without affecting the cursors, etc. Type mismatches will be safely ignored and not returned
+        /// for behaviour matching Linq OfType().
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
@@ -53,7 +62,7 @@ namespace RepoDb.PagingPrimitives.CursorPaging
 
         /// <summary>
         /// Convenience method to easily map/convert/project all types in the current page to a different object type
-        /// altogether, without affecting the cursor indexes, etc. Provide deferred execution via Linq Select().
+        /// altogether, without affecting the cursors, etc.
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc">Specify the Func that takes the current type in and returns the target type.</param>

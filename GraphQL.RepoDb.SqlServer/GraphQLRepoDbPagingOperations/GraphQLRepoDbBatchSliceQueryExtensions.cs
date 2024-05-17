@@ -41,7 +41,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<CursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             Expression<Func<TEntity, bool>> whereExpression,
@@ -97,7 +97,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<CursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
@@ -153,7 +153,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<CursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
+        public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
@@ -209,7 +209,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<CursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
@@ -263,7 +263,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<CursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: RawSql Where is required to prevent Ambiguous Signatures
@@ -318,7 +318,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<CursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
+        public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...

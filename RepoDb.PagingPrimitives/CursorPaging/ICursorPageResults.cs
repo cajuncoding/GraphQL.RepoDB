@@ -13,14 +13,24 @@ namespace RepoDb.PagingPrimitives.CursorPaging
     public interface ICursorPageResults<out TEntity> : IPageNavigationInfo
     {
         /// <summary>
-        /// The set of all CursorResults decorator classes for TEntity model with Cursor Index values.
+        /// The set of all ICursorResults decorator classes for TEntity model with Cursor Index values.
         /// </summary>
-        IEnumerable<ICursorResult<TEntity>> CursorResults { get; }
+        IReadOnlyList<ICursorResult<TEntity>> CursorResults { get; }
 
         /// <summary>
         /// An enumerable list of the base non-decorated TEntity values.
         /// </summary>
         IEnumerable<TEntity> Results { get; }
+
+        /// <summary>
+        /// The Cursor for the first item in the results of this page; can be used for forward or backward cursor navigation via first/after or last/before.
+        /// </summary>
+        string StartCursor { get; }
+
+        /// <summary>
+        /// The Cursor for the last item in the results of this page; can be used for forward or backward cursor navigation via first/after or last/before.
+        /// </summary>
+        string EndCursor { get; }
 
         /// <summary>
         /// Support safe (deferred) casting to the specified Entity Type.

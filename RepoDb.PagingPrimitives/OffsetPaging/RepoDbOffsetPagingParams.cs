@@ -16,8 +16,8 @@ namespace RepoDb.PagingPrimitives.OffsetPaging
         /// </summary>
         /// <param name="skip">Is Optional and will default to the first page (or potentially all results based on Take) if null; but otherwise must be a valid positive value or an ArgumentException will occur.</param>
         /// <param name="take">Is Optional and may be null to get all results; but otherwise must be a valid positive value or an ArgumentException will occur.</param>
-        /// <param name="isTotalCountRequested">Boolean state of whether the TotalCount should be computed; computing the total count may have a performance impact.</param>
-        public RepoDbOffsetPagingParams(int? skip = null, int? take = null, bool isTotalCountRequested = false)
+        /// <param name="retrieveTotalCount">Boolean state of whether the TotalCount should be computed; computing the total count may have a performance impact.</param>
+        public RepoDbOffsetPagingParams(int? skip = null, int? take = null, bool retrieveTotalCount = false)
         {
             //For RepoDb both Skip & Take may actually be optional so that would result in default behaviour to retrieve all results
             //  which is consistent with Cursor Paging as not specifying any filtering for Cursor Pagination would also get all results.
@@ -30,8 +30,11 @@ namespace RepoDb.PagingPrimitives.OffsetPaging
 
             this.Skip = skip;
             this.Take = take;
-            this.IsTotalCountRequested = isTotalCountRequested;
+            this.IsTotalCountRequested = retrieveTotalCount;
         }
+
+        public static RepoDbOffsetPagingParams ForSkipTake(int? skip = null, int? take = null, bool retrieveTotalCount = false)
+            => new RepoDbOffsetPagingParams(skip, take, retrieveTotalCount);
 
         public int? Skip { get; }
         public int? Take { get; }

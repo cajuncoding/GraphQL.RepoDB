@@ -45,7 +45,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+        public static Task<IOffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
@@ -107,7 +107,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+        public static Task<IOffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup = null,
@@ -168,7 +168,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
+        public static Task<IOffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity, TDbConnection>(
                 this BaseRepository<TEntity, TDbConnection> baseRepo,
                 IEnumerable<OrderField> orderBy,
                 RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
@@ -228,7 +228,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static async Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
+        public static async Task<IOffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             Expression<Func<TEntity, bool>> whereExpression,
@@ -287,7 +287,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
+        public static Task<IOffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
@@ -344,7 +344,7 @@ namespace HotChocolate.RepoDb
         /// <param name="cancellationToken"></param>
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
-        public static Task<OffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
+        public static Task<IOffsetPageResults<TEntity>> GraphQLBatchSkipTakeQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...

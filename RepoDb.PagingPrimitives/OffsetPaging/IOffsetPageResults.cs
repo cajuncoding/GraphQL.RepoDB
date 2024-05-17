@@ -13,12 +13,23 @@ namespace RepoDb.PagingPrimitives.OffsetPaging
     public interface IOffsetPageResults<out TEntity> : IPageNavigationInfo
     {
         /// <summary>
-        /// An enumerable list of the base non-decorated TEntity values.
+        /// A readonly enumerable list of the base non-decorated TEntity results for this page.
         /// </summary>
-        IEnumerable<TEntity> Results { get; }
+        IReadOnlyList<TEntity> Results { get; }
 
         /// <summary>
-        /// Support safe (deferred) casting to the specified Entity Type.
+        /// The Ordinal position index for the first item in the results of this page; can be used for forward or backward offset navigation via skip/take.
+        /// </summary>
+        int StartIndex { get; }
+
+        /// <summary>
+        /// The Ordinal position index for the last item in the results of this page; can be used for forward or backward offset navigation via skip/take.
+        /// </summary>
+        int EndIndex { get; }
+
+        /// <summary>
+        /// Convenience method to easily cast all types in the current page to another compatible type.
+        /// Type mismatches will be safely ignored and not returned for behaviour matching Linq OfType().
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <returns></returns>
@@ -26,7 +37,7 @@ namespace RepoDb.PagingPrimitives.OffsetPaging
 
         /// <summary>
         /// Convenience method to easily map/convert/project all types in the current page to a different object type
-        /// altogether, without losing the decorator paging details; Provide deferred execution via Linq Select().
+        /// altogether, without losing the decorator paging details.
         /// </summary>
         /// <typeparam name="TTargetType"></typeparam>
         /// <param name="mappingFunc"></param>

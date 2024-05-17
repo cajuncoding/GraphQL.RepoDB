@@ -18,7 +18,6 @@
 			- This allows non-GraphQL projects (e.g. normal REST APIs) to more easily implement modern paging (Cursor or Offset) with the RepoDb ORM and SQL Server.
 			- These extensions have been in use in production applications using GraphQL.RepoDb.SqlServer for a long while, but are now available independently.
 		</PackageReleaseNotes>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using RepoDb.Enumerations;
@@ -44,7 +45,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
+        public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             Expression<Func<TEntity, bool>> whereExpression,
@@ -99,7 +100,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
+        public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
@@ -154,7 +155,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
+        public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
@@ -209,7 +210,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        private static async Task<CursorPageResults<TEntity>> PagingCursorQueryForRepoInternalAsync<TEntity, TDbConnection>(
+        private static async Task<ICursorPageResults<TEntity>> PagingCursorQueryForRepoInternalAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             object where = null,
@@ -284,7 +285,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
+        public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Where Expression is required to prevent Ambiguous Signatures
@@ -339,7 +340,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static async Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
+        public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: Where filter is required to prevent Ambiguous Signatures
@@ -397,7 +398,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
-        public static Task<CursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
+        public static Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             //NOTE: This Overload allows cases where NO WHERE Filter is needed...
@@ -439,7 +440,60 @@ namespace RepoDb.SqlServer.PagingOperations
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
         /// </summary>        /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection"></param>
-        /// <param name="rawSqlStatement">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
+        /// <param name="sql">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
+        /// <param name="orderBy">Order By is required and must be specified as an independent list for proper support to rewrite the query for paging.</param>
+        /// <param name="sqlParams"></param>
+        /// <param name="retrieveTotalCount"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="transaction"></param>
+        /// <param name="logTrace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="first"></param>
+        /// <param name="afterCursor"></param>
+        /// <param name="last"></param>
+        /// <param name="beforeCursor"></param>
+        /// <returns></returns>
+        public static Task<ICursorPageResults<TEntity>> ExecutePagingCursorQueryAsync<TEntity>(
+            this DbConnection dbConnection,
+            string sql,
+            IEnumerable<OrderField> orderBy,
+            object sqlParams = null,
+            int? first = null,
+            string afterCursor = null,
+            int? last = null,
+            string beforeCursor = null,
+            bool retrieveTotalCount = false,
+            int? commandTimeout = null,
+            IDbTransaction transaction = null,
+            Action<string> logTrace = null,
+            CancellationToken cancellationToken = default
+        ) where TEntity : class
+            => dbConnection.PagingCursorQueryInternalAsync<TEntity>(
+                orderBy: orderBy,
+                //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
+                rawSql: RawSql.From(sql, sqlParams),
+                pagingParams: RepoDbCursorPagingParams.ForCursors(first, last, afterCursor, beforeCursor, retrieveTotalCount),
+                commandTimeout: commandTimeout,
+                transaction: transaction,
+                logTrace: logTrace,
+                cancellationToken: cancellationToken
+            );
+
+        /// <summary>
+        /// Base DbConnection (SqlConnection) extension for Relay Cursor Paginated Batch Query capability.
+        /// 
+        /// Public Facade method to provide dynamically paginated results using Relay Cursor slicing.
+        /// Relay spec cursor algorithm is implemented for Sql Server on top of RepoDb.
+        /// 
+        /// NOTE: Since RepoDb supports only Offset Batch querying, this logic provided as an extension
+        ///     of RepoDb core functionality; and if this is ever provided by the Core functionality
+        ///     this facade will remain as a proxy.
+        ///     
+        /// NOTE: For Relay Spec details and Cursor Algorithm see:
+        ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
+        /// </summary>        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="sql">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
         /// <param name="orderBy">Order By is required and must be specified as an independent list for proper support to rewrite the query for paging.</param>
         /// <param name="sqlParams"></param>
         /// <param name="pagingParams"></param>
@@ -448,9 +502,9 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static Task<CursorPageResults<TEntity>> ExecutePagingCursorQueryAsync<TEntity>(
+        public static Task<ICursorPageResults<TEntity>> ExecutePagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
-            string rawSqlStatement,
+            string sql,
             IEnumerable<OrderField> orderBy,
             object sqlParams = null,
             IRepoDbCursorPagingParams pagingParams = default,
@@ -462,7 +516,7 @@ namespace RepoDb.SqlServer.PagingOperations
             => dbConnection.PagingCursorQueryInternalAsync<TEntity>(
                 orderBy: orderBy,
                 //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
-                rawSql: RawSql.From(rawSqlStatement, sqlParams),
+                rawSql: RawSql.From(sql, sqlParams),
                 pagingParams: pagingParams,
                 commandTimeout: commandTimeout,
                 transaction: transaction,
@@ -483,7 +537,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// NOTE: For Relay Spec details and Cursor Algorithm see:
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
         /// </summary>
-        internal static async Task<CursorPageResults<TEntity>> PagingCursorQueryInternalAsync<TEntity>(
+        internal static async Task<ICursorPageResults<TEntity>> PagingCursorQueryInternalAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             object where = null, //NOTE: May be either a QueryGroup or RawSqlWhere object

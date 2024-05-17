@@ -24,7 +24,7 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
         {
             //Do nothing if there are no results...
             if (items?.Any() != true)
-                return new OffsetPageResults<T>(Enumerable.Empty<T>(), false, false, 0);
+                return new OffsetPageResults<T>(Enumerable.Empty<T>(), false, false, 0, 0, 0);
 
             //NOTE: Implemented similar algorithm that would be used in a SQL Query; also similar to what the default
             //      HotChocolate QueryableCursorPagingHandler does...
@@ -43,8 +43,14 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
             var totalCount = includeTotalCount ? (int?)items.Count() : null;
 
             //Wrap all results into a Offset Page Slice result with Total Count...
-            var offsetPageResults = new OffsetPageResults<T>(pagedResults, hasNextPage, hasPreviousPage, totalCount);
-            return offsetPageResults;
+            return new OffsetPageResults<T>(
+                pagedResults, 
+                hasNextPage, 
+                hasPreviousPage, 
+                skipPast + 1, 
+                skipPast + takeSome, 
+                totalCount
+            );
         }
     }
 }

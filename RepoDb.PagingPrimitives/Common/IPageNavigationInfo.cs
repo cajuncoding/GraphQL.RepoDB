@@ -12,6 +12,11 @@
         int? TotalCount { get; }
 
         /// <summary>
+        /// The count of item results for this Page.
+        /// </summary>
+        int PageCount { get; }
+
+        /// <summary>
         /// Denotes if there are any Cursor pages after this current page within the full data-set for which this Page was retrieved.
         /// </summary>
         bool HasNextPage { get; }

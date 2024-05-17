@@ -11,17 +11,26 @@ namespace RepoDb.PagingPrimitives.OffsetPaging
     /// <typeparam name="TEntity"></typeparam>
     public class OffsetPageResults<TEntity> : IOffsetPageResults<TEntity>
     {
-        public OffsetPageResults(IEnumerable<TEntity> results, bool hasNextPage, bool hasPreviousPage, int? totalCount)
+        public OffsetPageResults(IEnumerable<TEntity> results, bool hasNextPage, bool hasPreviousPage, int startIndex, int endIndex, int? totalCount)
         {
-            this.Results = results ?? throw new ArgumentNullException(nameof(results));
+            this.Results = results?.ToList().AsReadOnly() ?? throw new ArgumentNullException(nameof(results));
+            this.PageCount = Results.Count;
+            this.StartIndex = startIndex;
+            this.EndIndex = endIndex;
             this.HasNextPage = hasNextPage;
             this.HasPreviousPage = hasPreviousPage;
             this.TotalCount = totalCount;
         }
 
-        public IEnumerable<TEntity> Results { get; protected set; }
+        public IReadOnlyList<TEntity> Results { get; protected set; }
+
+        public int StartIndex { get; }
+
+        public int EndIndex { get; }
 
         public int? TotalCount { get; protected set; }
+
+        public int PageCount { get; }
 
         public bool HasNextPage { get; protected set; }
 
@@ -31,7 +40,7 @@ namespace RepoDb.PagingPrimitives.OffsetPaging
         public virtual OffsetPageResults<TTargetType> OfType<TTargetType>() 
         {
             var results = this.Results?.OfType<TTargetType>();
-            return new OffsetPageResults<TTargetType>(results, this.HasNextPage, this.HasPreviousPage, this.TotalCount);
+            return new OffsetPageResults<TTargetType>(results, this.HasNextPage, this.HasPreviousPage, this.StartIndex, this.EndIndex, this.TotalCount);
         }
 
         public virtual OffsetPageResults<TTargetType> AsMappedType<TTargetType>(Func<TEntity, TTargetType> mappingFunc)
@@ -40,7 +49,7 @@ namespace RepoDb.PagingPrimitives.OffsetPaging
                 throw new ArgumentException(nameof(mappingFunc));
 
             var results = this.Results?.Select(mappingFunc);
-            return new OffsetPageResults<TTargetType>(results, this.HasNextPage, this.HasPreviousPage, this.TotalCount);
+            return new OffsetPageResults<TTargetType>(results, this.HasNextPage, this.HasPreviousPage, this.StartIndex, this.EndIndex, this.TotalCount);
         }
     }
 }
