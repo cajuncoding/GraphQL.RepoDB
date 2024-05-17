@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using RepoDb.PagingPrimitives;
 using RepoDb.PagingPrimitives.CursorPaging;
 
 namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
@@ -25,11 +26,11 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
                 return new CursorPageResults<T>(Enumerable.Empty<ICursorResult<T>>(), 0, false, false);
 
             var afterIndex = after != null
-                ? RepoDbCursorHelper.ParseCursor(after)
+                ? CursorFactory.ParseCursor(after)
                 : 0;
 
             var beforeIndex = before != null
-                ? RepoDbCursorHelper.ParseCursor(before)
+                ? CursorFactory.ParseCursor(before)
                 : 0;
 
             //FIRST log the index of all items in the list BEFORE slicing, as these indexes are 
@@ -38,7 +39,7 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
 
             //NOTE: We MUST materialize this after applying index values to prevent ongoing increments...
             IEnumerable<CursorResult<T>> slice = items
-                .Select((item, index) => CursorResult<T>.CreateIndexedCursor(item, RepoDbCursorHelper.CreateCursor(index), index))
+                .Select((item, index) => CursorResult<T>.CreateIndexedCursor(item, CursorFactory.CreateCursor(index), index))
                 .ToList();
 
             int totalCount = slice.Count();

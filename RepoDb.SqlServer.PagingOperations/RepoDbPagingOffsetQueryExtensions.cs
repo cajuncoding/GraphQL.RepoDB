@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using RepoDb.PagingPrimitives;
 using RepoDb.PagingPrimitives.CursorPaging;
 using RepoDb.PagingPrimitives.OffsetPaging;
 
@@ -48,7 +49,7 @@ namespace RepoDb.SqlServer.PagingOperations
             IEnumerable<OrderField> orderBy,
             //NOTE: Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> whereExpression,
-            IRepoDbOffsetPagingParams pagingParams = default,
+            IOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -116,7 +117,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup = null,
-            IRepoDbOffsetPagingParams pagingParams = default,
+            IOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -185,7 +186,7 @@ namespace RepoDb.SqlServer.PagingOperations
             IEnumerable<OrderField> orderBy,
             //NOTE: This Overload allows cases where NO WHERE Filter is needed...
             RawSqlWhere whereRawSql = null,
-            IRepoDbOffsetPagingParams pagingParams = default,
+            IOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -252,7 +253,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             Expression<Func<TEntity, bool>> whereExpression,
-            IRepoDbOffsetPagingParams pagingParams = default,
+            IOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -318,7 +319,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
-            IRepoDbOffsetPagingParams pagingParams = default,
+            IOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -385,7 +386,7 @@ namespace RepoDb.SqlServer.PagingOperations
             IEnumerable<OrderField> orderBy,
             //NOTE: This Overload allows cases where NO WHERE Filter is needed...
             RawSqlWhere whereRawSql = null,
-            IRepoDbOffsetPagingParams pagingParams = default,
+            IOffsetPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -470,7 +471,7 @@ namespace RepoDb.SqlServer.PagingOperations
                 sql: sql,
                 orderBy: orderBy,
                 sqlParams: sqlParams,
-                pagingParams: ConvertOffsetParamsToCursorParams(RepoDbOffsetPagingParams.ForSkipTake(skip, take, retrieveTotalCount)),
+                pagingParams: ConvertOffsetParamsToCursorParams(OffsetPagingParams.ForSkipTake(skip, take, retrieveTotalCount)),
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
@@ -514,7 +515,7 @@ namespace RepoDb.SqlServer.PagingOperations
             string sql,
             IEnumerable<OrderField> orderBy,
             object sqlParams = null,
-            IRepoDbOffsetPagingParams pagingParams = default,
+            IOffsetPagingParams pagingParams = default,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
@@ -552,13 +553,13 @@ namespace RepoDb.SqlServer.PagingOperations
                 cursorPageResults.Results,
                 cursorPageResults.HasNextPage,
                 cursorPageResults.HasPreviousPage,
-                RepoDbCursorHelper.ParseCursor(cursorPageResults.StartCursor),
-                RepoDbCursorHelper.ParseCursor(cursorPageResults.EndCursor),
+                CursorFactory.ParseCursor(cursorPageResults.StartCursor),
+                CursorFactory.ParseCursor(cursorPageResults.EndCursor),
                 cursorPageResults.TotalCount
             );
 
-        private static IRepoDbCursorPagingParams ConvertOffsetParamsToCursorParams(IRepoDbOffsetPagingParams offsetParams)
-            => RepoDbCursorPagingParams.ForIndexes(
+        private static ICursorPagingParams ConvertOffsetParamsToCursorParams(IOffsetPagingParams offsetParams)
+            => CursorPagingParams.ForIndexes(
                 first: offsetParams?.Take,
                 afterIndex: offsetParams?.Skip,
                 retrieveTotalCount: offsetParams?.IsTotalCountRequested ?? false

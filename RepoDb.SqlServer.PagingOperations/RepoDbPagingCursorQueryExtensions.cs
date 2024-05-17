@@ -9,6 +9,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using RepoDb.Enumerations;
+using RepoDb.PagingPrimitives;
 using RepoDb.PagingPrimitives.CursorPaging;
 using RepoDb.SqlServer.PagingOperations.DotNetExtensions;
 using RepoDb.SqlServer.PagingOperations.QueryBuilders;
@@ -49,7 +50,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             Expression<Func<TEntity, bool>> whereExpression,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -104,7 +105,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             QueryGroup whereQueryGroup,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -159,7 +160,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             RawSqlWhere whereRawSql = null, //NOTE: This Overload allows cases where NO WHERE Filter is needed...
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -214,7 +215,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
             object where = null,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -290,7 +291,7 @@ namespace RepoDb.SqlServer.PagingOperations
             IEnumerable<OrderField> orderBy,
             //NOTE: Where Expression is required to prevent Ambiguous Signatures
             Expression<Func<TEntity, bool>> whereExpression,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -345,7 +346,7 @@ namespace RepoDb.SqlServer.PagingOperations
             IEnumerable<OrderField> orderBy,
             //NOTE: Where filter is required to prevent Ambiguous Signatures
             QueryGroup whereQueryGroup,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string hints = null,
             IEnumerable<Field> fields = null,
             string tableName = null,
@@ -403,7 +404,7 @@ namespace RepoDb.SqlServer.PagingOperations
             IEnumerable<OrderField> orderBy,
             //NOTE: This Overload allows cases where NO WHERE Filter is needed...
             RawSqlWhere whereRawSql = null,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -472,7 +473,7 @@ namespace RepoDb.SqlServer.PagingOperations
                 orderBy: orderBy,
                 //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
                 rawSql: RawSql.From(sql, sqlParams),
-                pagingParams: RepoDbCursorPagingParams.ForCursors(first, last, afterCursor, beforeCursor, retrieveTotalCount),
+                pagingParams: CursorPagingParams.ForCursors(first, last, afterCursor, beforeCursor, retrieveTotalCount),
                 commandTimeout: commandTimeout,
                 transaction: transaction,
                 logTrace: logTrace,
@@ -507,7 +508,7 @@ namespace RepoDb.SqlServer.PagingOperations
             string sql,
             IEnumerable<OrderField> orderBy,
             object sqlParams = null,
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             int? commandTimeout = null,
             IDbTransaction transaction = null,
             Action<string> logTrace = null,
@@ -541,7 +542,7 @@ namespace RepoDb.SqlServer.PagingOperations
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
             object where = null, //NOTE: May be either a QueryGroup or RawSqlWhere object
-            IRepoDbCursorPagingParams pagingParams = default,
+            ICursorPagingParams pagingParams = default,
             string tableName = null,
             string hints = null,
             IEnumerable<Field> fields = null,
@@ -728,7 +729,7 @@ namespace RepoDb.SqlServer.PagingOperations
                             //  so there's NO REQUIREMENT that the Model (TEntity) have any special fields/interfaces added.
                             var cursorResult = CursorResult<TEntity>.CreateIndexedCursor(
                                 entity, 
-                                RepoDbCursorHelper.CreateCursor(cursorIndex),
+                                CursorFactory.CreateCursor(cursorIndex),
                                 cursorIndex
                             );
                             results.Add(cursorResult);
