@@ -1,8 +1,8 @@
 ﻿## Overview 
-*RepoDb (Unofficial) Extension for Sql Server to simplify Pagination of Queries.*
+*RepoDb (Unofficial) Extensions for Sql Server to simplify dynamic Pagination of Queries.*
 
 This library greatly simplifies working with paginated data in Sql Server for most common use cases.
-It is built on top of RepoDb and follows the same naming conventions to provide new APIs for executing SQL with
+It is built on top of RepoDb and follows the similar conventions to provide new APIs for executing SQL with
 automatic hanlding of both Cursor based pagination (following the GraphQL Relay Spec as [outlined here](https://relay.dev/graphql/connections.htm)) 
 as well as Offset based pagination (following HotChocolate GraphQL platform implementation). Though these two implementations
 are native to GraphQL they are not limited to only that and can be fully leveraged for any pagination based API over
@@ -11,11 +11,10 @@ your data in Sql Server (e.g. even REST based APIs).
 This extension pack provides access to key elements such as ready-to-use Paging argument models, Paging result models, etc.
 And completely manages the generation of valid Cursors over properly sorted query results.
 
-
-The reason we want to follow the GraphQL spec -- even when not implementing GraphQL per se -- is because it provides one 
+The benefit of followwing the GraphQL spec -- even when not implementing GraphQL per se -- is because it provides one 
 of the most clear guidance on how pagination can be managed flexibly and consistently without each and every API/Team/Developer 
-re-creating their own version. And they outline the benefits of Cursor based pagination really well 
-[here](https://graphql.org/learn/pagination/#pagination-and-edges):
+re-inventing the wheel. And they outline the benefits of Cursor based pagination really well 
+[here](https://graphql.org/learn/pagination/#pagination-and-edges) in this quote from the GraphQL spec:
 
 > In general, we’ve found that cursor-based pagination is the most powerful of those designed. 
 > Especially if the cursors are opaque, either offset or ID-based pagination can be implemented using cursor-based 
@@ -26,8 +25,8 @@ re-creating their own version. And they outline the benefits of Cursor based pag
 ### *Query Limitations*
 There are a few limitations on the queries that can be used. Any query that can be executed using 
 RepoDb's [_Query_](https://repodb.net/operation/query) APIs -- which use Field args, SortField args, and Where expressions 
-via C# code -- should be supported. In addition raw sql is supported similar to using RepoDb's 
-[_ExecuteQuery_](https://repodb.net/operation/executequery) as long as the query does not use CTE's or other 
+via C# code -- should be supported. In addition raw sql is supported, similar to using RepoDb's 
+[_ExecuteQuery_](https://repodb.net/operation/executequery) API, as long as the query does not use CTE's or other 
 complexities that prevent it from being able to be re-written into a wrapper CTE (which the API does to provide dynamic pagination).
 
 The main workaround to needing to use a complex query with your own CTE's etc. would be to encapsulate & deploy 
@@ -51,7 +50,7 @@ Here is an example of iterating through a large data set using `Cursor` based pa
 
 NOTE: RepoDb has built in functionality for [`BatchQuerying`](https://repodb.net/operation/batchquery) as a paginated query feature, however, the current
 _Batch_ query API is notably less flexible than true Cursor Based pagination which provides a slice based approach that is 
-both more flexible and (subjectively) more intuitive or at least more consistent with Linq Skip/Take paradigm.
+both more flexible and fully compliant with (attaining aformentioned benefits) the GraphQL Relay spec for Cursor paging.
 
 ```csharp
 using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
@@ -83,12 +82,12 @@ Alternatively the RepoDb _Query_ API may also be used...
 var page = await sqlConnection.PagingCursorQueryAsync<CharacterDbModel>(
     fields: Field.Parse<CharacterDbModel>(c => new { c.Id, c.Name }),
     orderBy: new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
-    pagingParams: RepoDbCursorPagingParams.ForCursors(
+    whereExpression: c => c.HomePlanet == "Tatooine",
+    pagingParams: CursorPagingParams.ForCursors(
         first: pageSize, 
-        afterCursor: page?.EndCursor,
-        retrieveTotalCount: page?.HasPreviousPage == null
-    ),
-    whereExpression: c => c.HomePlanet == "Tatooine"
+        afterCursor: lastPageEndCursor,
+        retrieveTotalCount: isFirstPageRequest
+    )
 )
 ```
 
@@ -130,12 +129,12 @@ Alternatively the RepoDb _Query_ API may also be used...
 var page = await sqlConnection.PagingOffsetQueryAsync<CharacterDbModel>(
     fields: Field.Parse<CharacterDbModel>(c => new { c.Id, c.Name }),
     orderBy: new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
-    pagingParams: RepoDbCursorPagingParams.ForCursors(
-        first: pageSize, 
-        afterCursor: page?.EndCursor,
-        retrieveTotalCount: page?.HasPreviousPage == null
-    ),
-    whereExpression: c => c.HomePlanet == "Tatooine"
+    whereExpression: c => c.HomePlanet == "Tatooine",
+    pagingParams: OffsetPagingParams.ForSkipTake(
+        skip: lastPageEndIndex,
+        take: pageSize,
+        retrieveTotalCount: isFirstPageRequest
+    )
 )
 ```
 
