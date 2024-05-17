@@ -1,5 +1,6 @@
 {
   "Values": {
-    "SqlConnectionString": "{{CONNECTION STRING GOES HERE}}"
+    //"SqlConnectionString": "{{CONNECTION STRING GOES HERE}}"
+    "SqlConnectionString": "Server=tcp:exlrt-sql-01.database.windows.net,1433;Initial Catalog=EXLRT_DEV_DB;Persist Security Info=False;User ID=exlrt_sql_admin;Password=Z6DUSy8ug00I1Ac1rGyX;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Min Pool Size=1;"
   }
 }

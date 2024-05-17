@@ -16,7 +16,7 @@
 	<ItemGroup>
 		<!-- NOTE: See Directory.Builds.targets for dynamic MSBuild Xml script as provied by the great Blog article at: https://www.meziantou.net/declaring-internalsvisibleto-in-the-csproj.htm-->
 		<!-- Dynamically Adds: [assembly: InternalsVisibleTo("RepoDb.SqlServer.PagingOperations")] -->
-		<InternalsVisibleTo Include="RepoDb.SqlServer.PagingOperations" />
+		<InternalsVisibleTo Include="RepoDbExtensions.SqlServer.PagingOperations" />
 	</ItemGroup>
 
 </Project>

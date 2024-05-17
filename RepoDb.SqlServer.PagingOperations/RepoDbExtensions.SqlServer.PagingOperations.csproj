@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;</TargetFrameworks>
-		<Version>1.1.5.1</Version>
-		<AssemblyVersion>1.1.5.1</AssemblyVersion>
-		<FileVersion>1.1.5.1</FileVersion>
+		<Version>1.1.5.0</Version>
+		<AssemblyVersion>1.1.5.0</AssemblyVersion>
+		<FileVersion>1.1.5.0</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>A set of extensions for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
@@ -36,7 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\RepoDb.PagingPrimitives\RepoDb.PagingPrimitives.csproj" />
+	  <ProjectReference Include="..\RepoDb.PagingPrimitives\RepoDbExtensions.PagingPrimitives.csproj" />
 	</ItemGroup>
 
 </Project>

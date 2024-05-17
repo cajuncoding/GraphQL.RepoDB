@@ -65,7 +65,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\GraphQL.ResolverProcessingExtensions\GraphQL.ResolverProcessingExtensions.csproj" />
-		<ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDb.SqlServer.PagingOperations.csproj" />
+		<ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDbExtensions.SqlServer.PagingOperations.csproj" />
 	</ItemGroup>
 
 </Project>
