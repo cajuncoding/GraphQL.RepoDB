@@ -26,7 +26,14 @@ jobs:
       - name: Run a one-line script
         run: echo Executing Main Branch NuGet Publish Workflow!
 
-      - name: "Publish NuGet: RepoDb.SqlServer.PagingOperations"
+      - name: "Publish NuGet: RepoDbExtensions.PagingPrimitives"
+        uses: alirezanet/publish-nuget@v3.0.4
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: RepoDb.PagingPrimitives/RepoDbExtensions.PagingPrimitives.csproj
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+
+      - name: "Publish NuGet: RepoDbExtensions.SqlServer.PagingOperations"
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           # Filepath of the project to be packaged, relative to root of repository
