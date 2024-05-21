@@ -3,6 +3,21 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Version>1.1.5.0</Version>
+		<AssemblyVersion>1.1.5.0</AssemblyVersion>
+		<FileVersion>1.1.5.0</FileVersion>
+		<Authors>BBernard / CajunCoding</Authors>
+		<Company>CajunCoding</Company>
+		<Description>The primitives and helpers needed for RepoDbExtensions.SqlServer.PagingOperations pacakge; used for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
+		<Copyright>Copyright © 2024</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/cajuncoding/GraphQL.RepoDB/tree/main/RepoDb.SqlServer.PagingOperations</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDB/tree/main/RepoDb.SqlServer.PagingOperations</RepositoryUrl>
+		<PackageTags>repodb, paging, pagination, cursor, offset, skip, take, sorting, graphql, graph-ql, hotchocolate, dapper, sqlkata</PackageTags>
+		<PackageReleaseNotes>
+			Release Notes:
+			- Initial release of independent set of primities and helpers for RepoDb to support enhanced Cursor &amp; Offset Paging Query Operations using the RepoDbExtensions.SqlServer.PagingOperations package.
+		</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>
