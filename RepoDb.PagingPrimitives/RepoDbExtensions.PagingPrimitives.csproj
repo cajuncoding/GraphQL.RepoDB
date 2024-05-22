@@ -3,9 +3,9 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Version>1.1.5.1</Version>
-		<AssemblyVersion>1.1.5.1</AssemblyVersion>
-		<FileVersion>1.1.5.1</FileVersion>
+		<Version>1.1.5.2</Version>
+		<AssemblyVersion>1.1.5.2</AssemblyVersion>
+		<FileVersion>1.1.5.2</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>The primitives and helpers needed for RepoDbExtensions.SqlServer.PagingOperations pacakge; used for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
@@ -16,9 +16,10 @@
 		<PackageTags>repodb, paging, pagination, cursor, offset, skip, take, sorting, graphql, graph-ql, hotchocolate, dapper, sqlkata</PackageTags>
 		<PackageReleaseNotes>
 			Release Notes:
-			- Eliminate Index fields from ICursorPagingParams interface so they don't pollute the parameter as a primitive to be used by consuming apps.
+			- Fix Raw SQL validation logic to handle SQL that has been formatted with line breaks.
 
 			Prior Release Notes:
+			- Eliminate Index fields from ICursorPagingParams interface so they don't pollute the parameter as a primitive to be used by consuming apps.
 			- Initial release of independent set of primities and helpers for RepoDb to support enhanced Cursor &amp; Offset Paging Query Operations using the RepoDbExtensions.SqlServer.PagingOperations package.
 		</PackageReleaseNotes>
 	</PropertyGroup>
