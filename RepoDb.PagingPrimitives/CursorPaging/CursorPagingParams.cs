@@ -18,7 +18,7 @@
             Before = beforeCursor;
             AfterIndex = DeserializeCursor(afterCursor);
             BeforeIndex = DeserializeCursor(beforeCursor);
-            IsTotalCountRequested = retrieveTotalCount;
+            RetrieveTotalCount = retrieveTotalCount;
         }
 
         public CursorPagingParams(int? firstTake = null, int? lastTake = null, int? afterIndex = null, int? beforeIndex = null, bool retrieveTotalCount = false)
@@ -29,7 +29,7 @@
             BeforeIndex = beforeIndex;
             After = SerializeCursor(afterIndex);
             Before = SerializeCursor(beforeIndex);
-            IsTotalCountRequested = retrieveTotalCount;
+            RetrieveTotalCount = retrieveTotalCount;
         }
 
         public static CursorPagingParams ForCursors(int? first = null, int? last = null, string afterCursor = null, string beforeCursor = null, bool retrieveTotalCount = false)
@@ -53,6 +53,6 @@
         public int? AfterIndex { get; }
         public string Before { get; }
         public int? BeforeIndex { get; }
-        public bool IsTotalCountRequested { get; }
+        public bool RetrieveTotalCount { get; }
     }
 }

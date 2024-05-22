@@ -583,7 +583,7 @@ namespace RepoDb.SqlServer.PagingOperations
 
             var sanitizedPagingParams = 
                 pagingParams is CursorPagingParams cursorPagingParams ? cursorPagingParams
-                : pagingParams != null ? CursorPagingParams.ForCursors(pagingParams.First, pagingParams.Last, pagingParams.After, pagingParams.Before, pagingParams.IsTotalCountRequested)
+                : pagingParams != null ? CursorPagingParams.ForCursors(pagingParams.First, pagingParams.Last, pagingParams.After, pagingParams.Before, pagingParams.RetrieveTotalCount)
                 : null;
 
             //Build the Cursor Paging query...
@@ -599,7 +599,7 @@ namespace RepoDb.SqlServer.PagingOperations
                 beforeCursorIndex: sanitizedPagingParams?.BeforeIndex,
                 lastTake: sanitizedPagingParams?.Last,
                 //Optionally we compute the Total Count only when requested!
-                includeTotalCountQuery: sanitizedPagingParams?.IsTotalCountRequested ?? false
+                includeTotalCountQuery: sanitizedPagingParams?.RetrieveTotalCount ?? false
             );
 
             //Now we can execute the process and get the results!

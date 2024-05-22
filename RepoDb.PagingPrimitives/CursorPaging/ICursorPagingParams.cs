@@ -6,6 +6,6 @@
         string After { get; }
         int? Last { get; }
         string Before { get; }
-        bool IsTotalCountRequested { get; }
+        bool RetrieveTotalCount { get; }
     }
 }
