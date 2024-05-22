@@ -581,6 +581,11 @@ namespace RepoDb.SqlServer.PagingOperations
                 case RawSql rawSqlParam: validatedWhereParams = rawSqlParam.SqlParams; break;
             };
 
+            var sanitizedPagingParams = 
+                pagingParams is CursorPagingParams cursorPagingParams ? cursorPagingParams
+                : pagingParams != null ? CursorPagingParams.ForCursors(pagingParams.First, pagingParams.Last, pagingParams.After, pagingParams.Before, pagingParams.IsTotalCountRequested)
+                : null;
+
             //Build the Cursor Paging query...
             var querySliceInfo = RepoDbCursorPagingQueryBuilder.BuildSqlServerCursorPagingQuery<TEntity>(
                 tableName: dbTableName,
@@ -589,12 +594,12 @@ namespace RepoDb.SqlServer.PagingOperations
                 orderBy: orderBy,
                 where: where,
                 hints: hints,
-                afterCursorIndex: pagingParams?.AfterIndex,
-                firstTake: pagingParams?.First,
-                beforeCursorIndex: pagingParams?.BeforeIndex,
-                lastTake: pagingParams?.Last,
+                afterCursorIndex: sanitizedPagingParams?.AfterIndex,
+                firstTake: sanitizedPagingParams?.First,
+                beforeCursorIndex: sanitizedPagingParams?.BeforeIndex,
+                lastTake: sanitizedPagingParams?.Last,
                 //Optionally we compute the Total Count only when requested!
-                includeTotalCountQuery: pagingParams?.IsTotalCountRequested ?? false
+                includeTotalCountQuery: sanitizedPagingParams?.IsTotalCountRequested ?? false
             );
 
             //Now we can execute the process and get the results!

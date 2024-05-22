@@ -2,12 +2,10 @@
 {
     public interface ICursorPagingParams
     {
-        string After { get; }
-        int? AfterIndex { get; }
-        string Before { get; }
-        int? BeforeIndex { get; }
         int? First { get; }
+        string After { get; }
         int? Last { get; }
+        string Before { get; }
         bool IsTotalCountRequested { get; }
     }
 }
