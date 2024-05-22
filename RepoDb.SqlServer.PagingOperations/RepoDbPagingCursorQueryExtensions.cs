@@ -440,7 +440,7 @@ namespace RepoDb.SqlServer.PagingOperations
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
         /// </summary>        /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection"></param>
-        /// <param name="sql">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
+        /// <param name="commandText">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
         /// <param name="orderBy">Order By is required and must be specified as an independent list for proper support to rewrite the query for paging.</param>
         /// <param name="sqlParams"></param>
         /// <param name="retrieveTotalCount"></param>
@@ -455,7 +455,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <returns></returns>
         public static Task<ICursorPageResults<TEntity>> ExecutePagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
-            string sql,
+            string commandText,
             IEnumerable<OrderField> orderBy,
             object sqlParams = null,
             int? first = null,
@@ -471,7 +471,7 @@ namespace RepoDb.SqlServer.PagingOperations
             => dbConnection.PagingCursorQueryInternalAsync<TEntity>(
                 orderBy: orderBy,
                 //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
-                rawSql: RawSql.From(sql, sqlParams),
+                rawSql: RawSql.From(commandText, sqlParams),
                 pagingParams: CursorPagingParams.ForCursors(first, last, afterCursor, beforeCursor, retrieveTotalCount),
                 commandTimeout: commandTimeout,
                 transaction: transaction,
@@ -493,7 +493,7 @@ namespace RepoDb.SqlServer.PagingOperations
         ///     https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
         /// </summary>        /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection"></param>
-        /// <param name="sql">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
+        /// <param name="commandText">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
         /// <param name="orderBy">Order By is required and must be specified as an independent list for proper support to rewrite the query for paging.</param>
         /// <param name="sqlParams"></param>
         /// <param name="pagingParams"></param>
@@ -504,7 +504,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <returns></returns>
         public static Task<ICursorPageResults<TEntity>> ExecutePagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
-            string sql,
+            string commandText,
             IEnumerable<OrderField> orderBy,
             object sqlParams = null,
             ICursorPagingParams pagingParams = default,
@@ -516,7 +516,7 @@ namespace RepoDb.SqlServer.PagingOperations
             => dbConnection.PagingCursorQueryInternalAsync<TEntity>(
                 orderBy: orderBy,
                 //NOTE: Must cast to raw object to prevent Recursive execution with our catch-all overload...
-                rawSql: RawSql.From(sql, sqlParams),
+                rawSql: RawSql.From(commandText, sqlParams),
                 pagingParams: pagingParams,
                 commandTimeout: commandTimeout,
                 transaction: transaction,

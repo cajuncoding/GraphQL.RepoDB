@@ -91,7 +91,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
             do
             {
                 page = await sqlConnection.ExecutePagingOffsetQueryAsync<CharacterDbModel>(
-                    sql: "SELECT * FROM [dbo].[StarWarsCharacters]",
+                    commandText: "SELECT * FROM [dbo].[StarWarsCharacters]",
                     orderBy: new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
                     skip: page?.EndIndex,
                     take: pageSize,

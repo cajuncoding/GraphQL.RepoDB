@@ -26,7 +26,11 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
                 do
                 {
                     page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
-                        "SELECT * FROM [dbo].[StarWarsCharacters]",
+                        //TEST Formatted SQL with line breaks, ending semi-colon, etc....
+                        commandText: @"
+                            SELECT * 
+                            FROM [dbo].[StarWarsCharacters];
+                        ",
                         new [] {OrderField.Descending<CharacterDbModel>(c => c.Id) },
                         first: pageSize, 
                         afterCursor: page?.EndCursor,

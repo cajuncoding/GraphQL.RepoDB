@@ -10,7 +10,7 @@ namespace RepoDb.SqlServer.PagingOperations
         
         public RawSql(string rawSql, object sqlParams)
         {
-            var sanitizedRawSql = rawSql.Trim();
+            var sanitizedRawSql = rawSql.Trim().TrimEnd(';');
 
             if (string.IsNullOrWhiteSpace(sanitizedRawSql))
                 throw new ArgumentException("The raw sql select statement cannot be null or whitespace.");

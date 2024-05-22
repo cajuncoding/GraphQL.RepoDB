@@ -34,18 +34,18 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
         {
             var dbSetting = RepoDbSettings.SqlServerSettings;
 
-            var fieldsList = fields?.ToList();
-            var orderByList = orderBy.ToList();
+            var fieldsArray = fields?.ToArray() ?? Array.Empty<Field>();
+            var orderByArray = orderBy?.ToArray() ?? Array.Empty<OrderField>();
 
             var primaryResultsSql =
-                fieldsList != null ? BuildSqlServerPrimaryResultsSql(tableName, fieldsList, orderByList, dbSetting, where, hints)
+                fieldsArray.Length > 0 ? BuildSqlServerPrimaryResultsSql(tableName, fieldsArray, orderByArray, dbSetting, where, hints)
                 : !string.IsNullOrWhiteSpace(rawSqlStatement) ? rawSqlStatement
                 : throw new ArgumentException("Either a Fields set or Raw Sql statement must be specified.");
 
             //Dynamically build/optimize the core data SQL that will be used as a CTE wrapped by the Pagination logic!
             var rowNumCteBuilder = new QueryBuilder().Clear()
                 .Select()
-                    .RowNumber().Over().OpenParen().OrderByFrom(orderByList, dbSetting).CloseParen().As($"[{CursorIndexName}],")
+                    .RowNumber().Over().OpenParen().OrderByFrom(orderByArray, dbSetting).CloseParen().As($"[{CursorIndexName}],")
                     .WriteText("p.*")
                 .From().WriteText("PrimaryResultsCte p");
 
@@ -70,7 +70,7 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                 ")
                 //Implement Relay Spec Cursor Slicing Algorithm!
                 .WriteText(sqlWhereClauseSliceInfo.SQL)
-                .OrderByFrom(orderByList, dbSetting)
+                .OrderByFrom(orderByArray, dbSetting)
                 .End(); //Appends ';'
 
             if (includeTotalCountQuery)
@@ -116,8 +116,8 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
 
         internal static string BuildSqlServerPrimaryResultsSql(
             string tableName,
-            List<Field> fieldsList,
-            List<OrderField> orderByList,
+            Field[] fieldsArray,
+            OrderField[] orderByArray,
             IDbSetting dbSetting,
             object where = null,
             string hints = null
@@ -126,13 +126,13 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             //Ensure that we Remove any risk of Name conflicts with the CursorIndex field on the CTE
             //  because we are dynamically adding ROW_NUMBER() as [CursorIndex]!
             //  And, ensure that there are no conflicts with the OrderBy
-            var cteFields = new List<Field>(fieldsList);
+            var cteFields = new List<Field>(fieldsArray);
             cteFields.RemoveAll(f => f.Name.Equals(CursorIndexName, StringComparison.OrdinalIgnoreCase));
 
             //We must ensure that all OrderBy fields are also part of the CTE Select Clause so that they are
             //  actually available to be sorted on; or else 'Invalid Column Errors' will occur if the field is not 
             //  originally part of the Select Fields list.
-            var missingSortFieldNames = orderByList
+            var missingSortFieldNames = orderByArray
                 .Select(o => o.Name)
                 .Except(cteFields.Select(f => f.Name), StringComparer.OrdinalIgnoreCase)
                 .ToList();

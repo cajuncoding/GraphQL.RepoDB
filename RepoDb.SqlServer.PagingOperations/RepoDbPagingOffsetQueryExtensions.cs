@@ -437,7 +437,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="sql"></param>
+        /// <param name="commandText">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
         /// <param name="orderBy"></param>
         /// <param name="sqlParams"></param>
         /// <param name="take"></param>
@@ -450,7 +450,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<IOffsetPageResults<TEntity>> ExecutePagingOffsetQueryAsync<TEntity>(
             this DbConnection dbConnection,
-            string sql,
+            string commandText,
             IEnumerable<OrderField> orderBy,
             object sqlParams = null,
             int? skip = 0,
@@ -468,7 +468,7 @@ namespace RepoDb.SqlServer.PagingOperations
             //  need to maintain duplicated code for the less flexible paging approach since we can provide
             //  the simplified Offset Paging facade on top of the existing Slice Queries!
             var cursorPageResults = await dbConnection.ExecutePagingCursorQueryAsync<TEntity>(
-                sql: sql,
+                commandText: commandText,
                 orderBy: orderBy,
                 sqlParams: sqlParams,
                 pagingParams: ConvertOffsetParamsToCursorParams(OffsetPagingParams.ForSkipTake(skip, take, retrieveTotalCount)),
@@ -501,7 +501,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="dbConnection">Extends the RepoDb BaseRepository abstraction</param>
-        /// <param name="sql"></param>
+        /// <param name="commandText">The raw SQL to be executed; must be a simple SELECT without any CTE or ORDER BY clause.</param>
         /// <param name="orderBy"></param>
         /// <param name="sqlParams"></param>
         /// <param name="pagingParams"></param>
@@ -512,7 +512,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <returns>OffsetPageResults&lt;TEntity&gt;</returns>
         public static async Task<IOffsetPageResults<TEntity>> ExecutePagingOffsetQueryAsync<TEntity>(
             this DbConnection dbConnection,
-            string sql,
+            string commandText,
             IEnumerable<OrderField> orderBy,
             object sqlParams = null,
             IOffsetPagingParams pagingParams = default,
@@ -528,7 +528,7 @@ namespace RepoDb.SqlServer.PagingOperations
             //  need to maintain duplicated code for the less flexible paging approach since we can provide
             //  the simplified Offset Paging facade on top of the existing Slice Queries!
             var cursorPageResults = await dbConnection.ExecutePagingCursorQueryAsync<TEntity>(
-                sql: sql,
+                commandText: commandText,
                 orderBy: orderBy,
                 sqlParams: sqlParams,
                 pagingParams: ConvertOffsetParamsToCursorParams(pagingParams),
