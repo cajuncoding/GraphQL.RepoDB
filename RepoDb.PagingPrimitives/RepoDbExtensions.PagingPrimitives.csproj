@@ -17,6 +17,7 @@
 		<PackageReleaseNotes>
 			Release Notes:
 			- Fix bug with in-memory cursor paging logic incorrectly indexing the results resulting in invalid page results.
+			- Removed unnecessary class constraint for both cursor and offset in-memory paging extensions making them more flexible.
 
 			Prior Release Notes:
 			- Improve flexibility of base interface support for cursor navigation with non-generic ICursorPageNavigationInfo.
