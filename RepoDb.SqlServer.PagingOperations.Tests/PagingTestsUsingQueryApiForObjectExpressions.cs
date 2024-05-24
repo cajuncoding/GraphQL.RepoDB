@@ -14,7 +14,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
     public class PagingTestsUsingQueryApiForObjectExpressions : BaseTest
     {
         [TestMethod]
-        public async Task SimpleExampleOfCursorPagingThroughDatasetUsingQueryApi()
+        public async Task SimpleExampleOfCursorPagingThroughDatasetUsingQueryApiAsync()
         {
             using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
 
@@ -47,7 +47,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         }
 
         [TestMethod]
-        public async Task SimpleExampleOfCursorPagingThroughDatasetUsingQueryApiWithWhereExpression()
+        public async Task SimpleExampleOfCursorPagingThroughDatasetUsingQueryApiWithWhereExpressionAsync()
         {
             using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
 
@@ -81,7 +81,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         }
 
         [TestMethod]
-        public async Task SimpleExampleOfOffsetPagingThroughDatasetUsingQueryApi()
+        public async Task SimpleExampleOfOffsetPagingThroughDatasetUsingQueryApiAsync()
         {
             using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
 
@@ -113,7 +113,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         }
 
         [TestMethod]
-        public async Task SimpleExampleOfOffsetPagingThroughDatasetUsingQueryApiWithWhereExpression()
+        public async Task SimpleExampleOfOffsetPagingThroughDatasetUsingQueryApiWithWhereExpressionAsync()
         {
             using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
 
@@ -148,7 +148,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         }
 
         [TestMethod]
-        public async Task TestCursorPagingQueryApiSyntax()
+        public async Task TestCursorPagingQueryApiSyntaxAsync()
         {
             using (var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false))
             {
@@ -206,7 +206,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         }
 
         [TestMethod]
-        public async Task TestOffsetPagingQueryApiSyntax()
+        public async Task TestOffsetPagingQueryApiSyntaxAsync()
         {
             using (var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false))
             {

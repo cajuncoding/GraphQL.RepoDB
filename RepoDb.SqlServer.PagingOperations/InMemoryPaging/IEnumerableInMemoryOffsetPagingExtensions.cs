@@ -11,7 +11,8 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
         /// Implement Linq in-memory slicing as described by Relay spec here:
         /// https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
         /// NOTE: This is primarily used for Unit Testing of in-memory data sets and is generally not recommended for production
-        ///     use unless you always have 100% of all your data in-memory; this is because sorting must be done on a pre-filtered and/or
+        ///     use unless you always have 100% of all your data in-memory. But there are valid use-cases such as if data is archived
+        ///     in compressed format and is always retrieved into memory, etc.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="items"></param>
@@ -20,7 +21,6 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
         /// <param name="includeTotalCount"></param>
         /// <returns></returns>
         public static IOffsetPageResults<T> SliceAsOffsetPage<T>(this IEnumerable<T> items, int? skip, int? take, bool includeTotalCount = true)
-            where T : class
         {
             //Do nothing if there are no results...
             if (items?.Any() != true)
@@ -40,7 +40,7 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
             if (hasNextPage) pagedResults.Remove(pagedResults.Last());
 
             //NOTE: We only materialize the FULL Count if actually requested to do so...
-            var totalCount = includeTotalCount ? (int?)items.Count() : null;
+            var totalCount = includeTotalCount ? items.Count() : (int?)null;
 
             //Wrap all results into a Offset Page Slice result with Total Count...
             return new OffsetPageResults<T>(

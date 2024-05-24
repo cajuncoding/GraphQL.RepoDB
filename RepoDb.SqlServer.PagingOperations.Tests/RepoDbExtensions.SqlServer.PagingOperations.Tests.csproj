@@ -22,7 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDbExtensions.SqlServer.PagingOperations.csproj" />
+	  <ProjectReference Include="..\RepoDb.PagingPrimitives\RepoDbExtensions.PagingPrimitives.csproj" />
+	  <ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDbExtensions.SqlServer.PagingOperations.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

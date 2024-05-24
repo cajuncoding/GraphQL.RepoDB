@@ -14,7 +14,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
     public class PagingTestsUsingExecuteQueryApiForRawSql : BaseTest
     {
         [TestMethod]
-        public async Task TestCursorPagingWithRawSql()
+        public async Task TestCursorPagingWithRawSqlAsync()
         {
             using (var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false))
             {
@@ -75,7 +75,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         }
 
         [TestMethod]
-        public async Task TestOffsetPagingWithRawSql()
+        public async Task TestOffsetPagingWithRawSqlAsync()
         {
             using (var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false))
             {

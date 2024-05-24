@@ -12,14 +12,14 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
         /// Implement Linq in-memory slicing as described by Relay spec here:
         /// https://relay.dev/graphql/connections.htm#sec-Pagination-algorithm
         /// NOTE: This is primarily used for Unit Testing of in-memory data sets and is generally not recommended for production
-        ///     use unless you always have 100% of all your data in-memory; this is because sorting must be done on a pre-filtered and/or
+        ///     use unless you always have 100% of all your data in-memory. But there are valid use-cases such as if data is archived
+        ///     in compressed format and is always retrieved into memory, etc.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="items"></param>
         /// <param name="pagingArgs"></param>
         /// <returns></returns>
-        public static ICursorPageResults<T> SliceAsCursorPage<T>(this IEnumerable<T> items, string after, int? first, string before, int? last)
-        where T : class
+        public static ICursorPageResults<T> SliceAsCursorPage<T>(this IEnumerable<T> items, string after, int? first, string before, int? last, bool includeTotalCount = true)
         {
             //Do nothing if there are no results...
             if (!items.Any())
@@ -39,7 +39,12 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
 
             //NOTE: We MUST materialize this after applying index values to prevent ongoing increments...
             IEnumerable<CursorResult<T>> slice = items
-                .Select((item, index) => CursorResult<T>.CreateIndexedCursor(item, CursorFactory.CreateCursor(index), index))
+                .Select((item, index) => 
+                {
+                    //NOTE: We must increment index+1 to ensure our indexes are 1 based to simplify the rest of the algorithm...
+                    var cursorIndex = index + 1;
+                    return CursorResult<T>.CreateIndexedCursor(item, CursorFactory.CreateCursor(cursorIndex), cursorIndex);
+                })
                 .ToList();
 
             int totalCount = slice.Count();
@@ -76,7 +81,7 @@ namespace RepoDb.SqlServer.PagingOperations.InMemoryPaging
 
             var cursorPageSlice = new CursorPageResults<T>(
                 results,
-                totalCount,
+                includeTotalCount ? totalCount : (int?)null,
                 hasPreviousPage: firstCursor?.CursorIndex > 1,
                 hasNextPage: lastCursor?.CursorIndex < totalCount
             );
