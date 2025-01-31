@@ -13,13 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarWars-AzureFunctions-Rep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ResolverProcessingExtensions.Tests", "GraphQL.ResolverProcessingExtensions.Tests\GraphQL.ResolverProcessingExtensions.Tests.csproj", "{2334C956-DC54-4A52-8277-0FA6A269C330}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDbExtensions.SqlServer.PagingOperations", "RepoDb.SqlServer.PagingOperations\RepoDbExtensions.SqlServer.PagingOperations.csproj", "{8CCDB80F-5C51-475A-A28F-0FAD001A1540}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDb.SqlServer.PagingOperations", "RepoDb.SqlServer.PagingOperations\RepoDb.SqlServer.PagingOperations.csproj", "{8CCDB80F-5C51-475A-A28F-0FAD001A1540}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RepoDb Extensions", "RepoDb Extensions", "{B206CD28-5ED8-48AF-89AB-558208CCAC18}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDbExtensions.SqlServer.PagingOperations.Tests", "RepoDb.SqlServer.PagingOperations.Tests\RepoDbExtensions.SqlServer.PagingOperations.Tests.csproj", "{B2806638-C496-469B-8E8E-DC855E735643}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDb.SqlServer.PagingOperations.Tests", "RepoDb.SqlServer.PagingOperations.Tests\RepoDb.SqlServer.PagingOperations.Tests.csproj", "{B2806638-C496-469B-8E8E-DC855E735643}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDbExtensions.PagingPrimitives", "RepoDb.PagingPrimitives\RepoDbExtensions.PagingPrimitives.csproj", "{E3375FA1-F179-4A77-A5F7-C7C89A544ECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepoDb.PagingPrimitives", "RepoDb.PagingPrimitives\RepoDb.PagingPrimitives.csproj", "{E3375FA1-F179-4A77-A5F7-C7C89A544ECA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

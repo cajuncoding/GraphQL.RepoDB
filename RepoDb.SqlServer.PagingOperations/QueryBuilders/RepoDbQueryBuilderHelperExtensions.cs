@@ -1,5 +1,6 @@
 ﻿using RepoDb.Extensions;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,19 +28,13 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             IEnumerable<Field> selectFields
         )
         {
-            if (dbConnection == null || selectFields == null || string.IsNullOrWhiteSpace(tableName))
+            var dbFieldCollection = await GetDbFieldCollectionForTableInternalAsync(dbConnection, tableName).ConfigureAwait(false);
+            if (dbFieldCollection == null || selectFields == null)
                 return null;
 
-            //FILTER for only VALID fields from the selection by safely comparing to the valid fields from the DB Schema!
-            //NOTE: Per RepoDb source we need to compare unquoted names to get pure matches...
             var dbSetting = dbConnection.GetDbSetting();
-            var dbFields = await DbFieldCache
-                .GetAsync(dbConnection, tableName, null, false)
-                .ConfigureAwait(false);
-
-            var dbFieldLookup = dbFields.ToLookup(f => f.Name.AsUnquoted(dbSetting).ToLower());
-            var safeSelectFields = selectFields.Where(s => dbFieldLookup.Contains(s.Name.AsUnquoted(dbSetting).ToLower()));
-
+            var safeSelectFields = selectFields.Where(s => !(dbFieldCollection.GetByUnquotedName(s.Name.AsUnquoted(dbSetting)) is null));
+            
             return safeSelectFields;
         }
 
@@ -59,20 +54,29 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
             IEnumerable<OrderField> sortFields
         )
         {
-            if (dbConnection == null || sortFields == null || string.IsNullOrWhiteSpace(tableName))
+            var dbFieldCollection = await GetDbFieldCollectionForTableInternalAsync(dbConnection, tableName).ConfigureAwait(false);
+            if (dbFieldCollection == null || sortFields == null)
                 return null;
 
             //FILTER for only VALID fields from the sort fields by safely comparing to the valid fields from the DB Schema!
             //NOTE: Per RepoDb source we need to compare unquoted names to get pure matches...
             var dbSetting = dbConnection.GetDbSetting();
-            var dbFields = await DbFieldCache
-                .GetAsync(dbConnection, tableName, null, false)
-                .ConfigureAwait(false);
-
-            var dbFieldLookup = dbFields.ToLookup(f => f.Name.AsUnquoted(dbSetting).ToLower());
-            var safeSortFields = sortFields.Where(s => dbFieldLookup.Contains(s.Name.AsUnquoted(dbSetting).ToLower()));
+            var safeSortFields = sortFields.Where(s => !(dbFieldCollection.GetByUnquotedName(s.Name.AsUnquoted(dbSetting)) is null));
 
             return safeSortFields;
+        }
+
+        /// <summary>
+        /// Helper Method to get the Field Collection from RepoDb...
+        /// </summary>
+        private static async Task<DbFieldCollection> GetDbFieldCollectionForTableInternalAsync(this DbConnection dbConnection, string tableName)
+        {
+            if (dbConnection == null || string.IsNullOrWhiteSpace(tableName))
+                return null;
+
+            return await DbFieldCache
+                .GetAsync(dbConnection, tableName, null, false)
+                .ConfigureAwait(false);
         }
 
         public static async Task<string> GetValidatedSelectClauseAsync<TEntity>(

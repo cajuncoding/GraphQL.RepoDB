@@ -775,15 +775,20 @@ namespace RepoDb.SqlServer.PagingOperations
 
             var dbSetting = dbConn.GetDbSetting();
 
-            var dbFieldsForCache = await DbFieldCache
+            var dbFieldCollection = await DbFieldCache
                 .GetAsync(dbConn, tableNameForCache, transaction, false, cancellationToken)
                 .ConfigureAwait(false);
 
             //Initialize the RepoDb compiled entity mapping function (via Brute Force Proxy class; it's marked 'internal'.
             var functionCacheProxy = new RepoDbFunctionCacheProxy<TEntity>();
 
-            var repoDbMappingFunc = functionCacheProxy.GetDataReaderToDataEntityFunctionCompatible(
-                reader, dbConn, transaction, true, dbFieldsForCache, dbSetting
+            var repoDbMappingFunc = functionCacheProxy.GetDataReaderToDataEntityFunctionSafely(
+                reader,
+                dbConn,
+                transaction, 
+                basedOnFields: true,
+                dbFieldCollection,
+                dbSetting
             ) ?? throw new Exception($"Unable to retrieve the RepoDb entity mapping function for [{typeof(TEntity).Name}].");
 
             return repoDbMappingFunc;

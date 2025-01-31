@@ -18,13 +18,13 @@
     <PackageReference Include="HotChocolate.Data" Version="13.0.0" />
     <PackageReference Include="HotChocolate.PersistedQueries.FileSystem" Version="12.4.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
-    <PackageReference Include="RepoDb.SqlServer" Version="1.1.5" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.6.0" />
+    <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.RepoDB.SqlServer\GraphQL.RepoDb.SqlServer.csproj" />
     <ProjectReference Include="..\GraphQL.ResolverProcessingExtensions\GraphQL.ResolverProcessingExtensions.csproj" />
-    <ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDbExtensions.SqlServer.PagingOperations.csproj" />
+    <ProjectReference Include="..\RepoDb.SqlServer.PagingOperations\RepoDb.SqlServer.PagingOperations.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

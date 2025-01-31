@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using RepoDb.Interfaces;
@@ -36,7 +35,7 @@ namespace RepoDb.SqlServer.PagingOperations.Reflection
         //          IDbSetting dbSetting = null)
 
         protected static readonly
-            Func<DbDataReader, IEnumerable<DbField>, IDbSetting, Func<DbDataReader, TEntity>>
+            Func<DbDataReader, DbFieldCollection, IDbSetting, Func<DbDataReader, TEntity>>
             _getDataReaderToTypeCompiledFunctionProxy;
 
         /// <summary>
@@ -46,13 +45,14 @@ namespace RepoDb.SqlServer.PagingOperations.Reflection
         /// will only every run one time in the thread safe Static Initializer for each type improving performance 
         /// for ALL future calls of that Generic Type.
         /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         static RepoDbFunctionCacheProxy()
         {
             var repoDbAssembly = typeof(DbConnectionExtension).Assembly;
             var functionCacheType = repoDbAssembly.GetType("RepoDb.FunctionCache");
 
             //BBernard
-            //Safely try to resolve a Proxy for 'GetDataReaderToDataEntityFunction' which is the method in RepoDb v1.12.4
+            //Safely try to resolve a Proxy for 'GetDataReaderToDataEntityFunction' which is the method used in (older) RepoDb v1.12.4 and earlier...
             //Find the method via Reflection and compile into a local Expression Delegate for performance!
             _getDataReaderToDataEntityFunctionProxy = StaticReflectionHelper.FindStaticMethodForDelegate(
                 functionCacheType,
@@ -64,7 +64,7 @@ namespace RepoDb.SqlServer.PagingOperations.Reflection
             );
 
             //BBernard
-            //Safely try to resolve a Proxy for 'GetDataReaderToTypeCompiledFunction' which is the method in RepoDb v1.12.4
+            //Safely try to resolve a Proxy for 'GetDataReaderToTypeCompiledFunction' which is the method in (newer) RepoDb v1.13.1+ and later...
             //Find the method via Reflection and compile into a local Expression Delegate for performance!
             _getDataReaderToTypeCompiledFunctionProxy = StaticReflectionHelper.FindStaticMethodForDelegate(
                functionCacheType,
@@ -77,9 +77,9 @@ namespace RepoDb.SqlServer.PagingOperations.Reflection
 
             //Now Validate that we have at least one Proxy... or else throw an Exception Early
             if(_getDataReaderToTypeCompiledFunctionProxy == null && _getDataReaderToDataEntityFunctionProxy == null)
-                throw new Exception(
+                throw new InvalidOperationException(
                     $"Could not initialize the [{nameof(RepoDbFunctionCacheProxy<TEntity>)}];" +
-                    $" the method to be proxied for [{nameof(GetDataReaderToDataEntityFunctionCompatible)}] is null and/or could not be found." +
+                    $" the method to be proxied for [{nameof(GetDataReaderToDataEntityFunctionSafely)}] is null and/or could not be found." +
                     $" This could be related to change in RepoDb version (source code has changed); please verify the version or update" +
                     $" this method to account for any differences."
                 );
@@ -100,23 +100,21 @@ namespace RepoDb.SqlServer.PagingOperations.Reflection
         /// <param name="connection"></param>
         /// <param name="transaction"></param>
         /// <param name="basedOnFields"></param>
+        /// <param name="dbSetting"></param>
         /// <returns></returns>
-        public virtual Func<DbDataReader, TEntity> GetDataReaderToDataEntityFunctionCompatible(
+        public virtual Func<DbDataReader, TEntity> GetDataReaderToDataEntityFunctionSafely(
             DbDataReader reader,
             IDbConnection connection,
             IDbTransaction transaction,
             bool basedOnFields = false,
-            IEnumerable<DbField> dbFields = null,
+            DbFieldCollection dbFieldCollection = null,
             IDbSetting dbSetting = null
         )
         {
             //First try the current function for RepoDb v1.12.4
-            var funcResult = _getDataReaderToTypeCompiledFunctionProxy?.Invoke(reader, dbFields, dbSetting);
-
             //Second try the updated Function (as of 10/18/2020) for upcoming RepoDb release...
-            if(funcResult == null)
-                funcResult = _getDataReaderToDataEntityFunctionProxy?.Invoke(reader, connection, transaction, basedOnFields);
-
+            var funcResult = _getDataReaderToTypeCompiledFunctionProxy?.Invoke(reader, dbFieldCollection, dbSetting)
+                                ?? _getDataReaderToDataEntityFunctionProxy?.Invoke(reader, connection, transaction, basedOnFields);
 
             return funcResult;
         }

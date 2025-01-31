@@ -2,12 +2,10 @@
 using HotChocolate.RepoDb;
 using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.Types;
-using StarWars.Characters.DbModels;
 using StarWars.Repositories;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace StarWars.Characters

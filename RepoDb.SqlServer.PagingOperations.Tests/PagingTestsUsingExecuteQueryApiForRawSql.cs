@@ -16,62 +16,61 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         [TestMethod]
         public async Task TestCursorPagingWithRawSqlAsync()
         {
-            using (var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false))
-            {
-                const int pageSize = 2;
-                int? totalCount = null;
-                int runningTotal = 0;
-                ICursorPageResults<CharacterDbModel> page = null;
+            using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
 
-                do
-                {
-                    page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
-                        //TEST Formatted SQL with line breaks, ending semi-colon, etc....
-                        commandText: @"
+            const int pageSize = 2;
+            int? totalCount = null;
+            int runningTotal = 0;
+            ICursorPageResults<CharacterDbModel> page = null;
+
+            do
+            {
+                page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
+                    //TEST Formatted SQL with line breaks, ending semi-colon, etc....
+                    commandText: @"
                             SELECT * 
                             FROM [dbo].[StarWarsCharacters];
                         ",
-                        new [] {OrderField.Descending<CharacterDbModel>(c => c.Id) },
-                        first: pageSize, 
-                        afterCursor: page?.EndCursor,
-                        retrieveTotalCount: totalCount is null
-                    );
+                    new [] {OrderField.Descending<CharacterDbModel>(c => c.Id) },
+                    first: pageSize, 
+                    afterCursor: page?.EndCursor,
+                    retrieveTotalCount: totalCount is null
+                );
 
-                    page.Should().NotBeNull();
+                page.Should().NotBeNull();
 
-                    var resultsList = page.CursorResults.ToList();
-                    resultsList.Should().HaveCount(pageSize);
+                var resultsList = page.CursorResults.ToList();
+                resultsList.Should().HaveCount(pageSize);
 
-                    //Validate that we get Total Count only once, and on all following pages it is skipped and Null is returned as expected!
-                    if (totalCount is null)
-                    {
-                        page.TotalCount.Should().BePositive();
-                        totalCount = page.TotalCount;
-                        TestContext.WriteLine("*********************************************************");
-                        TestContext.WriteLine($"[{totalCount}] Total Results to be processed...");
-                        TestContext.WriteLine("*********************************************************");
-                    }
-                    else
-                    {
-                        page.TotalCount.Should().BeNull();
-                    }
+                //Validate that we get Total Count only once, and on all following pages it is skipped and Null is returned as expected!
+                if (totalCount is null)
+                {
+                    page.TotalCount.Should().BePositive();
+                    totalCount = page.TotalCount;
+                    TestContext.WriteLine("*********************************************************");
+                    TestContext.WriteLine($"[{totalCount}] Total Results to be processed...");
+                    TestContext.WriteLine("*********************************************************");
+                }
+                else
+                {
+                    page.TotalCount.Should().BeNull();
+                }
                     
-                    runningTotal += resultsList.Count;
+                runningTotal += resultsList.Count;
 
-                    TestContext.WriteLine("");
-                    TestContext.WriteLine($"[{resultsList.Count}] Page Results:");
-                    TestContext.WriteLine("----------------------------------------");
-                    foreach (var result in resultsList)
-                    {
-                        var entity = result.Entity;
-                        TestContext.WriteLine($"[{result.Cursor}] ==> ({entity.Id}) {entity.Name}");
-                        AssertCharacterDbModelIsValid(entity);
-                    }
+                TestContext.WriteLine("");
+                TestContext.WriteLine($"[{resultsList.Count}] Page Results:");
+                TestContext.WriteLine("----------------------------------------");
+                foreach (var result in resultsList)
+                {
+                    var entity = result.Entity;
+                    TestContext.WriteLine($"[{result.Cursor}] ==> ({entity.Id}) {entity.Name}");
+                    AssertCharacterDbModelIsValid(entity);
+                }
 
-                } while (page.HasNextPage);
+            } while (page.HasNextPage);
 
-                Assert.AreEqual(totalCount, runningTotal, "Total Count doesn't Match the final running total tally!");
-            }
+            Assert.AreEqual(totalCount, runningTotal, "Total Count doesn't Match the final running total tally!");
         }
 
         [TestMethod]
