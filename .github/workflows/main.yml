@@ -30,14 +30,14 @@ jobs:
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: RepoDb.PagingPrimitives/RepoDbExtensions.PagingPrimitives.csproj
+          PROJECT_FILE_PATH: RepoDb.PagingPrimitives/RepoDb.PagingPrimitives.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
 
       - name: "Publish NuGet: RepoDbExtensions.SqlServer.PagingOperations"
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           # Filepath of the project to be packaged, relative to root of repository
-          PROJECT_FILE_PATH: RepoDb.SqlServer.PagingOperations/RepoDbExtensions.SqlServer.PagingOperations.csproj
+          PROJECT_FILE_PATH: RepoDb.SqlServer.PagingOperations/RepoDb.SqlServer.PagingOperations.csproj
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
       
       - name: "Publish NuGet: GraphQL.ResolverProcessingExtensions"
