@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;</TargetFrameworks>
-		<Version>1.13.1.2</Version>
-		<AssemblyVersion>1.13.1.2</AssemblyVersion>
-		<FileVersion>1.13.1.2</FileVersion>
+		<Version>1.13.1.3</Version>
+		<AssemblyVersion>1.13.1.3</AssemblyVersion>
+		<FileVersion>1.13.1.3</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>A set of extensions for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
@@ -15,6 +15,7 @@
 		<PackageTags>repodb, paging, pagination, cursor, offset, skip, take, sorting, graphql, graph-ql, hotchocolate, dapper, sqlkata</PackageTags>
 		<PackageReleaseNotes>
 			Release Notes:
+			- Fix bug with Pagination not properly running Raw Sql that has a Where/Join clause in some use cases.
 			- Updated to now support the latest version of RepoDb v1.13.1 and later; version convention conveys the compatible version of RepoDb.
 
 			Prior Release Notes:

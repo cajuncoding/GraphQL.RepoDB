@@ -36,11 +36,13 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
 
             var fieldsArray = fields?.ToArray() ?? Array.Empty<Field>();
             var orderByArray = orderBy?.ToArray() ?? Array.Empty<OrderField>();
+            string primaryResultsSql;
 
-            var primaryResultsSql =
-                fieldsArray.Length > 0 ? BuildSqlServerPrimaryResultsSql(tableName, fieldsArray, orderByArray, dbSetting, where, hints)
-                : !string.IsNullOrWhiteSpace(rawSqlStatement) ? rawSqlStatement
-                : throw new ArgumentException("Either a Fields set or Raw Sql statement must be specified.");
+            //NOTE: If a Raw SQL Statement is provided then we assume the author has formed it properly for the results they wish to attain
+            //      with correct/valid Select Fields and Where condition as needed; no further rewriting is done.
+            if (!string.IsNullOrWhiteSpace(rawSqlStatement)) primaryResultsSql = rawSqlStatement;
+            else if (fieldsArray.Length > 0) primaryResultsSql = BuildSqlServerPrimaryResultsSql(tableName, fieldsArray, orderByArray, dbSetting, where, hints);
+            else throw new ArgumentException("Either a Fields set or Raw Sql statement must be specified.");
 
             //Dynamically build/optimize the core data SQL that will be used as a CTE wrapped by the Pagination logic!
             var rowNumCteBuilder = new QueryBuilder().Clear()
@@ -49,7 +51,14 @@ namespace RepoDb.SqlServer.PagingOperations.QueryBuilders
                     .WriteText("p.*")
                 .From().WriteText("PrimaryResultsCte p");
 
-            var sqlWhereClauseSliceInfo = BuildRelaySpecQuerySliceInfo($"r.{CursorIndexName}", "RowNumResultsCte", afterCursorIndex, beforeCursorIndex, firstTake, lastTake);
+            var sqlWhereClauseSliceInfo = BuildRelaySpecQuerySliceInfo(
+                cursorFieldName: $"r.{CursorIndexName}", 
+                resultsCteTableName: "RowNumResultsCte",
+                afterCursorIndex,
+                beforeCursorIndex,
+                firstTake,
+                lastTake
+            );
 
             // Build the base Paginated Query
             var sqlBuilder = new QueryBuilder().Clear()

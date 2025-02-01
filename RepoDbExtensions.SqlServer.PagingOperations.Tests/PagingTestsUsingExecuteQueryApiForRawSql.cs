@@ -28,9 +28,9 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
                 page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
                     //TEST Formatted SQL with line breaks, ending semi-colon, etc....
                     commandText: @"
-                            SELECT * 
-                            FROM [dbo].[StarWarsCharacters];
-                        ",
+                        SELECT * 
+                        FROM [dbo].[StarWarsCharacters] c;
+                    ",
                     new [] {OrderField.Descending<CharacterDbModel>(c => c.Id) },
                     first: pageSize, 
                     afterCursor: page?.EndCursor,
@@ -74,60 +74,88 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         }
 
         [TestMethod]
+        public async Task TestCursorPagingWithRawSqlWhereClauseAndNullPagingParamValuesAsync()
+        {
+            using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
+
+            ICursorPageResults<CharacterDbModel> page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
+                //TEST Formatted SQL with line breaks, ending semi-colon, etc....
+                commandText: @"
+                    SELECT * 
+                    FROM [dbo].[StarWarsCharacters] c
+                    WHERE c.[Name] LIKE @NamePattern;
+                ",
+                new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
+                //TEST PASSING IN Empty Paging Params (all values being NULL)....
+                pagingParams: CursorPagingParams.ForCursors(null, null, null, null),
+                sqlParams: new
+                {
+                    NamePattern = "%Luke%"
+                }
+            );
+
+            page.Should().NotBeNull();
+            page.TotalCount.Should().BeNull();
+            page.CursorResults.Should().HaveCount(1);
+
+            TestContext.WriteLine("");
+            TestContext.WriteLine($"[{page.PageCount}] Page Results:");
+        }
+
+        [TestMethod]
         public async Task TestOffsetPagingWithRawSqlAsync()
         {
-            using (var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false))
+            using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
+
+            const int pageSize = 2;
+            int? totalCount = null;
+            int runningTotal = 0;
+            IOffsetPageResults<CharacterDbModel> page = null;
+
+            do
             {
-                const int pageSize = 2;
-                int? totalCount = null;
-                int runningTotal = 0;
-                IOffsetPageResults<CharacterDbModel> page = null;
+                page = await sqlConnection.ExecutePagingOffsetQueryAsync<CharacterDbModel>(
+                    "SELECT * FROM [dbo].[StarWarsCharacters]",
+                    new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
+                    skip: page?.EndIndex,
+                    take: pageSize,
+                    retrieveTotalCount: totalCount is null
+                );
 
-                do
+                page.Should().NotBeNull();
+
+                var resultsList = page.Results.ToList();
+                resultsList.Should().HaveCount(pageSize);
+
+                //Validate that we get Total Count only once, and on all following pages it is skipped and Null is returned as expected!
+                if (totalCount is null)
                 {
-                    page = await sqlConnection.ExecutePagingOffsetQueryAsync<CharacterDbModel>(
-                        "SELECT * FROM [dbo].[StarWarsCharacters]",
-                        new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
-                        skip: page?.EndIndex,
-                        take: pageSize,
-                        retrieveTotalCount: totalCount is null
-                    );
+                    page.TotalCount.Should().BePositive();
+                    totalCount = page.TotalCount;
+                    TestContext.WriteLine("*********************************************************");
+                    TestContext.WriteLine($"[{totalCount}] Total Results to be processed...");
+                    TestContext.WriteLine("*********************************************************");
+                }
+                else
+                {
+                    page.TotalCount.Should().BeNull();
+                }
 
-                    page.Should().NotBeNull();
+                runningTotal += resultsList.Count;
 
-                    var resultsList = page.Results.ToList();
-                    resultsList.Should().HaveCount(pageSize);
+                TestContext.WriteLine("");
+                TestContext.WriteLine($"[{resultsList.Count}] Page Results:");
+                TestContext.WriteLine("----------------------------------------");
+                int counter = 0;
+                foreach (var entity in resultsList)
+                {
+                    TestContext.WriteLine($"[{++counter}] ==> ({entity.Id}) {entity.Name}");
+                    AssertCharacterDbModelIsValid(entity);
+                }
 
-                    //Validate that we get Total Count only once, and on all following pages it is skipped and Null is returned as expected!
-                    if (totalCount is null)
-                    {
-                        page.TotalCount.Should().BePositive();
-                        totalCount = page.TotalCount;
-                        TestContext.WriteLine("*********************************************************");
-                        TestContext.WriteLine($"[{totalCount}] Total Results to be processed...");
-                        TestContext.WriteLine("*********************************************************");
-                    }
-                    else
-                    {
-                        page.TotalCount.Should().BeNull();
-                    }
+            } while (page.HasNextPage);
 
-                    runningTotal += resultsList.Count;
-
-                    TestContext.WriteLine("");
-                    TestContext.WriteLine($"[{resultsList.Count}] Page Results:");
-                    TestContext.WriteLine("----------------------------------------");
-                    int counter = 0;
-                    foreach (var entity in resultsList)
-                    {
-                        TestContext.WriteLine($"[{++counter}] ==> ({entity.Id}) {entity.Name}");
-                        AssertCharacterDbModelIsValid(entity);
-                    }
-
-                } while (page.HasNextPage);
-
-                Assert.AreEqual(totalCount, runningTotal, "Total Count doesn't Match the final running total tally!");
-            }
+            Assert.AreEqual(totalCount, runningTotal, "Total Count doesn't Match the final running total tally!");
         }
 
         private void AssertCharacterDbModelIsValid(CharacterDbModel entity)

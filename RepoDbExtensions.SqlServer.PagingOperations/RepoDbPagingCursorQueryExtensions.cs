@@ -687,7 +687,7 @@ namespace RepoDb.SqlServer.PagingOperations
             //Re-use the RepoDb Execute Reader method to get benefits of Command & Param caches, etc.
             var reader = (DbDataReader)await dbConn.ExecuteReaderAsync(
                 commandText: commandText,
-                param: queryParams,
+                param: queryParams, 
                 commandType: CommandType.Text,
                 transaction: transaction,
                 commandTimeout: commandTimeout,
