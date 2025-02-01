@@ -78,6 +78,8 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
         {
             using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
 
+            var namePattern = "%Luke%";
+
             ICursorPageResults<CharacterDbModel> page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
                 //TEST Formatted SQL with line breaks, ending semi-colon, etc....
                 commandText: @"
@@ -90,7 +92,7 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
                 pagingParams: CursorPagingParams.ForCursors(null, null, null, null),
                 sqlParams: new
                 {
-                    NamePattern = "%Luke%"
+                    NamePattern = namePattern
                 }
             );
 
@@ -98,8 +100,38 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
             page.TotalCount.Should().BeNull();
             page.CursorResults.Should().HaveCount(1);
 
-            TestContext.WriteLine("");
-            TestContext.WriteLine($"[{page.PageCount}] Page Results:");
+            TestContext.WriteLine("NO Cursor values provided so ALL results are expected...");
+            TestContext.WriteLine($"[{namePattern}] WHERE Filter Applied to Limit Primary Result Set...");
+            TestContext.WriteLine($"[{page.PageCount}] Page Results Returned...");
+        }
+
+        [TestMethod]
+        public async Task TestCursorPagingWithRawSqlWhereClauseToGetTotalCountButNoResults()
+        {
+            using var sqlConnection = await CreateSqlConnectionAsync().ConfigureAwait(false);
+
+            ICursorPageResults<CharacterDbModel> page = await sqlConnection.ExecutePagingCursorQueryAsync<CharacterDbModel>(
+                //TEST Formatted SQL with line breaks, ending semi-colon, etc....
+                commandText: @"
+                    SELECT * 
+                    FROM [dbo].[StarWarsCharacters] c
+                    WHERE c.[Name] LIKE @NamePattern;
+                ",
+                new[] { OrderField.Descending<CharacterDbModel>(c => c.Id) },
+                //TEST PASSING IN Empty Paging Params (all values being NULL)....
+                pagingParams: CursorPagingParams.ForCursors(first: 0, retrieveTotalCount: true),
+                sqlParams: new
+                {
+                    NamePattern = "%Luke%"
+                }
+            );
+
+            page.Should().NotBeNull();
+            page.TotalCount.Should().Be(1);//TOTAL Count == 1
+            page.CursorResults.Should().HaveCount(0);//NO RESULTS REQUESTED!
+
+            TestContext.WriteLine($"[{page.TotalCount}] Total Results...");
+            TestContext.WriteLine($"[{page.PageCount}] Page Results Returned...");
         }
 
         [TestMethod]
