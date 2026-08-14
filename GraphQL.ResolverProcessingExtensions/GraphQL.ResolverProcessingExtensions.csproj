@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<Version>13.0.0.0</Version>
 		<AssemblyVersion>13.0.0.0</AssemblyVersion>
 		<FileVersion>13.0.0.0</FileVersion>
@@ -54,8 +54,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HotChocolate.Data" Version="13.0.0" />
-		<PackageReference Include="HotChocolate.Types.OffsetPagination" Version="13.0.0" />
+		<PackageReference Include="HotChocolate.Data" Version="16.6.0" />
+		<PackageReference Include="HotChocolate.Types.OffsetPagination" Version="16.6.0" />
 	</ItemGroup>
 
 	<ItemGroup>

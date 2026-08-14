@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="13.0.0" />
-    <PackageReference Include="HotChocolate.Data" Version="13.0.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="16.6.0" />
+    <PackageReference Include="HotChocolate.Data" Version="16.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.20" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
