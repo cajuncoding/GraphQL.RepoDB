@@ -157,9 +157,8 @@ namespace HotChocolate.ResolverProcessingExtensions
             var results = new List<ResolverProcessingDependencyLink>();
             foreach (var selectionField in AllSelectionFields)
             {
-                var contextData = selectionField?.graphqlFieldSelection?.Field?.ContextData;
-                if (contextData?.ContainsKey(ResolverProcessingParentDependencies.ContextDataKey) == true
-                    && contextData[ResolverProcessingParentDependencies.ContextDataKey] is IEnumerable<ResolverProcessingDependencyLink> dependencyLinks)
+                var dependenciesFeature = selectionField?.GraphQLSelectedField?.Field?.Features.Get<ResolverProcessingParentDependenciesFeature>();
+                if (dependenciesFeature?.Dependencies is IEnumerable<ResolverProcessingDependencyLink> dependencyLinks)
                 {
                     results.AddRange(dependencyLinks);
                 }
@@ -167,6 +166,5 @@ namespace HotChocolate.ResolverProcessingExtensions
 
             return results;
         }
-
     }
 }

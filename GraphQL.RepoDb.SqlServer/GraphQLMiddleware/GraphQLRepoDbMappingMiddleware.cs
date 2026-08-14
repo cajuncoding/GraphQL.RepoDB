@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using HotChocolate.Data.Projections.Context;
 using HotChocolate.ResolverProcessingExtensions;
 using RepoDb.SqlServer.PagingOperations.Reflection;
+using GraphQL.ResolverProcessingExtensions.Selections;
 
 namespace HotChocolate.RepoDb
 {
@@ -31,7 +32,7 @@ namespace HotChocolate.RepoDb
         {
             var field = context.GetSelectedField();
 
-            if (field.Field.ResolverMember is MethodInfo resolverMethod 
+            if (field.GetResolverMethodInfo() is MethodInfo resolverMethod 
                 && GetRepoDbMapperFactoryForResolver(resolverMethod) is { } repoDbMapperFactoryDelegate)
             {
                 //ONLY initialize/retrieve the  Params Context if the Resolver is requesting (via DI) the GraphQLRepoDbMapper0...

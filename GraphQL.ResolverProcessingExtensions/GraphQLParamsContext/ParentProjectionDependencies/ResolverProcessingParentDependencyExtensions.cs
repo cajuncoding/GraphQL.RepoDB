@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using HotChocolate.Features;
 using HotChocolate.Types;
 
 namespace HotChocolate.ResolverProcessingExtensions
@@ -27,26 +28,37 @@ namespace HotChocolate.ResolverProcessingExtensions
                 .Select(s => new ResolverProcessingDependencyLink(s))
                 .ToList();
 
-            //Add to the pre-compiled Field Context for future use/retrieval.
-            descriptor.AddDescriptorContextData(new Dictionary<string, object>()
-            {
-                [ResolverProcessingParentDependencies.ContextDataKey] = dependencies
-            });
+            //Add to the pre-compiled Field Features for future use/retrieval.
+            descriptor.AddResolverProcessingParentDependenciesFeature(dependencies);
 
             //Keep chainable...
             return descriptor;
         }
 
+        public static void AddResolverProcessingParentDependenciesFeature(this IObjectFieldDescriptor descriptor, IReadOnlyList<ResolverProcessingDependencyLink> dependencies)
+        {
+            descriptor
+                .Extend()
+                .OnBeforeCreate((descriptorContext, fieldDefinition) =>
+                {
+                    fieldDefinition.Features.Set(new ResolverProcessingParentDependenciesFeature(dependencies));
+                });
+        }
+
         public static void AddDescriptorContextData(this IObjectFieldDescriptor descriptor, IReadOnlyDictionary<string, object> contextBag)
         {
-            //var context = descriptor;
-            //context.ContextData.TryAdd(key, value);
             descriptor
                 .Extend()
                 .OnBeforeCreate((descriptorContext, fieldDefinition) =>
                 {
                     foreach (var (key, value) in contextBag)
-                        fieldDefinition.ContextData.TryAdd(key, value);
+                    {
+                        if (key == ResolverProcessingParentDependencies.ContextDataKey
+                            && value is IReadOnlyList<ResolverProcessingDependencyLink> dependencies)
+                        {
+                            fieldDefinition.Features.Set(new ResolverProcessingParentDependenciesFeature(dependencies));
+                        }
+                    }
                 });
         }
     }

@@ -1,12 +1,4 @@
 ﻿using System;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using HotChocolate.ResolverProcessingExtensions.Tests.GraphQL;
-using HotChocolate.AspNetCore.Extensions;
-using HotChocolate.AspNetCore.Serialization;
-using HotChocolate.Execution.Configuration;
-using HotChocolate.Resolvers;
 
 namespace HotChocolate.ResolverProcessingExtensions.Tests
 {

@@ -12,7 +12,7 @@
     <PackageReference Include="HotChocolate.AzureFunctions" Version="16.6.0" />
     <PackageReference Include="HotChocolate.Data" Version="16.6.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.RepoDb.SqlServer\GraphQL.RepoDb.SqlServer.csproj" />

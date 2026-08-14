@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using HotChocolate.Data.Projections.Context;
+using GraphQL.ResolverProcessingExtensions.Selections;
 
 namespace HotChocolate.ResolverProcessingExtensions
 {
@@ -24,7 +25,7 @@ namespace HotChocolate.ResolverProcessingExtensions
             IParamsContext paramsContextFacade = null;
 
             var field = context.GetSelectedField();
-            if (field.Field.ResolverMember is MethodInfo resolverMethod 
+            if (field.GetResolverMethodInfo() is MethodInfo resolverMethod 
                 && DoesResolverNeedGraphQLParamsContext(resolverMethod))
             {
                 paramsContextFacade = context.InitializeGraphQLParamsContextSafely();

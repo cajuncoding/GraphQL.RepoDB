@@ -1,15 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using HotChocolate;
-using HotChocolate.AspNetCore.Extensions;
-using HotChocolate.AspNetCore.Serialization;
-using HotChocolate.Execution.Configuration;
-using HotChocolate.ResolverProcessingExtensions;
 using HotChocolate.ResolverProcessingExtensions.Tests.GraphQL;
-using HotChocolate.Resolvers;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HotChocolate.ResolverProcessingExtensions.Tests

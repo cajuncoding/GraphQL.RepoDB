@@ -3,6 +3,7 @@ using HotChocolate.Types;
 using System;
 using System.Reflection;
 using HotChocolate.Data.Projections.Context;
+using GraphQL.ResolverProcessingExtensions.Selections;
 
 namespace HotChocolate.ResolverProcessingExtensions
 {
@@ -11,22 +12,22 @@ namespace HotChocolate.ResolverProcessingExtensions
     /// Field objects from HotChocolate to a set of common shared values; 
     /// primarily the GraphQL Field Name for Selection/Projection.
     /// </summary>
-    public class ResolverProcessingSelection : IHasName, IResolverProcessingSelection
+    public class ResolverProcessingSelection : INameProvider, IResolverProcessingSelection
     {
         public ResolverProcessingSelection(ISelectedField selectedField)
         {
-            graphqlFieldSelection = selectedField ?? throw new ArgumentNullException(nameof(selectedField));
-            if (graphqlFieldSelection.Field == null)
-                throw new ArgumentNullException(nameof(graphqlFieldSelection.Field));
+            GraphQLSelectedField = selectedField ?? throw new ArgumentNullException(nameof(selectedField));
+            if (GraphQLSelectedField.Field == null)
+                throw new ArgumentNullException(nameof(GraphQLSelectedField.Field));
         }
 
-        public Type RuntimeType => graphqlFieldSelection.Field.RuntimeType;
+        public Type RuntimeType => GraphQLSelectedField.Type.ToRuntimeType();
 
-        public ISelectedField graphqlFieldSelection { get; }
+        public ISelectedField GraphQLSelectedField { get; }
 
-        public MemberInfo? ClassMemberInfo => graphqlFieldSelection.Field.Member;
+        public MemberInfo? ClassMemberInfo => GraphQLSelectedField.GetResolverMethodInfo();
 
-        public string Name => graphqlFieldSelection.Field.Name;
+        public string Name => GraphQLSelectedField.Field.Name;
         public string SelectionName => Name;
 
         public string SelectionMemberName => ClassMemberInfo?.Name ?? Name;
@@ -39,7 +40,7 @@ namespace HotChocolate.ResolverProcessingExtensions
 
         public override string ToString()
         {
-            return $"{graphqlFieldSelection.Field.DeclaringType.Name}:{SelectionName}";
+            return $"{GraphQLSelectedField.Field.DeclaringType.Name}:{SelectionName}";
         }
     }
 }

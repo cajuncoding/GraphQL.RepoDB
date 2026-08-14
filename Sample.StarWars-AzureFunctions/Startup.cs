@@ -52,11 +52,11 @@ namespace StarWars
                 //  of results for sorting, paging, etc. and do not want redundant post-processing to occur
                 //  by HotChocolate internals...
                 //NOTE: This Adds Sorting & Paging providers/conventions by default!
-                .SetPagingOptions(new PagingOptions()
+                .ModifyPagingOptions(options =>
                 {
-                    DefaultPageSize = 10,
-                    IncludeTotalCount = true,
-                    MaxPageSize = 100
+                    options.DefaultPageSize = 10;
+                    options.IncludeTotalCount = true;
+                    options.MaxPageSize = 100;
                 })
                 .AddResolverProcessingExtensions()
                 //*******************************************************************************************

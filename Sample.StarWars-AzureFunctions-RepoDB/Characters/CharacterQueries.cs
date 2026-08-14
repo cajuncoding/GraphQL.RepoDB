@@ -13,7 +13,7 @@ using HotChocolate.ResolverProcessingExtensions;
 
 namespace StarWars.Characters
 {
-    [ExtendObjectType(Name = "Query")]
+    [QueryType]
     public class CharacterQueries
     {
         /// <summary>

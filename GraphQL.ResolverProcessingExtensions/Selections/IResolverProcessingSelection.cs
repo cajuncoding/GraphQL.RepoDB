@@ -7,7 +7,7 @@ namespace HotChocolate.ResolverProcessingExtensions
 {
     public interface IResolverProcessingSelection
     {
-        ISelectedField graphqlFieldSelection { get; }
+        ISelectedField GraphQLSelectedField { get; }
 
         public Type RuntimeType { get; }
 

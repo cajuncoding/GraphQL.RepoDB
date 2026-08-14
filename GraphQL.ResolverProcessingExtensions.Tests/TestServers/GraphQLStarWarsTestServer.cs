@@ -25,11 +25,11 @@ namespace HotChocolate.ResolverProcessingExtensions.Tests
                         .AddType<StarWarsDroid>()
                         .AddTypeExtension<HumanFieldResolvers>()
                         .AddSorting()
-                        .SetPagingOptions(new PagingOptions()
+                        .ModifyPagingOptions(options =>
                         {
-                            DefaultPageSize = 5,
-                            IncludeTotalCount = true,
-                            MaxPageSize = 10
+                            options.DefaultPageSize = 5;
+                            options.IncludeTotalCount = true;
+                            options.MaxPageSize = 10;
                         })
                         .AddResolverProcessingExtensions();
 
