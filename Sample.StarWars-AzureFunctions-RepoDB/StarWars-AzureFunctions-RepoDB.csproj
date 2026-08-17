@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+    <OutputType>Exe</OutputType>
     <RootNamespace>StarWars.AzureFunctions</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
@@ -13,12 +14,15 @@
     <None Include="..\README.md" Link="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore" Version="16.6.0" />
-    <PackageReference Include="HotChocolate.AzureFunctions" Version="16.6.0" />
-    <PackageReference Include="HotChocolate.Data" Version="16.6.0" />
+    <PackageReference Include="Functions.Worker.HttpResponseDataJsonMiddleware" Version="1.2.0" />
+    <PackageReference Include="Functions.Worker.HttpResponseDataCompression" Version="1.2.0" />
+    <PackageReference Include="Functions.Worker.ILoggerSupport" Version="1.2.0" />
+    <PackageReference Include="HotChocolate.AzureFunctions.IsolatedProcess" Version="16.6.0" />
+    <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.6.0" />
     <PackageReference Include="HotChocolate.PersistedQueries.FileSystem" Version="13.9.16" />
-    <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.6.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.52.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
     <PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
   </ItemGroup>
   <ItemGroup>

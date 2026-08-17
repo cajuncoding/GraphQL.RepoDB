@@ -12,7 +12,6 @@ namespace HotChocolate.ResolverProcessingExtensions
     /// </summary>
     public class ResolverProcessingParentDependenciesAttribute : ObjectFieldDescriptorAttribute
     {
-
         public string[] SelectionDependencies { get; }
 
         public ResolverProcessingParentDependenciesAttribute(params string[] selections)
@@ -26,5 +25,4 @@ namespace HotChocolate.ResolverProcessingExtensions
             descriptor.AddResolverProcessingParentProjectionDependencies(this.SelectionDependencies);
         }
     }
-
 }

@@ -27,7 +27,7 @@ namespace HotChocolate.ResolverProcessingExtensions.Selections
             var selectionResults = new List<ResolverProcessingSelection>();
 
             var selections = GatherChildSelections(context!);
-            if (selections.Any())
+            if (selections.Count != 0)
             {
                 //BBernard
                 //Determine if the Selection is for a Connection, and dive deeper to get the real

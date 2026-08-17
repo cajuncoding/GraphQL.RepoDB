@@ -17,7 +17,7 @@ namespace StarWars.Characters
         [ResolverProcessingParentDependencies(nameof(ICharacter.Id))]
         public async Task<IEnumerable<Droid>> GetDroidsAsync(
             [Service] ICharacterRepository repository,
-            [Parent] ICharacter character,
+            [Parent(requires: nameof(ICharacter.Name))] ICharacter character,
             [GraphQLRepoDbMapper] GraphQLRepoDbMapper<Droid> repoDbGraphQL
         )
         {

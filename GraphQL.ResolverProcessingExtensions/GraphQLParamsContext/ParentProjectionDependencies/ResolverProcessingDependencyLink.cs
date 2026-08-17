@@ -28,5 +28,7 @@ namespace HotChocolate.ResolverProcessingExtensions
         {
             this.DependencyMemberName = selectionMemberName;
         }
+
+        public override string ToString() => $"[{nameof(ResolverProcessingDependencyLink)}]{DependencyMemberName}";
     }
 }

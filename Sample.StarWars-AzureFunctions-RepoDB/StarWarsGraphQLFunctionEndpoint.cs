@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -11,10 +10,10 @@ namespace StarWars.AzureFunctions
     /// NOTE: This class is not marked as static so that .Net Core DI handles injecting
     ///         the Executor Proxy for us.
     /// </summary>
-    public class StarWarsFunctionEndpoint(IGraphQLRequestExecutor graphqlExecutor)
+    public class StarWarsGraphQLFunctionEndpoint(IGraphQLRequestExecutor graphqlExecutor)
     {
-        [Function(nameof(StarWarsFunctionEndpoint))]
-        public Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "graphql/{**slug}")] HttpRequestData req)
+        [Function(nameof(StarWarsGraphQLFunctionEndpoint))]
+        public Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "graphql/{**slug}")] HttpRequestData req) 
             => graphqlExecutor.ExecuteAsync(req);
     }
 }

@@ -104,7 +104,7 @@ namespace RepoDb.SqlServer.PagingOperations.BulkQueryById
                 .Select().FieldsFrom(validSelectFields, dbSetting)
                 .From().TableNameFrom(dbTableName, dbSetting).WriteText("data")
                 .WriteText("INNER JOIN STRING_SPLIT(@StringSplitCsvValues, ',') split")
-                .On().WriteText("(data.").FieldFrom(filterField).WriteText("= split.value)")
+                .On().WriteText("(data.").FieldFrom(filterField, dbSetting).WriteText("= split.value)")
                 .OrderByFrom(orderBy, dbSetting)
                 .HintsFrom(hints)
                 .End();

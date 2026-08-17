@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using HotChocolate.Features;
 using HotChocolate.Types;
 
 namespace HotChocolate.ResolverProcessingExtensions
@@ -42,23 +41,6 @@ namespace HotChocolate.ResolverProcessingExtensions
                 .OnBeforeCreate((descriptorContext, fieldDefinition) =>
                 {
                     fieldDefinition.Features.Set(new ResolverProcessingParentDependenciesFeature(dependencies));
-                });
-        }
-
-        public static void AddDescriptorContextData(this IObjectFieldDescriptor descriptor, IReadOnlyDictionary<string, object> contextBag)
-        {
-            descriptor
-                .Extend()
-                .OnBeforeCreate((descriptorContext, fieldDefinition) =>
-                {
-                    foreach (var (key, value) in contextBag)
-                    {
-                        if (key == ResolverProcessingParentDependencies.ContextDataKey
-                            && value is IReadOnlyList<ResolverProcessingDependencyLink> dependencies)
-                        {
-                            fieldDefinition.Features.Set(new ResolverProcessingParentDependenciesFeature(dependencies));
-                        }
-                    }
                 });
         }
     }

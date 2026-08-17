@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net10.0;</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Version>1.13.1.3</Version>
-		<AssemblyVersion>1.13.1.3</AssemblyVersion>
-		<FileVersion>1.13.1.3</FileVersion>
+		<Version>1.13.1.4</Version>
+		<AssemblyVersion>1.13.1.4</AssemblyVersion>
+		<FileVersion>1.13.1.4</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>The primitives and helpers needed for RepoDbExtensions.SqlServer.PagingOperations pacakge; used for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
@@ -15,19 +15,20 @@
 		<RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDB/tree/main/RepoDb.SqlServer.PagingOperations</RepositoryUrl>
 		<PackageTags>repodb, paging, pagination, cursor, offset, skip, take, sorting, graphql, graph-ql, hotchocolate, dapper, sqlkata</PackageTags>
 		<PackageReleaseNotes>
-			Release Notes:
-			- Updated to now support the latest version of RepoDb v1.13.1 and later; version convention conveys the compatible version of RepoDb.
+      Release Notes:
+      - Updated to support .Net 8 and .Net 10 (.Net 6 is now removed as it's no longer supported by Microsoft).
 
-			Prior Release Notes:
-			- Fix bug with in-memory cursor paging logic incorrectly indexing the results resulting in invalid page results.
-			- Removed unnecessary class constraint for both cursor and offset in-memory paging extensions making them more flexible.
-			- Improve flexibility of base interface support for cursor navigation with non-generic ICursorPageNavigationInfo.
-			- Simplify RetrieveTotalCount param name on ICursorParams.
-			- Fix SQL building bug not using Raw SQL as specified; improved integration tests to validate this better.
-			- Improved raw sql parameter name to be more consistent with RepDb naming conventions.
-			- Fix Raw SQL validation logic to handle SQL that has been formatted with line breaks.
-			- Eliminate Index fields from ICursorPagingParams interface so they don't pollute the parameter as a primitive to be used by consuming apps.
-			- Initial release of independent set of primities and helpers for RepoDb to support enhanced Cursor &amp; Offset Paging Query Operations using the RepoDbExtensions.SqlServer.PagingOperations package.
+      Prior Release Notes:
+      - Updated to now support the latest version of RepoDb v1.13.1 and later; version convention conveys the compatible version of RepoDb.
+      - Fix bug with in-memory cursor paging logic incorrectly indexing the results resulting in invalid page results.
+      - Removed unnecessary class constraint for both cursor and offset in-memory paging extensions making them more flexible.
+      - Improve flexibility of base interface support for cursor navigation with non-generic ICursorPageNavigationInfo.
+      - Simplify RetrieveTotalCount param name on ICursorParams.
+      - Fix SQL building bug not using Raw SQL as specified; improved integration tests to validate this better.
+      - Improved raw sql parameter name to be more consistent with RepDb naming conventions.
+      - Fix Raw SQL validation logic to handle SQL that has been formatted with line breaks.
+      - Eliminate Index fields from ICursorPagingParams interface so they don't pollute the parameter as a primitive to be used by consuming apps.
+      - Initial release of independent set of primities and helpers for RepoDb to support enhanced Cursor &amp; Offset Paging Query Operations using the RepoDbExtensions.SqlServer.PagingOperations package.
 		</PackageReleaseNotes>
 	</PropertyGroup>
 

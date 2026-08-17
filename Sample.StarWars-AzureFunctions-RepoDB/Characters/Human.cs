@@ -20,12 +20,12 @@ namespace StarWars.Characters
             string? homePlanet = null,
             IReadOnlyList<ICharacter>? friends = null,
             IReadOnlyList<Episode>? appearsIn = null,
-            double height = 1.72d)
-        {
+            double height = 1.72d
+        ) {
             Id = id;
             Name = name;
-            Friends = friends ?? new List<ICharacter>();
-            AppearsIn = appearsIn ?? new List<Episode>();
+            Friends = friends ?? [];
+            AppearsIn = appearsIn ?? [];
             HomePlanet = homePlanet;
             Height = height;
         }
