@@ -5,7 +5,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Version>1.15.1.1</Version>
 		<AssemblyVersion>1.15.1.1</AssemblyVersion>
-		<FileVersion>1.15.1.0</FileVersion>
+		<FileVersion>1.15.1.1</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>The primitives and helpers needed for RepoDbExtensions.SqlServer.PagingOperations pacakge; used for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>

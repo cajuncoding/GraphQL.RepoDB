@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</TargetFrameworks>
-		<Version>1.15.1.0</Version>
-		<AssemblyVersion>1.15.1.0</AssemblyVersion>
-		<FileVersion>1.15.1.0</FileVersion>
+		<Version>1.15.1.1</Version>
+		<AssemblyVersion>1.15.1.1</AssemblyVersion>
+		<FileVersion>1.15.1.1</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>A set of extensions for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
