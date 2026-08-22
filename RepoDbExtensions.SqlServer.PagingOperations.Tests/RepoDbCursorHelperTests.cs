@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RepoDb.PagingPrimitives;
+using RepoDb.PagingPrimitives.CursorPaging;
 
 
 namespace RepoDb.SqlServer.PagingOperations.Tests
@@ -37,6 +37,24 @@ namespace RepoDb.SqlServer.PagingOperations.Tests
                 //Assert our results are valid...
                 cursorIndex.Should().BePositive();
                 cursorIndex.Should().Be(testIndexes[i++]);
+            }
+        }
+
+        [TestMethod]
+        public void TestCursorParsingFromStringParams()
+        {
+            var testIndexes = new[] { 10, 100, 1000, 1000000, 1000000000 };
+
+            TestContext.WriteLine("Parsing Cursors...");
+            foreach (var index in testIndexes)
+            {
+                var cursor = CursorFactory.CreateCursor(index);
+                var cursorIndex = CursorFactory.ParseCursor(cursor);
+                TestContext.WriteLine($"[{cursor}] ==> [{cursorIndex}]");
+
+                //Assert our results are valid...
+                cursorIndex.Should().BePositive();
+                cursorIndex.Should().Be(index);
             }
         }
     }
