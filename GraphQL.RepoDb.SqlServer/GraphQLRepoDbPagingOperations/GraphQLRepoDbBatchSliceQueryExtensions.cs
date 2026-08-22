@@ -39,7 +39,7 @@ namespace HotChocolate.RepoDb
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
         public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
@@ -95,7 +95,7 @@ namespace HotChocolate.RepoDb
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
         public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
@@ -151,7 +151,7 @@ namespace HotChocolate.RepoDb
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
         public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
@@ -207,7 +207,7 @@ namespace HotChocolate.RepoDb
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
         public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
@@ -261,7 +261,7 @@ namespace HotChocolate.RepoDb
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
         public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,
@@ -316,7 +316,7 @@ namespace HotChocolate.RepoDb
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         [Obsolete("NOTE: This Method remains for backwards compatibility since the underlying RepoDb.SqlServer.PagingOperations package was released with renamed methods for better clarity.")]
         public static Task<ICursorPageResults<TEntity>> GraphQLBatchSliceQueryAsync<TEntity>(
             this DbConnection dbConnection,

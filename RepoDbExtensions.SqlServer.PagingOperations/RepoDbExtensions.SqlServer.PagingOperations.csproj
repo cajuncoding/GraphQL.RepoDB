@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</TargetFrameworks>
-		<Version>1.13.1.4</Version>
-		<AssemblyVersion>1.13.1.4</AssemblyVersion>
-		<FileVersion>1.13.1.4</FileVersion>
+		<Version>1.15.1.0</Version>
+		<AssemblyVersion>1.15.1.0</AssemblyVersion>
+		<FileVersion>1.15.1.0</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>A set of extensions for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
@@ -16,6 +16,7 @@
 		<PackageReleaseNotes>
       Release Notes:
       - Updated to support .Net 8 and .Net 10 (.Net 6 is now removed as it's no longer supported by Microsoft).
+      - Update RepoDb reference to v1.15.1 stable.
 
       Prior Release Notes:
       - Fix bug with Pagination not properly running Raw Sql that has a Where/Join clause in some use cases.
@@ -39,7 +40,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
+		<PackageReference Include="RepoDb.SqlServer" Version="1.15.1" />
 	</ItemGroup>
 
 	<ItemGroup>

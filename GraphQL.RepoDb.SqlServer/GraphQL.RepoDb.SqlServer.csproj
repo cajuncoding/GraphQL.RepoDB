@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
-    <Version>16.6.0.0</Version>
-		<AssemblyVersion>16.6.0.0</AssemblyVersion>
-		<FileVersion>16.6.0.0</FileVersion>
+    <Version>16.6.0.1</Version>
+		<AssemblyVersion>16.6.0.1</AssemblyVersion>
+		<FileVersion>16.6.0.1</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>A set of extensions for working with HotChocolate GraphQL and RepoDb as the data access micro-orm without dependency on IQueryable.  This enables fully encapsulated control over SQL queries in every way within a Service or Repository layer of your application. This extension pack provides a significantly simplified facade to access critial elements such as Selections/Projections, Sort arguments, &amp; Paging arguments with support for mapping them to Models using built in RepoDb functionality.  It also leverages RepoDb to provide a generic, Relay spec compatible, cursor pagination/slice query api for Sql Server.</Description>
@@ -16,6 +16,7 @@
       Release Notes:
       - Updated to support HotChocolate v16.6+.
       - Updated to support .Net 8 and .Net 10 (.Net 6 is now removed as it's no longer supported by Microsoft).
+      - Update RepoDb reference to v1.15.1 stable.
 
       Prior Releases Notes:
       - Updated and Optimized now with HC v13 -- leveraging more out-of-the-box features, simplifying code, and improving performance.
@@ -62,7 +63,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="RepoDb.SqlServer" Version="1.13.1" />
+		<PackageReference Include="RepoDb.SqlServer" Version="1.15.1" />
 	</ItemGroup>
 
 	<ItemGroup>

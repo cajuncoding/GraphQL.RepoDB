@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33103.201
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12105.275 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.RepoDb.SqlServer", "GraphQL.RepoDb.SqlServer\GraphQL.RepoDb.SqlServer.csproj", "{9B7A623E-4CA8-4897-8EE7-87E692115FAC}"
 EndProject

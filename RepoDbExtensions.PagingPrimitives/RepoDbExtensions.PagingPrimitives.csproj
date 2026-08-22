@@ -3,9 +3,9 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<Version>1.13.1.4</Version>
-		<AssemblyVersion>1.13.1.4</AssemblyVersion>
-		<FileVersion>1.13.1.4</FileVersion>
+		<Version>1.15.1.0</Version>
+		<AssemblyVersion>1.15.1.0</AssemblyVersion>
+		<FileVersion>1.15.1.0</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>The primitives and helpers needed for RepoDbExtensions.SqlServer.PagingOperations pacakge; used for working with modern pagination approaches such as Cursor based paging, as well as Offset based pagination, using the RepoDb ORM with Sql Server.</Description>
@@ -17,6 +17,7 @@
 		<PackageReleaseNotes>
       Release Notes:
       - Updated to support .Net 8 and .Net 10 (.Net 6 is now removed as it's no longer supported by Microsoft).
+      - Update RepoDb reference to v1.15.1 stable.
 
       Prior Release Notes:
       - Updated to now support the latest version of RepoDb v1.13.1 and later; version convention conveys the compatible version of RepoDb.

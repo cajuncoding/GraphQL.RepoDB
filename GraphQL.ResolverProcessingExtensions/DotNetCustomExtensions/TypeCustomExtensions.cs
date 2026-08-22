@@ -14,11 +14,11 @@ namespace HotChocolate.ResolverProcessingExtensions
         /// <returns></returns>
         public static bool IsDerivedFromGenericParent(this Type type, Type parentType)
         {
-            if (!parentType.IsGenericType)
+            if (parentType is null || !parentType.IsGenericType)
             {
                 throw new ArgumentException("type must be generic", nameof(parentType));
             }
-            else if (type == null || type == typeof(object))
+            else if (type is null || type == typeof(object))
             {
                 return false;
             }
@@ -31,7 +31,7 @@ namespace HotChocolate.ResolverProcessingExtensions
             {
                 return true;
             }
-         
+
             return false;
         }
     }

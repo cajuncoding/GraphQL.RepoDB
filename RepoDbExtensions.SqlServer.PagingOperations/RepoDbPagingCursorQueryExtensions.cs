@@ -44,7 +44,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
@@ -99,7 +99,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
@@ -154,7 +154,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
@@ -209,7 +209,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         private static async Task<ICursorPageResults<TEntity>> PagingCursorQueryForRepoInternalAsync<TEntity, TDbConnection>(
             this BaseRepository<TEntity, TDbConnection> baseRepo,
             IEnumerable<OrderField> orderBy,
@@ -284,7 +284,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
@@ -339,7 +339,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         public static async Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
@@ -397,7 +397,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         public static Task<ICursorPageResults<TEntity>> PagingCursorQueryAsync<TEntity>(
             this DbConnection dbConnection,
             IEnumerable<OrderField> orderBy,
@@ -661,7 +661,7 @@ namespace RepoDb.SqlServer.PagingOperations
         /// <param name="transaction"></param>
         /// <param name="logTrace"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns>CursorPageSlice&lt;TEntity&gt;</returns>
+        /// <returns>ICursorPageResults&lt;TEntity&gt;</returns>
         private static async Task<CursorPageResults<TEntity>> ExecuteCursorPagingQueryInternalAsync<TEntity>(
             this DbConnection dbConn,
             SqlQuerySliceInfo sqlQuerySliceInfo,
