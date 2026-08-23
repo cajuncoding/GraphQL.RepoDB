@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net8.0;net10.0</TargetFrameworks>
 		<Version>1.15.1.1</Version>
 		<AssemblyVersion>1.15.1.1</AssemblyVersion>
 		<FileVersion>1.15.1.1</FileVersion>
@@ -15,6 +15,8 @@
 		<PackageTags>repodb, paging, pagination, cursor, offset, skip, take, sorting, graphql, graph-ql, hotchocolate, dapper, sqlkata</PackageTags>
 		<PackageReleaseNotes>
       Release Notes:
+      - Fix dependency issues with Cursor Parsing breaking with recent changes and updates in .Net version.
+      - Removed unnecessary netstandard2.1 target framework as it already covered by netstandard2.0.
       - Updated to support .Net 8 and .Net 10 (.Net 6 is now removed as it's no longer supported by Microsoft).
       - Update RepoDb reference to v1.15.1 stable.
 

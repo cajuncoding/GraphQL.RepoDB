@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
-		<Version>16.6.0.0</Version>
-		<AssemblyVersion>16.6.0.0</AssemblyVersion>
-		<FileVersion>16.6.0.0</FileVersion>
+		<Version>16.6.0.2</Version>
+		<AssemblyVersion>16.6.0.2</AssemblyVersion>
+		<FileVersion>16.6.0.2</FileVersion>
 		<Authors>BBernard / CajunCoding</Authors>
 		<Company>CajunCoding</Company>
 		<Description>A set of extensions for working with HotChocolate GraphQL and Database access with micro-orms such as RepoDb (or Dapper).  This extension pack provides access to key elements such as Selections/Projections, Sort arguments, &amp; Paging arguments in a significantly simplified facade so this logic can be leveraged in the Resolvers (and lower level Serivces/Repositories that encapsulate all data access) without dependency on IQueryable deferred execution (e.g. EntityFramework).</Description>
@@ -13,6 +13,7 @@
 		<RepositoryUrl>https://github.com/cajuncoding/GraphQL.RepoDB/tree/main/GraphQL.ResolverProcessingExtensions</RepositoryUrl>
 		<PackageReleaseNotes>
       Release Notes:
+      - Fix dependency issues with Cursor Parsing breaking with recent changes and updates in .Net version.
       - Updated to support HotChocolate v16.6+.
       - Updated to support .Net 8 and .Net 10 (.Net 6 is now removed as it's no longer supported by Microsoft).
 
